@@ -1,0 +1,8 @@
+include:
+
+analyser:
+  exclude:
+
+linter:
+  rules:
+    file_names:

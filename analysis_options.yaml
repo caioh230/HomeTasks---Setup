@@ -1,8 +1,1 @@
-include:
-
-analyser:
-  exclude:
-
-linter:
-  rules:
-    file_names:
+include: package:dart_frog_lint/recommended.yaml

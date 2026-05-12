@@ -9,7 +9,8 @@ environment:
 dependencies:
   dart_frog: ^1.1.0
   dotenv: ^4.2.0
-  supabase: ^2.10.6
+  firebase_admin_sdk: ^0.5.2
+  google_cloud_firestore: ^0.5.1
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0

@@ -1,20 +1,23 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:user/config/DataBase_client.dart';
-import 'package:user/src/User/models/UserDBModel.dart';
 import 'package:user/src/User/models/UserModel.dart';
 
 
 class UserRepository {
+  final ref = firestore.collection("User");
+
   //-----------------------------
   //            create
   //-----------------------------
   Future<Response> createUser(UserModel user) async {
     try{
-
-      await supabase.from('User').insert(user.toMap());
+      await ref
+        .doc()
+        .set(user.toMap());
       
       return Response.json(statusCode: HttpStatus.created, body: 'Criação bem sucedida');
     }catch(e){
@@ -25,13 +28,13 @@ class UserRepository {
   //-----------------------------
   //            read
   //-----------------------------
-  Future<Response> readUser(int id) async{
+  Future<Response> readUser(String id) async{
     try{
-      final val = await supabase.from('User')
-        .select()
-        .eq('id', id);
+      final val = await ref
+        .doc(id)
+        .get(); 
       
-      return Response.json(statusCode: HttpStatus.found, body: val[0]);
+      return Response.json(statusCode: HttpStatus.found, body: val.data());
     }catch(e){
       throw Exception(e);
     }
@@ -42,15 +45,20 @@ class UserRepository {
   //-----------------------------
   Future<Response> isUser(UserModel user) async{
     try{
-      final map = user.toMap();
-
-      final val = await supabase.from('User')
-        .select()
-        .eq('email', map['email'].toString())
-        .eq('password', map['password'].toString());
+      final val = await ref
+        .where(
+          'email', 
+          WhereFilter.equal, 
+          user.email
+        ).where(
+          'password', 
+          WhereFilter.equal, 
+          user.password
+        )
+        .get(); 
       
-      if (val.isNotEmpty){
-        return Response.json(statusCode: HttpStatus.found, body: val);
+      if (!val.empty){
+        return Response.json(statusCode: HttpStatus.found, body:"Encontrado");
       }else{
         return Response.json(statusCode: HttpStatus.notFound);
       }
@@ -62,14 +70,14 @@ class UserRepository {
   //-----------------------------
   //            update
   //-----------------------------
-  Future<Response> updateUser(int id, UserModel user) async{ 
+  Future<Response> updateUser(String id, UserModel user) async{ 
     try{
 
-      await supabase.from('User')
-      .update(user.toMap())
-      .eq('id', id);
+      await ref
+        .doc(id.toString())
+        .update(user.toMap()); 
 
-      return Response.json(statusCode: HttpStatus.accepted, body: 'Criação bem sucedida');
+      return Response.json(statusCode: HttpStatus.accepted, body: 'Atualização bem sucedida');
     }catch(e){
       throw Exception(e);
     }
@@ -78,11 +86,12 @@ class UserRepository {
   //-----------------------------
   //            delete
   //-----------------------------
-  Future<Response> deleteUser(int id) async{
+  Future<Response> deleteUser(String id) async{
     try{
-      await supabase.from('User')
-      .delete()
-      .eq('id', id);
+      await ref
+        .doc(id)
+        .delete();
+      
       return Response(statusCode: HttpStatus.accepted, body: 'Deleção bem sucedida');
     }catch(e){
       throw Exception(e);

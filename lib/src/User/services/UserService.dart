@@ -21,7 +21,7 @@ class UserService {
   //-----------------------------
   //            read
   //-----------------------------
-  Future<Response> readUser(int id, RequestContext context) async{
+  Future<Response> readUser(String id, RequestContext context) async{
     try{
       return UserRepository().readUser(id);
 
@@ -44,7 +44,7 @@ class UserService {
   //-----------------------------
   //            update
   //-----------------------------
-  Future<Response> updateUser(int id, UserModel user) async{
+  Future<Response> updateUser(String id, UserModel user) async{
     try{
       return UserRepository().updateUser(id, user);
     }catch(e){
@@ -55,7 +55,7 @@ class UserService {
   //-----------------------------
   //            delete
   //-----------------------------
-  Future<Response> deleteUser(int id) async{
+  Future<Response> deleteUser(String id) async{
     try{
       return UserRepository().deleteUser(id);
     }catch(e){

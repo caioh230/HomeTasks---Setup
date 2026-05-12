@@ -17,3 +17,4 @@ coverage/
 
 #Dados sensíveis
 .env
+database-credentials.json

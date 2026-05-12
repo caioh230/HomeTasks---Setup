@@ -9,11 +9,11 @@ Future<dynamic> onRequest(RequestContext context, String id) async{
   try{
     switch (context.request.method){
       case HttpMethod.get:
-        return readUser(int.parse(id), context);
+        return readUser(id, context);
       case HttpMethod.put:
-        return updateUser(int.parse(id), context);
+        return updateUser(id, context);
       case HttpMethod.delete:
-        return deleteUser(int.parse(id), context);
+        return deleteUser(id, context);
       
       case HttpMethod.post:
       case HttpMethod.head:
@@ -28,7 +28,7 @@ Future<dynamic> onRequest(RequestContext context, String id) async{
 //-----------------------------
 //            Read
 //-----------------------------
-Future<dynamic> readUser(int id, RequestContext context) async{
+Future<dynamic> readUser(String id, RequestContext context) async{
     try{
       final service = context.read<UserService>();
       
@@ -41,7 +41,7 @@ Future<dynamic> readUser(int id, RequestContext context) async{
 //-----------------------------
 //            Update
 //-----------------------------
-Future<Response> updateUser(int id, RequestContext context)async{
+Future<Response> updateUser(String id, RequestContext context)async{
     try{
       final service = context.read<UserService>();
 
@@ -56,7 +56,7 @@ Future<Response> updateUser(int id, RequestContext context)async{
 //-----------------------------
 //          Delete
 //-----------------------------
-Future<Response> deleteUser(int id, RequestContext context)async{
+Future<Response> deleteUser(String id, RequestContext context)async{
     try{
       final service = context.read<UserService>();
 

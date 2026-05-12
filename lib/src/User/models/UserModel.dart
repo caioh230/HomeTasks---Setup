@@ -1,23 +1,13 @@
-class UserModel {
-  final String? nickname;
-  final String email;
-  final String password;
-  
-  
+///Classe para o modelo comum(Inserção no banco)
+class UserModel{
+  ///Modelo base
   UserModel({
-    this.nickname,
     required this.email,
-    required this.password,  
+    required this.password,
+    this.nickname,  
   });
-
-  Map<String, dynamic> toMap(){
-    return {
-      'nickname': nickname,
-      'email': email,
-      'password': password
-    };
-  }
-
+  
+  ///Conversão para o model
   factory UserModel.toModel ( Map<String, dynamic> map){
     final regex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     
@@ -28,7 +18,23 @@ class UserModel {
         password: map['password'].toString()
       );
     }else{
-      throw("Erro: email não formatado");
+      throw Exception('Erro: email não formatado');
     }
+  }
+
+  ///Campo nickname
+  final String? nickname;
+  ///Campo email
+  final String email;
+  ///Campo password
+  final String password;
+  
+  ///Conversão para Map
+  Map<String, dynamic> toMap(){
+    return {
+      'nickname': nickname,
+      'email': email,
+      'password': password
+    };
   }
 }

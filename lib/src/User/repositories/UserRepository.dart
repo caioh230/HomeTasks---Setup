@@ -6,20 +6,25 @@ import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 import 'package:user/config/DataBase_client.dart';
 import 'package:user/src/User/models/UserModel.dart';
 
-
+///Responsável pela conexão com o banco remoto
 class UserRepository {
-  final ref = firestore.collection("User");
+  ///Referência à coleção User
+  final ref = firestore.collection('User');
 
   //-----------------------------
   //            create
   //-----------------------------
+  ///Criação de uma nova instância no banco remoto
   Future<Response> createUser(UserModel user) async {
     try{
       await ref
         .doc()
         .set(user.toMap());
       
-      return Response.json(statusCode: HttpStatus.created, body: 'Criação bem sucedida');
+      return Response.json(
+        statusCode: HttpStatus.created, 
+        body: 'Criação bem sucedida'
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -28,13 +33,17 @@ class UserRepository {
   //-----------------------------
   //            read
   //-----------------------------
+  ///Obter instância já registrada no banco remoto
   Future<Response> readUser(String id) async{
     try{
       final val = await ref
         .doc(id)
         .get(); 
       
-      return Response.json(statusCode: HttpStatus.found, body: val.data());
+      return Response.json(
+        statusCode: HttpStatus.found, 
+        body: val.data()
+        );
     }catch(e){
       throw Exception(e);
     }
@@ -43,6 +52,7 @@ class UserRepository {
   //-----------------------------
   //            read
   //-----------------------------
+  ///Verificar se uma instância existe no banco remoto
   Future<Response> isUser(UserModel user) async{
     try{
       final val = await ref
@@ -58,9 +68,14 @@ class UserRepository {
         .get(); 
       
       if (!val.empty){
-        return Response.json(statusCode: HttpStatus.found, body:"Encontrado");
+        return Response.json(
+          statusCode: HttpStatus.found, 
+          body:'Encontrado'
+        );
       }else{
-        return Response.json(statusCode: HttpStatus.notFound);
+        return Response.json(
+          statusCode: HttpStatus.notFound
+        );
       }
     }catch(e){
       throw Exception(e);
@@ -70,14 +85,18 @@ class UserRepository {
   //-----------------------------
   //            update
   //-----------------------------
+  ///Atualizar uma instância no banco remoto
   Future<Response> updateUser(String id, UserModel user) async{ 
     try{
 
       await ref
-        .doc(id.toString())
+        .doc(id)
         .update(user.toMap()); 
 
-      return Response.json(statusCode: HttpStatus.accepted, body: 'Atualização bem sucedida');
+      return Response.json(
+        statusCode: HttpStatus.accepted, 
+        body: 'Atualização bem sucedida'
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -86,13 +105,17 @@ class UserRepository {
   //-----------------------------
   //            delete
   //-----------------------------
+  ///Remoção de instância no banco remoto
   Future<Response> deleteUser(String id) async{
     try{
       await ref
         .doc(id)
         .delete();
       
-      return Response(statusCode: HttpStatus.accepted, body: 'Deleção bem sucedida');
+      return Response(
+        statusCode: HttpStatus.accepted, 
+        body: 'Deleção bem sucedida'
+      );
     }catch(e){
       throw Exception(e);
     }

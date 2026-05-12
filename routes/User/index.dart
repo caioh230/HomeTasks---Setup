@@ -1,10 +1,12 @@
 import 'package:dart_frog/dart_frog.dart';
+
 import 'package:user/src/User/models/UserModel.dart';
 import 'package:user/src/User/services/UserService.dart';
 
 //-----------------------------
 //            main
 //-----------------------------
+///Responsável por receber as requisições
 Future<Response> onRequest(RequestContext context) async{
   try{
     switch (context.request.method){
@@ -19,7 +21,7 @@ Future<Response> onRequest(RequestContext context) async{
       case HttpMethod.options:
       case HttpMethod.patch:
 
-      throw();
+      throw Exception();
     }
   }catch(e){
     throw Exception(e);
@@ -29,6 +31,7 @@ Future<Response> onRequest(RequestContext context) async{
 //-----------------------------
 //            Read
 //-----------------------------
+///Responsável por executar a requisição de verificação
 Future<Response> isUser(RequestContext context) async{
   try{
     final service = context.read<UserService>();
@@ -44,9 +47,10 @@ Future<Response> isUser(RequestContext context) async{
 //-----------------------------
 //            Create
 //-----------------------------
+///Responsável por executar a requisição de criação
 Future<Response> createUser(RequestContext context)async{
   try{
-    final service = await context.read<UserService>();
+    final service = context.read<UserService>();
 
     final data = await context.request.json() as Map<String, dynamic>;
 

@@ -5,6 +5,7 @@ import 'package:user/src/User/services/UserService.dart';
 //-----------------------------
 //            main
 //-----------------------------
+///Responsável por receber as requisições com identificador
 Future<dynamic> onRequest(RequestContext context, String id) async{
   try{
     switch (context.request.method){
@@ -28,6 +29,7 @@ Future<dynamic> onRequest(RequestContext context, String id) async{
 //-----------------------------
 //            Read
 //-----------------------------
+///Responsável por executar a requisição de leitura
 Future<dynamic> readUser(String id, RequestContext context) async{
     try{
       final service = context.read<UserService>();
@@ -41,6 +43,7 @@ Future<dynamic> readUser(String id, RequestContext context) async{
 //-----------------------------
 //            Update
 //-----------------------------
+///Responsável por executar a requisição de atualização
 Future<Response> updateUser(String id, RequestContext context)async{
     try{
       final service = context.read<UserService>();
@@ -56,6 +59,7 @@ Future<Response> updateUser(String id, RequestContext context)async{
 //-----------------------------
 //          Delete
 //-----------------------------
+///Responsável por executar a requisição de remoção
 Future<Response> deleteUser(String id, RequestContext context)async{
     try{
       final service = context.read<UserService>();

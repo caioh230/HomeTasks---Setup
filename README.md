@@ -1,6 +1,6 @@
 Andrey Oliveira |
 Caio Henrique das Chagas Santos |
-Isabela Guedes de Morais | Tela de Configurações
+Isabela Guedes de Morais | Tela de Configurações e revisão de telas no fim do projeto;
 Lucas Machado Delgado |
 Pedro Afonso Quintela Pedrosa |
 Raphael José Laurindo Santana

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "98977958789",
+    "project_id": "hometasks-ef2d9",
+    "storage_bucket": "hometasks-ef2d9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98977958789:android:744df343da1a17e27192ec",
+        "android_client_info": {
+          "package_name": "com.example.hometasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfOpECD6RVW7BcJT88WkYNUm9r-8Zqg4E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

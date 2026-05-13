@@ -6,6 +6,6 @@ Isabela Guedes de Morais | Tela de Configurações e revisão de telas no fim do
 
 Lucas Machado Delgado | Tela de editar perfil;
 
-Pedro Afonso Quintela Pedrosa |
+Pedro Afonso Quintela Pedrosa | Revisão de Telas
 
 Raphael José Laurindo Santana

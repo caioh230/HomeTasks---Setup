@@ -6,6 +6,7 @@ import 'package:hometasks/widgets/board_card.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
 import 'screens/profile.dart';
+import 'screens/settings.dart';
 
 class PageItem {
   final Widget page;
@@ -48,7 +49,7 @@ class DashboardPageState extends State<DashboardPage> {
   }
 
   void openSettings() {
-
+    showOverlay(SettingsScreen());
   }
   
   void signUserOut() async {
@@ -215,6 +216,7 @@ class DashboardPageState extends State<DashboardPage> {
             topRight: Radius.circular(24),
           ),
           child: BottomNavigationBar(
+            backgroundColor: Colors.white,
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             items: const [

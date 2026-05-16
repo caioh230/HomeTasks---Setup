@@ -212,18 +212,21 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                 )
               ),
               const SizedBox(height: 10),
-              TextField(
-                maxLines: null,
-                maxLength: 100,
-                decoration: InputDecoration(
-                  hintText: 'O que define este quadro?',
-                  hintStyle: TextStyle(color: Colors.grey.shade400),
-                  focusColor: Colors.grey.shade400,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: TextField(
+                  maxLines: null,
+                  maxLength: 100,
+                  decoration: InputDecoration(
+                    hintText: 'O que define este quadro?',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    focusColor: Colors.grey.shade400,
+                  ),
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  onChanged: (value) => setState(() => newBoard.description = value),
                 ),
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-                onChanged: (value) => setState(() => newBoard.description = value),
               ),
               Container(
                 margin: EdgeInsets.all(15),

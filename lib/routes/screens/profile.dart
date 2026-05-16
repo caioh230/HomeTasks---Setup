@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/edit_profile.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/board_card.dart';
 
@@ -31,9 +33,7 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
               BasicButton(
-                onTap: () => {
-                  //TO DO
-                },
+                onTap: () => DashboardPage.globalKey.currentState!.showOverlay(EditProfileScreen()),
                 icon: Icon(Icons.edit_note, color: Colors.white),
                 text: 'Editar perfil',
                 textSize: 18,

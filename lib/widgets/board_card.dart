@@ -40,6 +40,7 @@ enum UserRole {
 class Board {
   String? id;
   String title;
+  String? description;
   List<String> members;
   UserRole role;
   bool isActive;
@@ -49,6 +50,7 @@ class Board {
     this.id,
     required this.title,
     required this.members,
+    this.description,
     this.role = UserRole.reader,
     this.isActive = true,
     this.icon = Icons.home_outlined,

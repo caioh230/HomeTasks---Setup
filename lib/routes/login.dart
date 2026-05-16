@@ -18,11 +18,15 @@ class _LoginPageState extends State<LoginPage> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
     if(email.isEmpty) {
-      genericErrorMessage("Erro ao entrar", "Preencha o campo de e-mail e tente novamente.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Preencha o campo de e-mail e tente novamente.")),
+      );
       return;
     }
     if(password.isEmpty) {
-      genericErrorMessage("Erro ao entrar", "Preencha o campo de senha e tente novamente.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Preencha o campo de senha e tente novamente.")),
+      );
       return;
     }
 
@@ -42,39 +46,24 @@ class _LoginPageState extends State<LoginPage> {
       success = true;
     } on FirebaseAuthException catch (e) {
       navigator.pop(); 
-      genericErrorMessage("Erro ao entrar", switch(e.code) {
-        'invalid-email' => 'E-mail inválido!',
-        'invalid-credential' => 'Senha ou e-mail estão incorretas.',
-        _ => e.code
-      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(switch(e.code) {
+          'invalid-email' => 'E-mail inválido!',
+          'invalid-credential' => 'Senha ou e-mail estão incorretas.',
+          _ => e.code
+        })),
+      );
     } catch (e) {
       navigator.pop(); 
-      genericErrorMessage("Erro!", e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
       if (success && navigator.canPop()) {
         navigator.pop();
       }
     }
-  }
-
-  void genericErrorMessage(String code, String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(code),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

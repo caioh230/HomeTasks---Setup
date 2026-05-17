@@ -1,26 +1,28 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
-import 'package:hometasks/src/User/models/UserDBModel.dart';
-import 'package:hometasks/src/User/models/UserModel.dart';
+import 'package:hometasks/src/Task/models/TaskDBModel.dart';
+import 'package:hometasks/src/Task/models/TaskModel.dart';
 
-///Responsável pela conexão com o banco remoto
-class UserRepository {
-  ///Referência à coleção User
-  final ref = firestore.collection('User');
+///Repositório de conexão com o banco remoto 
+class TaskRepository {
+  ///Referência à coleção Task 
+  final ref = firestore.collection('Task');
 
   //-----------------------------
   //            create
   //-----------------------------
-  ///Criação de uma nova instância no banco remoto
-  Future<Response> createUser(UserModel user) async {
+  ///Registro de Nova instância
+  Future<Response> createTask(TaskModel task) async {
     try{
+
       await ref
-        .doc()
-        .set(user.toMap());
+      .doc()
+      .set(task.toMap());
       
       return Response.json(
         statusCode: HttpStatus.created, 
@@ -34,15 +36,15 @@ class UserRepository {
   //-----------------------------
   //            read
   //-----------------------------
-  ///Obter instância já registrada no banco remoto
-  Future<Response> readUser(String id) async{
+  ///Leitura de tarefa pré-registrada
+  Future<Response> readTask(String id) async{
     try{
       final val = await ref
-        .doc(id)
-        .get(); 
+      .doc(id)
+      .get();
 
-      final formDados = UserDBModel.fromFirestore(val);
-
+      final formDados = TaskDBModel.fromFirestore(val);
+      
       return Response.json(
         statusCode: HttpStatus.found, 
         body: formDados.toMap()
@@ -55,31 +57,21 @@ class UserRepository {
   //-----------------------------
   //            read
   //-----------------------------
-  ///Verificar se uma instância existe no banco remoto
-  Future<Response> isUser(UserModel user) async{
+  ///Leitura de tarefas pertencentes à mesma coluna
+  Future<Response> readColumnTasks(String id) async{
     try{
-      final val = await ref
-        .where(
-          'email', 
+      final val = ref
+      .where(
+          'idColumns', 
           WhereFilter.equal, 
-          user.email
-        ).where(
-          'password', 
-          WhereFilter.equal, 
-          user.password
+          id
         )
-        .get(); 
+      .get();
       
-      if (!val.empty){
-        return Response.json(
-          statusCode: HttpStatus.found, 
-          body:'Encontrado'
-        );
-      }else{
-        return Response.json(
-          statusCode: HttpStatus.notFound
-        );
-      }
+      return Response.json(
+        statusCode: HttpStatus.found, 
+        body: val
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -88,13 +80,13 @@ class UserRepository {
   //-----------------------------
   //            update
   //-----------------------------
-  ///Atualizar uma instância no banco remoto
-  Future<Response> updateUser(String id, UserModel user) async{ 
+  ///Atualização de tarefa única
+  Future<Response> updateTask(String id, TaskModel task) async{ 
     try{
 
       await ref
-        .doc(id)
-        .update(user.toMap()); 
+      .doc(id)
+      .update(task.toMap());
 
       return Response.json(
         statusCode: HttpStatus.accepted, 
@@ -108,13 +100,13 @@ class UserRepository {
   //-----------------------------
   //            delete
   //-----------------------------
-  ///Remoção de instância no banco remoto
-  Future<Response> deleteUser(String id) async{
+  ///Deleção de tarefa única
+  Future<Response> deleteTask(String id) async{
     try{
       await ref
-        .doc(id)
-        .delete();
-      
+      .doc(id)
+      .delete();
+
       return Response(
         statusCode: HttpStatus.accepted, 
         body: 'Deleção bem sucedida'

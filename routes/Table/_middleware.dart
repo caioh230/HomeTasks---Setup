@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:hometasks/src/User/repositories/UserRepository.dart';
-import 'package:hometasks/src/User/services/UserService.dart';
+import 'package:hometasks/src/Table/repositories/TableRepository.dart';
+import 'package:hometasks/src/Table/services/TableService.dart';
 
 Handler middleware(Handler handler) {
     return handler
@@ -12,13 +12,13 @@ Handler middleware(Handler handler) {
 
 
 Middleware serviceProvider() {
-  return provider<UserRepository>(
-    (_) => UserRepository(),
+  return provider<TableRepository>(
+    (_) => TableRepository(),
   );
 }
 
 Middleware repoProvider() {
-  return provider<UserService>(
-    (_) => UserService(),
+  return provider<TableService>(
+    (_) => TableService(),
   );
 }

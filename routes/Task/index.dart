@@ -1,19 +1,17 @@
 import 'package:dart_frog/dart_frog.dart';
-
-import 'package:hometasks/src/User/models/UserModel.dart';
-import 'package:hometasks/src/User/services/UserService.dart';
+import 'package:hometasks/src/Task/models/TaskModel.dart';
+import 'package:hometasks/src/Task/services/TaskService.dart';
 
 //-----------------------------
 //            main
 //-----------------------------
-///Responsável por receber as requisições
 Future<Response> onRequest(RequestContext context) async{
   try{
     switch (context.request.method){
       case HttpMethod.get:
-        return isUser(context);
+        return readColumnTasks(context);
       case HttpMethod.post:
-        return createUser(context);
+        return createTask(context);
 
       case HttpMethod.put:
       case HttpMethod.delete:
@@ -31,30 +29,29 @@ Future<Response> onRequest(RequestContext context) async{
 //-----------------------------
 //            Read
 //-----------------------------
-///Responsável por executar a requisição de verificação
-Future<Response> isUser(RequestContext context) async{
+Future<Response> readColumnTasks(RequestContext context)async{
   try{
-    final service = context.read<UserService>();
+    final service = context.read<TaskService>();
 
     final data = await context.request.json() as Map<String, dynamic>;
 
-    return await service.isUser(UserModel.toModel(data));
+    return service.readColumnTasks(TaskModel.toModel(data).idColumn, context);
   }catch(e){
     throw Exception(e);
   }
+
 }
 
 //-----------------------------
 //            Create
 //-----------------------------
-///Responsável por executar a requisição de criação
-Future<Response> createUser(RequestContext context)async{
+Future<Response> createTask(RequestContext context)async{
   try{
-    final service = context.read<UserService>();
+    final service = context.read<TaskService>();
 
     final data = await context.request.json() as Map<String, dynamic>;
 
-    return service.createUser(UserModel.toModel(data));
+    return service.createTask(TaskModel.toModel(data));
   }catch(e){
     throw Exception(e);
   }

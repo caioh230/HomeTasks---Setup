@@ -1,20 +1,19 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:hometasks/src/User/models/UserModel.dart';
-import 'package:hometasks/src/User/services/UserService.dart';
+import 'package:hometasks/src/Table/models/TableModel.dart';
+import 'package:hometasks/src/Table/services/TableService.dart';
 
 //-----------------------------
 //            main
 //-----------------------------
-///Responsável por receber as requisições com identificador
 Future<dynamic> onRequest(RequestContext context, String id) async{
   try{
     switch (context.request.method){
       case HttpMethod.get:
-        return readUser(id, context);
+        return readTable(id, context);
       case HttpMethod.put:
-        return updateUser(id, context);
+        return updateTable(id, context);
       case HttpMethod.delete:
-        return deleteUser(id, context);
+        return deleteTable(id, context);
       
       case HttpMethod.post:
       case HttpMethod.head:
@@ -29,12 +28,11 @@ Future<dynamic> onRequest(RequestContext context, String id) async{
 //-----------------------------
 //            Read
 //-----------------------------
-///Responsável por executar a requisição de leitura
-Future<dynamic> readUser(String id, RequestContext context) async{
+Future<dynamic> readTable(String id, RequestContext context) async{
     try{
-      final service = context.read<UserService>();
+      final service = context.read<TableService>();
       
-      return service.readUser(id, context);
+      return service.readTable(id, context);
     }catch(e){
       throw Exception(e);
     }
@@ -43,14 +41,13 @@ Future<dynamic> readUser(String id, RequestContext context) async{
 //-----------------------------
 //            Update
 //-----------------------------
-///Responsável por executar a requisição de atualização
-Future<Response> updateUser(String id, RequestContext context)async{
+Future<Response> updateTable(String id, RequestContext context)async{
     try{
-      final service = context.read<UserService>();
+      final service = context.read<TableService>();
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.updateUser(id, UserModel.toModel(data));
+      return service.updateTable(id, TableModel.toModel(data));
     }catch(e){
       throw Exception(e);
     }
@@ -59,12 +56,11 @@ Future<Response> updateUser(String id, RequestContext context)async{
 //-----------------------------
 //          Delete
 //-----------------------------
-///Responsável por executar a requisição de remoção
-Future<Response> deleteUser(String id, RequestContext context)async{
+Future<Response> deleteTable(String id, RequestContext context)async{
     try{
-      final service = context.read<UserService>();
+      final service = context.read<TableService>();
 
-      return service.deleteUser(id);
+      return service.deleteTable(id);
     }catch(e){
       throw Exception(e);
     }

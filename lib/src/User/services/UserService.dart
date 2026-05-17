@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:user/src/User/models/UserModel.dart';
-import 'package:user/src/User/repositories/UserRepository.dart';
+import 'package:hometasks/src/User/models/UserModel.dart';
+import 'package:hometasks/src/User/repositories/UserRepository.dart';
 
 ///Serviço responsável como intermediário entre as requisições e o repository
 class UserService {

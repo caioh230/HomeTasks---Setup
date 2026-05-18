@@ -99,6 +99,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                       hintText: 'Ex: Nossa Casa, Escritório Central...',
                       hintStyle: TextStyle(color: Colors.grey.shade400),
                       focusColor: Colors.grey.shade400,
+                      counterText: '',
                     ),
                     style: TextStyle(
                       fontSize: 20,
@@ -221,6 +222,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                     hintText: 'O que define este quadro?',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     focusColor: Colors.grey.shade400,
+                    counterText: '',
                   ),
                   style: TextStyle(
                     fontSize: 20,
@@ -228,6 +230,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                   onChanged: (value) => setState(() => newBoard.description = value),
                 ),
               ),
+              const SizedBox(height: 20),
               Container(
                 margin: EdgeInsets.all(15),
                 padding: EdgeInsets.all(20),

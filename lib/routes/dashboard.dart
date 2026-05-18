@@ -163,10 +163,7 @@ class DashboardPageState extends State<DashboardPage> {
               },
             );
           },
-          child: BoardCard.avatar(
-            image: "https://i.pravatar.cc/100?img=1",
-            size: 40,
-          ),
+          child: BoardCard.avatar(id: "1", size: 40),
         ),
         actions: [
           IconButton(

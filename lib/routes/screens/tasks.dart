@@ -1,8 +1,8 @@
-
-import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/new_task.dart';
 import 'package:hometasks/widgets/plus_button.dart';
 import 'package:hometasks/widgets/task_card.dart';
 
@@ -19,8 +19,8 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
     Task(
       id: "asdaiwjekla",
       title: "Limpar caixa do gato",
-      desc: "Trocar toda a areia e higienizar a base com desinfetante pet.",
-      members: ["test@gmail.com"],
+      description: "Trocar toda a areia e higienizar a base com desinfetante pet.",
+      members: ["125432315"],
       priority: TaskPriority.high,
       expiration: DateTime.now().add(const Duration(hours: 6)),
       status: TaskStatus.notStarted,
@@ -28,31 +28,31 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
     Task(
       id: "grehlskdpo",
       title: "Compras da Semana",
-      desc: "Lista no bloco de notas da geladeira. Focar em frutas, carne e produtos de limpeza.",
-      members: ["test@gmail.com", "test2@gmail.com"],
+      description: "Lista no bloco de notas da geladeira. Focar em frutas, carne e produtos de limpeza.",
+      members: ["125432315", "654123453"],
       expiration: DateTime.now().subtract(const Duration(days: 1)),
       status: TaskStatus.notStarted,
     ),
     Task(
       id: "qtriojhksda",
       title: "Organizar Home Office",
-      desc: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["test@gmail.com"],
+      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
+      members: ["125432315"],
       expiration: DateTime.now().add(const Duration(days: 5)),
       status: TaskStatus.inProgress,
     ),
     Task(
       id: "lfgdnmjhe",
       title: "Regar as Plantas",
-      desc: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["test@gmail.com"],
+      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
+      members: ["125432315"],
       expiration: DateTime.now().add(const Duration(hours: 3)),
       status: TaskStatus.inProgress,
     ),
     Task(
       id: "gregfsdaz",
       title: "Lavar a louça do jantar",
-      members: ["test@gmail.com"],
+      members: ["125432315"],
       expiration: DateTime.now().add(const Duration(hours: 8)),
       status: TaskStatus.complete,
       completedAt: DateTime.now().subtract(const Duration(hours: 2))
@@ -242,7 +242,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                     bottom: 0,
                     child: PlusButton(
                       onTap: () {
-                        // TO DO
+                        DashboardPage.globalKey.currentState?.showOverlay(NewTaskScreen());
                       },
                     ),
                   ),

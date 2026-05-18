@@ -18,7 +18,7 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              BoardCard.avatar(image: "https://i.pravatar.cc/100?img=1", size: 100),
+              BoardCard.avatar(id: "1", size: 100),
               const SizedBox(height: 10),
 
               const Text(
@@ -90,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                 icone: Icons.home,
                 trailing: SizedBox(
                   width: 80,
-                  child: Stack(children: BoardCard.prepareAvatars(["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
+                  child: Stack(children: BoardCard.prepareAvatars(members: ["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
                 )
               ),
 
@@ -104,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
                 icone: Icons.business_center,
                 trailing: SizedBox(
                   width: 80,
-                  child: Stack(children: BoardCard.prepareAvatars(["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
+                  child: Stack(children: BoardCard.prepareAvatars(members: ["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
                 )
               ),
 

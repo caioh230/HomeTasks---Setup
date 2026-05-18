@@ -32,9 +32,10 @@ enum TaskStatus {
 }
 
 class Task {
-  String id;
+  String? id;
   String title;
-  String? desc;
+  String? description;
+  String? board;
   List<String> members;
   TaskPriority? priority;
   DateTime expiration;
@@ -42,12 +43,13 @@ class Task {
   TaskStatus status;
 
   Task({
-    required this.id,
+    this.id,
     required this.title,
     required this.members,
     required this.expiration,
-    this.desc,
+    this.description,
     this.priority,
+    this.board,
     this.status = TaskStatus.notStarted,
     this.completedAt,
   });
@@ -127,10 +129,10 @@ class TaskCard extends StatelessWidget {
                 ),
               ),
 
-              if (task.desc != null && task.desc!.isNotEmpty) ...[
+              if (task.description != null && task.description!.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Text(
-                  task.desc!,
+                  task.description!,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                   ),
@@ -146,7 +148,7 @@ class TaskCard extends StatelessWidget {
                   SizedBox(
                     width: 70,
                     child: Stack(
-                      children: BoardCard.prepareAvatars(task.members),
+                      children: BoardCard.prepareAvatars(members: task.members),
                     ),
                   ),
 

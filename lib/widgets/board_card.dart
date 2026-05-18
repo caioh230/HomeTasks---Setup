@@ -137,7 +137,7 @@ class BoardCard extends StatelessWidget {
               SizedBox(
                 width: 70,
                 child: Stack(
-                  children: prepareAvatars(board.members),
+                  children: prepareAvatars(members: board.members),
                 ),
               ),
 
@@ -196,15 +196,15 @@ class BoardCard extends StatelessWidget {
     );
   }
 
-  static List<Widget> prepareAvatars(List<String> members) {
+  static List<Widget> prepareAvatars({required List<String> members, double size = 34.0, double offset = 20.0}) {
     final List<Widget> avatars = [];
     for (int i = 0; i < members.length; i++) {
       String member = members[i];
       if(members.length > 3 && i >= 2) {
-        avatars.add(numAvatar(num: members.length - i, offset: i * 20));
+        avatars.add(numAvatar(num: members.length - i, offset: i * offset, size: size));
         break;
       } else {
-        avatars.add(avatar(image: "https://i.pravatar.cc/100?img=$i", offset: i * 20));
+        avatars.add(avatar(id: (i+1).toString(), offset: i * offset, size: size));
       }
     }
     return avatars;
@@ -235,7 +235,7 @@ class BoardCard extends StatelessWidget {
     );
   }
 
-  static Widget avatar({required String image, double size = 34.0, double offset = 0.0}) {
+  static Widget avatar({required String id, double size = 34.0, double offset = 0.0}) {
     return Transform.translate(
       offset: Offset(offset, 0),
       child: Container(
@@ -245,7 +245,7 @@ class BoardCard extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 2),
           image: DecorationImage(
-            image: NetworkImage(image),
+            image: NetworkImage("https://i.pravatar.cc/100?img=$id"),
             fit: BoxFit.cover,
           ),
         ),

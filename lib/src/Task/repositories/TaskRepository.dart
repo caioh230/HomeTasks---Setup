@@ -14,7 +14,7 @@ class TaskRepository {
   final ref = firestore.collection('Task');
 
   //-----------------------------
-  //            create
+  //            create - Editor
   //-----------------------------
   ///Registro de Nova instância
   Future<Response> createTask(TaskModel task) async {
@@ -34,7 +34,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            read
+  //            read - Reader
   //-----------------------------
   ///Leitura de tarefa pré-registrada
   Future<Response> readTask(String id) async{
@@ -55,7 +55,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            read
+  //            read - Reader
   //-----------------------------
   ///Leitura de tarefas pertencentes à mesma coluna
   Future<Response> readColumnTasks(String id) async{
@@ -78,7 +78,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            update
+  //            update - Editor
   //-----------------------------
   ///Atualização de tarefa única
   Future<Response> updateTask(String id, TaskModel task) async{ 
@@ -98,7 +98,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            delete
+  //            delete - Editor
   //-----------------------------
   ///Deleção de tarefa única
   Future<Response> deleteTask(String id) async{

@@ -12,7 +12,7 @@ class ColumnRepository {
   final ref = firestore.collection('Column');
 
   //-----------------------------
-  //            create
+  //            create - Editor
   //-----------------------------
   ///Operação de criação
   Future<Response> createColumn(ColumnModel column) async {
@@ -32,7 +32,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            read
+  //            read - Reader
   //-----------------------------
   ///Operação de leitura individual
   Future<Response> readColumn(String id) async{
@@ -53,7 +53,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            update
+  //            update - Editor
   //-----------------------------
   ///Operação de atualização individual
   Future<Response> updateColumn(String id, ColumnModel column) async{ 
@@ -72,7 +72,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            delete
+  //            delete - Editor
   //-----------------------------
   ///Operação de remoção individual
   Future<Response> deleteColumn(String id) async{

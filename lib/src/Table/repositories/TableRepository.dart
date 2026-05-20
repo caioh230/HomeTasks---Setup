@@ -12,7 +12,7 @@ class TableRepository {
   final ref = firestore.collection('Table');
 
   //-----------------------------
-  //            create
+  //            create - Admin
   //-----------------------------
   ///Criação de novo registro no banco remoto
   Future<Response> createTable(TableModel table) async {
@@ -31,7 +31,7 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            read
+  //            read - Reader
   //-----------------------------
   ///Leitura individual das mesas
   Future<Response> readTable(String id) async{
@@ -52,7 +52,7 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            update
+  //            update - Admin
   //-----------------------------
   ///Atualização individual da table
   Future<Response> updateTable(String id, TableModel table) async{ 
@@ -72,7 +72,7 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            delete
+  //            delete - Admin
   //-----------------------------
   ///Remoção individual das tables
   Future<Response> deleteTable(String id) async{

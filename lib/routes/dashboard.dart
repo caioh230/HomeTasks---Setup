@@ -6,6 +6,7 @@ import 'package:hometasks/widgets/board_card.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
 import 'screens/profile.dart';
+import 'screens/notifications.dart';
 import 'screens/settings.dart';
 
 class PageItem {
@@ -45,7 +46,7 @@ class DashboardPageState extends State<DashboardPage> {
   }
 
   void openNotifications() async {
-
+    showOverlay(NotificationsScreen());
   }
 
   void openSettings() {

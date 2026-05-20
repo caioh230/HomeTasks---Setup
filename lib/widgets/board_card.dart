@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/tasks.dart';
 
 enum UserRole {
   owner(
@@ -44,6 +46,7 @@ class Board {
   List<String> members;
   UserRole role;
   bool isActive;
+  bool isPrivate;
   IconData icon;
 
   Board({
@@ -54,6 +57,7 @@ class Board {
     this.role = UserRole.reader,
     this.isActive = true,
     this.icon = Icons.home_outlined,
+    this.isPrivate = false,
   });
 }
 
@@ -69,7 +73,7 @@ class BoardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.only(left: 22, top: 22, right: 22, bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(26),
@@ -143,7 +147,7 @@ class BoardCard extends StatelessWidget {
 
               const SizedBox(width: 12),
               Text(
-                '${board.members.length} membro(s)',
+                '${board.members.length} ${board.members.length != 1 ? "membros" : "membro"}',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 15,
@@ -155,8 +159,6 @@ class BoardCard extends StatelessWidget {
           const SizedBox(height: 35),
 
           Divider(color: Colors.grey.shade200),
-
-          const SizedBox(height: 18),
 
           // Bottom row
           Row(
@@ -185,9 +187,12 @@ class BoardCard extends StatelessWidget {
                 ],
               ),
 
-              Icon(
-                Icons.arrow_forward,
-                color: Colors.grey.shade500,
+              IconButton(
+                onPressed: () => DashboardPage.globalKey.currentState!.showOverlay(TasksScreen(board: board.id)),
+                icon: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.grey.shade500,
+                )
               ),
             ],
           ),
@@ -210,7 +215,7 @@ class BoardCard extends StatelessWidget {
     return avatars;
   }
 
-  static Widget numAvatar({required int num, double size = 34.0, double offset = 0.0}) {
+  static Widget numAvatar({required int num, double size = 34.0, double offset = 0.0, double borderSize = 2}) {
     return Transform.translate(
       offset: Offset(offset, 0),
       child: Container(
@@ -218,7 +223,7 @@ class BoardCard extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
+          border: Border.all(color: Colors.white, width: borderSize),
           color: Colors.grey.shade300,
         ),
         child: Center(
@@ -235,7 +240,7 @@ class BoardCard extends StatelessWidget {
     );
   }
 
-  static Widget avatar({required String id, double size = 34.0, double offset = 0.0}) {
+  static Widget avatar({required String id, double size = 34.0, double offset = 0.0, double borderSize = 2}) {
     return Transform.translate(
       offset: Offset(offset, 0),
       child: Container(
@@ -243,9 +248,11 @@ class BoardCard extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-          image: DecorationImage(
-            image: NetworkImage("https://i.pravatar.cc/100?img=$id"),
+          border: Border.all(color: Colors.white, width: borderSize),
+        ),
+        child: ClipOval(
+          child: Image.network(
+            "https://i.pravatar.cc/100?img=$id",
             fit: BoxFit.cover,
           ),
         ),

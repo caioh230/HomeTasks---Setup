@@ -11,6 +11,28 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
+    List<Board> userBoards = [
+      Board(
+        title: "Residência Principal",
+        icon: Icons.home_outlined,
+        role: UserRole.owner,
+        members: ["1", "2", "3", "4"]
+      ),
+      Board(
+        title: "Estúdio Criativo",
+        icon: Icons.home_work_outlined,
+        role: UserRole.editor,
+        members: ["1", "7", "10", "9"]
+      ),
+      Board(
+        title: "Refúgio do Fim de Semana",
+        icon: Icons.lock_outline,
+        role: UserRole.reader,
+        members: [],
+        isPrivate: true
+      ),
+    ];
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -82,44 +104,38 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              _cardAmbiente(
-                titulo: "Residência Principal",
-                subtitulo: "Família • 4 Membros",
-                corIcone: const Color(0xFF1565C0),
-                corFundoIcone: const Color(0xFFE3F2FD),
-                icone: Icons.home,
-                trailing: SizedBox(
-                  width: 80,
-                  child: Stack(children: BoardCard.prepareAvatars(members: ["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
+              for (final board in userBoards) ... [
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: board.role.backgroundColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(board.icon, color: board.role.mainColor),
+                        ),
+                        title: Text(
+                          board.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(_boardDescriptor(board)),
+                        trailing: !board.isPrivate ?
+                            SizedBox(width: 80, child: Stack(children: BoardCard.prepareAvatars(members: board.members))) :
+                            Icon(Icons.lock_outline, color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                  ]
                 )
-              ),
-
-              const SizedBox(height: 15),
-
-              _cardAmbiente(
-                titulo: "Estúdio Criativo",
-                subtitulo: "Compartilhado • 2 Membros",
-                corIcone: const Color(0xFF2E7D32),
-                corFundoIcone: const Color(0xFFE8F5E9),
-                icone: Icons.business_center,
-                trailing: SizedBox(
-                  width: 80,
-                  child: Stack(children: BoardCard.prepareAvatars(members: ["test1@gmail.com", "test2@gmail.com", "test3@gmail.com", "test4@gmail.com"])),
-                )
-              ),
-
-              const SizedBox(height: 15),
-
-              _cardAmbiente(
-                titulo: "Refúgio de Fim de Semana",
-                subtitulo: "Privado • Por Márcia",
-                corIcone: const Color(0xFFD84315),
-                corFundoIcone: const Color(0xFFFBE9E7),
-                icone: Icons.home_work,
-                trailing: const Icon(Icons.lock_outline, color: Colors.grey),
-              ),
-
-              const SizedBox(height: 40),
+              ],
+              const SizedBox(height: 25),
             ],
           ),
         ),
@@ -157,35 +173,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _cardAmbiente({
-    required String titulo,
-    required String subtitulo,
-    required Color corIcone,
-    required Color corFundoIcone,
-    required IconData icone,
-    required Widget trailing,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: corFundoIcone,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icone, color: corIcone),
-        ),
-        title: Text(
-          titulo,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(subtitulo),
-        trailing: trailing,
-      ),
-    );
+  String _boardDescriptor(Board board) {
+    if(board.isPrivate) return "Privado";
+    
+    String ambient = "Ambiente";
+    switch(board.icon) {
+      case Icons.home_outlined: ambient = "Residência";
+      case Icons.home_work_outlined: ambient = "Trabalho";
+      case Icons.apartment_outlined: ambient = "Apartamento";
+    }
+    return "$ambient • ${board.members.length} ${board.members.length != 1 ? 'membros' : 'membro'}";
   }
 }

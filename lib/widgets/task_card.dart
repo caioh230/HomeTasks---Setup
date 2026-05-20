@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/models/lists.dart';
 import 'package:hometasks/widgets/board_card.dart';
 import 'package:intl/intl.dart';
 import 'package:hometasks/extensions/string.dart';
@@ -97,25 +98,37 @@ class TaskCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (task.priority != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: task.priority!.backgroundColor,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text(
-                    task.priority!.value.toUpperCase(),
+              Row(
+                children: [
+                  Text(
+                    Lists.boards[task.board]?.title ?? 'Indisponível',
                     style: TextStyle(
-                      color: task.priority!.mainColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade600,
                     ),
                   ),
-                ),
+                  const Spacer(),
+                  if (task.priority != null) ... [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: task.priority!.backgroundColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text(
+                        task.priority!.value.toUpperCase(),
+                        style: TextStyle(
+                          color: task.priority!.mainColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
 
               const SizedBox(height: 10),
 
@@ -197,14 +210,35 @@ class TaskCard extends StatelessWidget {
 
   static String dateFormat(DateTime date) {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final target = DateTime(date.year, date.month, date.day);
+    final today = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    final target = DateTime(date.year, date.month, date.day, date.hour, date.minute);
 
     final difference = target.difference(today).inDays;
     final time = DateFormat('HH:mm').format(date);
     switch (difference) {
-      case 0:
-        return 'Hoje, $time';
+      case 0: {
+        // Hoje
+        final diffHours = target.difference(today).inHours;
+        if(diffHours.abs() < 1) {
+          // A diferença é menor que 1 hora
+          final diffMinutes = target.difference(today).inMinutes;
+          if(diffMinutes > 0) {
+            return 'Em $diffMinutes minutos';
+          } else {
+            return 'Há ${-diffMinutes} minutos';
+          }
+        }
+        else if(diffHours.abs() < 12) {
+          // A diferença de horas é pouca demais para usar "Hoje, HH:mm"
+          if(diffHours > 0) {
+            return 'Em $diffHours horas';
+          } else {
+            return 'Há ${-diffHours} horas';
+          }
+        } else {
+          return 'Hoje, $time';
+        }
+      }
       case -1:
         return 'Ontem, $time';
       case 1:

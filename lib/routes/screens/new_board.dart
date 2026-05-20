@@ -57,7 +57,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
             children: [
               Row(
                 children: [
-                  BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.closeOverlay()),
+                  BackButton(color: Color(0xFF1067B4), onPressed: DashboardPage.globalKey.currentState?.closeOverlay),
                   const SizedBox(width: 12),
                   const Text(
                     'Criar Novo Quadro',

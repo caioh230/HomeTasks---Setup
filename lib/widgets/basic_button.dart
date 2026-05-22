@@ -7,6 +7,9 @@ class BasicButton extends StatefulWidget {
   final EdgeInsetsGeometry margin;
   final Icon? icon;
   final double textSize;
+  final Color pressedColor;
+  final Color backgroundColor;
+  final Color textColor;
   const BasicButton({
     super.key,
     required this.onTap,
@@ -14,7 +17,10 @@ class BasicButton extends StatefulWidget {
     this.icon,
     this.padding = const EdgeInsets.all(22),
     this.margin = const EdgeInsets.symmetric(horizontal: 25),
-    this.textSize = 15
+    this.textSize = 15,
+    this.pressedColor = const Color(0xFF0B4D7F),
+    this.backgroundColor = const Color(0xFF1067B4),
+    this.textColor = Colors.white,
   });
 
   @override
@@ -23,13 +29,8 @@ class BasicButton extends StatefulWidget {
 
 class _BasicButtonState extends State<BasicButton> {
   bool _isPressed = false;
-  Color get _backgroundColor {
-    if (_isPressed) return Color(0xFF0B4D7F);
-    return Color(0xFF1067B4);
-  }
-  Color get _textColor {
-    return Colors.white;
-  }
+  Color get _backgroundColor => _isPressed ? widget.pressedColor : widget.backgroundColor;
+  Color get _textColor => widget.textColor;
 
   @override
   Widget build(BuildContext context) {

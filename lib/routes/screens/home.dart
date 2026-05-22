@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Lists.reloadBoards();
-    List<BoardCard> boards = Lists.boards.map((board) => BoardCard(board: board)).toList();
+    List<BoardCard> boards = Lists.boards.values.map((board) => BoardCard(board: board)).toList();
     return SafeArea(
       child: Stack(
         children: [

@@ -90,7 +90,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             children: [
               Row(
                 children: [
-                  BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.closeOverlay()),
+                  BackButton(color: Color(0xFF1067B4), onPressed: DashboardPage.globalKey.currentState?.closeOverlay),
                   const SizedBox(width: 12),
                   const Text(
                     'Criar Nova Tarefa',
@@ -156,7 +156,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButtonFormField<String>(
-                        items: Lists.boards
+                        items: Lists.boards.values
                             .where((Board board) => board.isActive)
                             .map((Board board) => DropdownMenuItem<String>(
                                   value: board.id,
@@ -428,9 +428,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                           color: (newTask.priority != priority) ? priority.backgroundColor.withValues(alpha: 0.12) : priority.backgroundColor,
                                           borderRadius: BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: newTask.priority == priority
-                                                ? priority.mainColor
-                                                : Colors.transparent,
+                                            color: newTask.priority == priority ? priority.mainColor : Colors.transparent,
                                             width: 2,
                                           ),
                                         ),
@@ -467,13 +465,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       margin: EdgeInsets.zero,
                     ),
                     const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () => DashboardPage.globalKey.currentState?.closeOverlay(),
+                    TextButton(
+                      onPressed: DashboardPage.globalKey.currentState?.closeOverlay,
                       child: Text(
-                        'Descartar Tarefa',
+                        'Descartar tarefa',
                         style: TextStyle(
-                          fontSize: 18,
                           color: Colors.grey.shade800,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
                         ),
                       ),
                     ),

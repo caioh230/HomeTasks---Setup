@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hometasks/models/lists.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/new_task.dart';
 import 'package:hometasks/widgets/plus_button.dart';
@@ -8,57 +9,17 @@ import 'package:hometasks/widgets/task_card.dart';
 
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  final String? board; //Board filtering
+  const TasksScreen({
+    super.key,
+    this.board,
+  });
   
   @override
   State<TasksScreen> createState() => _TasksScreenState();
 }
 
 class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin {
-  final List<Task> tasks = [
-    Task(
-      id: "asdaiwjekla",
-      title: "Limpar caixa do gato",
-      description: "Trocar toda a areia e higienizar a base com desinfetante pet.",
-      members: ["125432315"],
-      priority: TaskPriority.high,
-      expiration: DateTime.now().add(const Duration(hours: 6)),
-      status: TaskStatus.notStarted,
-    ),
-    Task(
-      id: "grehlskdpo",
-      title: "Compras da Semana",
-      description: "Lista no bloco de notas da geladeira. Focar em frutas, carne e produtos de limpeza.",
-      members: ["125432315", "654123453"],
-      expiration: DateTime.now().subtract(const Duration(days: 1)),
-      status: TaskStatus.notStarted,
-    ),
-    Task(
-      id: "qtriojhksda",
-      title: "Organizar Home Office",
-      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["125432315"],
-      expiration: DateTime.now().add(const Duration(days: 5)),
-      status: TaskStatus.inProgress,
-    ),
-    Task(
-      id: "lfgdnmjhe",
-      title: "Regar as Plantas",
-      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["125432315"],
-      expiration: DateTime.now().add(const Duration(hours: 3)),
-      status: TaskStatus.inProgress,
-    ),
-    Task(
-      id: "gregfsdaz",
-      title: "Lavar a louça do jantar",
-      members: ["125432315"],
-      expiration: DateTime.now().add(const Duration(hours: 8)),
-      status: TaskStatus.complete,
-      completedAt: DateTime.now().subtract(const Duration(hours: 2))
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final ScrollController horizontalController = ScrollController();
@@ -91,6 +52,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
     }
 
     User? user = FirebaseAuth.instance.currentUser;
+    Lists.reloadTasks();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(22),
@@ -125,7 +87,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                       children: [
                         for (final status in [TaskStatus.notStarted, TaskStatus.inProgress, TaskStatus.complete]) ... [
                           (() {
-                            final filteredTasks = tasks.where((task) => task.status == status).toList();
+                            final filteredTasks = Lists.tasks.values.where((task) => task.status == status && (widget.board == null || task.board == widget.board)).toList();
                             return Padding(
                               padding: const EdgeInsets.only(right: 18),
                               child: Column(

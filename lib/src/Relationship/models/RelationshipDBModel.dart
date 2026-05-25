@@ -7,6 +7,7 @@ class RelationshipDBModel {
     required this.id,
     required this.idRole,
     required this.idTable,
+    required this.idUser,
     required this.roleName,
     required this.tableName,
   });
@@ -17,6 +18,7 @@ class RelationshipDBModel {
       id: map['id'].toString(),
       idRole: map['idRole'].toString(),
       idTable: map['idTable'].toString(),
+      idUser: map['idUser'].toString(),
       roleName: map['roleName'].toString(),
       tableName: map['tableName'].toString(),
     );
@@ -32,6 +34,7 @@ class RelationshipDBModel {
       id: doc.id,
       idRole: dados['idRole'].toString(),
       idTable: dados['idTable'].toString(),
+      idUser: dados['idUser'].toString(),
       roleName: dados['roleName'].toString(),
       tableName: dados['tableName'].toString(),
     );
@@ -43,6 +46,8 @@ class RelationshipDBModel {
   final String idRole;
   ///Campo idTable
   final String idTable;
+  ///Campo idUser
+  final String idUser;
   ///Campo roleName
   final String roleName;
   ///Campo tableName
@@ -54,6 +59,7 @@ class RelationshipDBModel {
       'id': id,
       'idRole': idRole,
       'idTable': idTable,
+      'idUser': idUser,
       'roleName': roleName,
       'tableName': tableName,
     };

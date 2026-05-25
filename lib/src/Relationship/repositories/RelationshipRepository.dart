@@ -35,18 +35,28 @@ class RelationshipRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - JWT
   //-----------------------------
   ///Leitura de relacionamento único
   Future<Response> readRelationship(
-    String id
+    String idUser,
+    String idTable
     ) async{
       try{
         final val = await ref
-        .doc(id)
+        .where(
+          'idUser', 
+          WhereFilter.equal, 
+          idUser
+        )
+        .where(
+          'idTable', 
+          WhereFilter.equal, 
+          idTable
+        )
         .get();
 
-        final formDados = RelationshipDBModel.fromFirestore(val);
+        final formDados = RelationshipDBModel.fromFirestore(val.docs.first);
         
         return Response.json(
           statusCode: HttpStatus.found, 
@@ -73,10 +83,11 @@ class RelationshipRepository {
         )
         .get();
 
-        final formDados = []; 
+        final formDados = <Map<String, dynamic>>[];
         for (var i = 0; i < val.docs.length; i++){
           formDados.add(RelationshipDBModel.fromFirestore(val.docs[i]).toMap());
         }
+
         return Response.json(
           statusCode: HttpStatus.found, 
           body: formDados
@@ -91,13 +102,26 @@ class RelationshipRepository {
   //-----------------------------
   ///Atualização de relacionamento único
   Future<Response> updateRelationship(
-    String id, 
+    String idUser,
+    String idTable,
     RelationshipModel relationship
     ) async{ 
       try{
+        final val = await ref
+        .where(
+          'idUser', 
+          WhereFilter.equal, 
+          idUser
+        )
+        .where(
+          'idTable', 
+          WhereFilter.equal, 
+          idTable
+        )
+        .get();
 
         await ref
-        .doc(id)
+        .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
         .update(relationship.toMap());
 
         return Response.json(
@@ -114,11 +138,25 @@ class RelationshipRepository {
   //-----------------------------
   ///Deleção de relacionamento única
   Future<Response> deleteRelationship(
-    String id
+    String idUser,
+    String idTable
     ) async{
       try{
+        final val = await ref
+        .where(
+          'idUser', 
+          WhereFilter.equal, 
+          idUser
+        )
+        .where(
+          'idTable', 
+          WhereFilter.equal, 
+          idTable
+        )
+        .get();
+
         await ref
-        .doc(id)
+        .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
         .delete();
 
         return Response(

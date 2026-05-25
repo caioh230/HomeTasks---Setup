@@ -15,78 +15,87 @@ class TableRepository {
   //            create - Admin
   //-----------------------------
   ///Criação de novo registro no banco remoto
-  Future<Response> createTable(TableModel table) async {
-    try{
-      await ref
-      .doc()
-      .set(table.toMap());
-      
-      return Response.json(
-        statusCode: HttpStatus.created, 
-        body: 'Criação bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> createTable(
+    TableModel table
+    ) async {
+      try{
+        await ref
+        .doc()
+        .set(table.toMap());
+        
+        return Response.json(
+          statusCode: HttpStatus.created, 
+          body: 'Criação bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read - Reader
   //-----------------------------
   ///Leitura individual das mesas
-  Future<Response> readTable(String id) async{
-    try{
-      final val = await ref
-      .doc(id)
-      .get();
+  Future<Response> readTable(
+    String id
+    ) async{
+      try{
+        final val = await ref
+        .doc(id)
+        .get();
 
-      final formDados = TableDBModel.fromFirestore(val);
-      
-      return Response.json(
-        statusCode: HttpStatus.found, 
-        body: formDados.toMap()
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        final formDados = TableDBModel.fromFirestore(val);
+        
+        return Response.json(
+          statusCode: HttpStatus.found, 
+          body: formDados.toMap()
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            update - Admin
   //-----------------------------
   ///Atualização individual da table
-  Future<Response> updateTable(String id, TableModel table) async{ 
-    try{
+  Future<Response> updateTable(
+    String id, 
+    TableModel table
+    ) async{ 
+      try{
 
-      await ref
-      .doc(id)
-      .update(table.toMap());
+        await ref
+        .doc(id)
+        .update(table.toMap());
 
-      return Response.json(
-        statusCode: HttpStatus.accepted, 
-        body: 'Atualização bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        return Response.json(
+          statusCode: HttpStatus.accepted, 
+          body: 'Atualização bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            delete - Admin
   //-----------------------------
   ///Remoção individual das tables
-  Future<Response> deleteTable(String id) async{
-    try{
-      await ref
-      .doc(id)
-      .delete();
+  Future<Response> deleteTable(
+    String id
+    ) async{
+      try{
+        await ref
+        .doc(id)
+        .delete();
 
-      return Response(
-        statusCode: HttpStatus.accepted, 
-        body: 'Deleção bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        return Response(
+          statusCode: HttpStatus.accepted, 
+          body: 'Deleção bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 }

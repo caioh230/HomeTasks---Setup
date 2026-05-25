@@ -6,35 +6,44 @@ import 'package:hometasks/src/User/services/UserService.dart';
 //            main
 //-----------------------------
 ///Responsável por receber as requisições com identificador
-Future<dynamic> onRequest(RequestContext context, String id) async{
-  try{
-    switch (context.request.method){
-      case HttpMethod.get:
-        return readUser(id, context);
-      case HttpMethod.put:
-        return updateUser(id, context);
-      case HttpMethod.delete:
-        return deleteUser(id, context);
-      
-      case HttpMethod.post:
-      case HttpMethod.head:
-      case HttpMethod.options:
-      case HttpMethod.patch:
+Future<dynamic> onRequest(
+  RequestContext context, 
+  String id
+  ) async{
+    try{
+      switch (context.request.method){
+        case HttpMethod.get:
+          return readUser(id, context);
+        case HttpMethod.put:
+          return updateUser(id, context);
+        case HttpMethod.delete:
+          return deleteUser(id, context);
+        
+        case HttpMethod.post:
+        case HttpMethod.head:
+        case HttpMethod.options:
+        case HttpMethod.patch:
+      }
+    }catch(e){
+      throw Exception(e);
     }
-  }catch(e){
-    throw Exception(e);
-  }
 }
 
 //-----------------------------
 //            Read
 //-----------------------------
 ///Responsável por executar a requisição de leitura
-Future<dynamic> readUser(String id, RequestContext context) async{
+Future<dynamic> readUser(
+  String id, 
+  RequestContext context
+  ) async{
     try{
       final service = context.read<UserService>();
       
-      return service.readUser(id, context);
+      return service.readUser(
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -44,13 +53,20 @@ Future<dynamic> readUser(String id, RequestContext context) async{
 //            Update
 //-----------------------------
 ///Responsável por executar a requisição de atualização
-Future<Response> updateUser(String id, RequestContext context)async{
+Future<Response> updateUser(
+  String id, 
+  RequestContext context
+  )async{
     try{
       final service = context.read<UserService>();
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.updateUser(id, UserModel.toModel(data));
+      return service.updateUser(
+        id, 
+        UserModel.toModel(data), 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -60,11 +76,17 @@ Future<Response> updateUser(String id, RequestContext context)async{
 //          Delete
 //-----------------------------
 ///Responsável por executar a requisição de remoção
-Future<Response> deleteUser(String id, RequestContext context)async{
+Future<Response> deleteUser(
+  String id, 
+  RequestContext context
+  )async{
     try{
       final service = context.read<UserService>();
 
-      return service.deleteUser(id);
+      return service.deleteUser(
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }

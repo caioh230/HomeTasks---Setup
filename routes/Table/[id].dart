@@ -5,34 +5,43 @@ import 'package:hometasks/src/Table/services/TableService.dart';
 //-----------------------------
 //            main
 //-----------------------------
-Future<dynamic> onRequest(RequestContext context, String id) async{
-  try{
-    switch (context.request.method){
-      case HttpMethod.get:
-        return readTable(id, context);
-      case HttpMethod.put:
-        return updateTable(id, context);
-      case HttpMethod.delete:
-        return deleteTable(id, context);
-      
-      case HttpMethod.post:
-      case HttpMethod.head:
-      case HttpMethod.options:
-      case HttpMethod.patch:
+Future<dynamic> onRequest(
+  RequestContext context, 
+  String id
+  ) async{
+    try{
+      switch (context.request.method){
+        case HttpMethod.get:
+          return readTable(id, context);
+        case HttpMethod.put:
+          return updateTable(id, context);
+        case HttpMethod.delete:
+          return deleteTable(id, context);
+        
+        case HttpMethod.post:
+        case HttpMethod.head:
+        case HttpMethod.options:
+        case HttpMethod.patch:
+      }
+    }catch(e){
+      throw Exception(e);
     }
-  }catch(e){
-    throw Exception(e);
-  }
 }
 
 //-----------------------------
 //            Read
 //-----------------------------
-Future<dynamic> readTable(String id, RequestContext context) async{
+Future<dynamic> readTable(
+  String id, 
+  RequestContext context
+  ) async{
     try{
       final service = context.read<TableService>();
       
-      return service.readTable(id, context);
+      return service.readTable(
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -41,13 +50,20 @@ Future<dynamic> readTable(String id, RequestContext context) async{
 //-----------------------------
 //            Update
 //-----------------------------
-Future<Response> updateTable(String id, RequestContext context)async{
+Future<Response> updateTable(
+  String id, 
+  RequestContext context
+  )async{
     try{
       final service = context.read<TableService>();
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.updateTable(id, TableModel.toModel(data));
+      return service.updateTable(
+        id, 
+        TableModel.toModel(data), 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -56,11 +72,17 @@ Future<Response> updateTable(String id, RequestContext context)async{
 //-----------------------------
 //          Delete
 //-----------------------------
-Future<Response> deleteTable(String id, RequestContext context)async{
+Future<Response> deleteTable(
+  String id, 
+  RequestContext context
+  )async{
     try{
       final service = context.read<TableService>();
 
-      return service.deleteTable(id);
+      return service.deleteTable(
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }

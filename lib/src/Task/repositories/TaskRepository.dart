@@ -17,102 +17,112 @@ class TaskRepository {
   //            create - Editor
   //-----------------------------
   ///Registro de Nova instância
-  Future<Response> createTask(TaskModel task) async {
-    try{
-
-      await ref
-      .doc()
-      .set(task.toMap());
-      
-      return Response.json(
-        statusCode: HttpStatus.created, 
-        body: 'Criação bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> createTask(
+    TaskModel task
+    ) async {
+      try{
+        await ref
+        .doc()
+        .set(task.toMap());
+        
+        return Response.json(
+          statusCode: HttpStatus.created, 
+          body: 'Criação bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read - Reader
   //-----------------------------
   ///Leitura de tarefa pré-registrada
-  Future<Response> readTask(String id) async{
-    try{
-      final val = await ref
-      .doc(id)
-      .get();
+  Future<Response> readTask(
+    String id
+    ) async{
+      try{
+        final val = await ref
+        .doc(id)
+        .get();
 
-      final formDados = TaskDBModel.fromFirestore(val);
-      
-      return Response.json(
-        statusCode: HttpStatus.found, 
-        body: formDados.toMap()
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        final formDados = TaskDBModel.fromFirestore(val);
+        
+        return Response.json(
+          statusCode: HttpStatus.found, 
+          body: formDados.toMap()
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read - Reader
   //-----------------------------
   ///Leitura de tarefas pertencentes à mesma coluna
-  Future<Response> readColumnTasks(String id) async{
-    try{
-      final val = ref
-      .where(
-          'idColumns', 
-          WhereFilter.equal, 
-          id
-        )
-      .get();
-      
-      return Response.json(
-        statusCode: HttpStatus.found, 
-        body: val
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> readColumnTasks(
+    String id
+    ) async{
+      try{
+        final val = ref
+        .where(
+            'idColumns', 
+            WhereFilter.equal, 
+            id
+          )
+        .get();
+        
+        return Response.json(
+          statusCode: HttpStatus.found, 
+          body: val
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            update - Editor
   //-----------------------------
   ///Atualização de tarefa única
-  Future<Response> updateTask(String id, TaskModel task) async{ 
-    try{
+  Future<Response> updateTask(
+    String id, 
+    TaskModel task
+    ) async{ 
+      try{
 
-      await ref
-      .doc(id)
-      .update(task.toMap());
+        await ref
+        .doc(id)
+        .update(task.toMap());
 
-      return Response.json(
-        statusCode: HttpStatus.accepted, 
-        body: 'Atualização bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        return Response.json(
+          statusCode: HttpStatus.accepted, 
+          body: 'Atualização bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            delete - Editor
   //-----------------------------
   ///Deleção de tarefa única
-  Future<Response> deleteTask(String id) async{
-    try{
-      await ref
-      .doc(id)
-      .delete();
+  Future<Response> deleteTask(
+    String id
+    ) async{
+      try{
+        await ref
+        .doc(id)
+        .delete();
 
-      return Response(
-        statusCode: HttpStatus.accepted, 
-        body: 'Deleção bem sucedida'
-      );
-    }catch(e){
-      throw Exception(e);
-    }
+        return Response(
+          statusCode: HttpStatus.accepted, 
+          body: 'Deleção bem sucedida'
+        );
+      }catch(e){
+        throw Exception(e);
+      }
   }
 }

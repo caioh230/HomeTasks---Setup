@@ -9,48 +9,68 @@ class TableService {
   //            create
   //-----------------------------
   ///Solicitação de criação
-  Future<Response> createTable(TableModel table) async {
-    try{
-      return TableRepository().createTable(table);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> createTable(
+    TableModel table, 
+    RequestContext context
+    ) async {
+      try{
+        final repository = context.read<TableRepository>();
+
+        return repository.createTable(table);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read
   //-----------------------------
   ///Solicitação de leitura
-  Future<Response> readTable(String id, RequestContext context) async{
-    try{
-      return TableRepository().readTable(id);
+  Future<Response> readTable(
+    String id, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TableRepository>();
 
-    }catch(e){
-      throw Exception(e);
-    }
+        return repository.readTable(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            update
   //-----------------------------
   ///Solicitação de atualização
-  Future<Response> updateTable(String id, TableModel table) async{
-    try{
-      return TableRepository().updateTable(id, table);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> updateTable(
+    String id, 
+    TableModel table,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TableRepository>();
+
+        return repository.updateTable(id, table);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            delete
   //-----------------------------
   ///Solicitação de remoção
-  Future<Response> deleteTable(String id) async{
-    try{
-      return TableRepository().deleteTable(id);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> deleteTable(
+    String id,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TableRepository>();
+        
+        return repository.deleteTable(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 }

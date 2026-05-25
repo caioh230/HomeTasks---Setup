@@ -5,37 +5,44 @@ import 'package:hometasks/src/Table/services/TableService.dart';
 //-----------------------------
 //            main
 //-----------------------------
-Future<Response> onRequest(RequestContext context) async{
-  try{
-    switch (context.request.method){
-      case HttpMethod.get:
-      case HttpMethod.post:
-        return createTable(context);
+Future<Response> onRequest(
+  RequestContext context
+  ) async{
+    try{
+      switch (context.request.method){
+        case HttpMethod.get:
+        case HttpMethod.post:
+          return createTable(context);
 
-      case HttpMethod.put:
-      case HttpMethod.delete:
-      case HttpMethod.head:
-      case HttpMethod.options:
-      case HttpMethod.patch:
+        case HttpMethod.put:
+        case HttpMethod.delete:
+        case HttpMethod.head:
+        case HttpMethod.options:
+        case HttpMethod.patch:
 
-      throw Exception();
+        throw Exception();
+      }
+    }catch(e){
+      throw Exception(e);
     }
-  }catch(e){
-    throw Exception(e);
-  }
 }
 
 //-----------------------------
 //            Create
 //-----------------------------
-Future<Response> createTable(RequestContext context)async{
-  try{
-    final service = context.read<TableService>();
+Future<Response> createTable(
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<TableService>();
 
-    final data = await context.request.json() as Map<String, dynamic>;
+      final data = await context.request.json() as Map<String, dynamic>;
 
-    return service.createTable(TableModel.toModel(data));
-  }catch(e){
-    throw Exception(e);
-  }
+      return service.createTable(
+        TableModel.toModel(data), 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
 }

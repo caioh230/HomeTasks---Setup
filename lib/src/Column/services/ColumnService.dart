@@ -9,48 +9,68 @@ class ColumnService {
   //            create
   //-----------------------------
   ///Solicitação de criação
-  Future<Response> createColumn(ColumnModel column) async {
-    try{
-      return ColumnRepository().createColumn(column);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> createColumn(
+    ColumnModel column,
+    RequestContext context
+    ) async {
+      try{
+        final repository = context.read<ColumnRepository>();
+
+        return repository.createColumn(column);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read
   //-----------------------------
   ///Solicitação de leitura
-  Future<Response> readColumn(String id, RequestContext context) async{
-    try{
-      return ColumnRepository().readColumn(id);
+  Future<Response> readColumn(
+    String id, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<ColumnRepository>();
 
-    }catch(e){
-      throw Exception(e);
-    }
+        return repository.readColumn(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            update
   //-----------------------------
   ///Solicitação de atualização
-  Future<Response> updateColumn(String id, ColumnModel column) async{
-    try{
-      return ColumnRepository().updateColumn(id, column);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> updateColumn(
+    String id, 
+    ColumnModel column,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<ColumnRepository>();
+
+        return repository.updateColumn(id, column);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            delete
   //-----------------------------
   ///Solicitação de remoção
-  Future<Response> deleteColumn(String id) async{
-    try{
-      return ColumnRepository().deleteColumn(id);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> deleteColumn(
+    String id,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<ColumnRepository>();
+
+        return repository.deleteColumn(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 }

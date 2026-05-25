@@ -9,61 +9,85 @@ class TaskService {
   //            create
   //-----------------------------
   ///Solicitação de criação
-  Future<Response> createTask(TaskModel task) async {
-    try{
-      return TaskRepository().createTask(task);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> createTask(
+    TaskModel task, 
+    RequestContext context
+    ) async {
+      try{
+        final repository = context.read<TaskRepository>();
+
+        return repository.createTask(task);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read
   //-----------------------------
   ///Solicitação de leitura individual
-  Future<Response> readTask(String id, RequestContext context) async{
-    try{
-      return TaskRepository().readTask(id);
+  Future<Response> readTask(
+    String id, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TaskRepository>();
 
-    }catch(e){
-      throw Exception(e);
-    }
+        return repository.readTask(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            read
   //-----------------------------
   ///Solicitação de leitura conjunta
-  Future<Response> readColumnTasks(String id, RequestContext context) async{
-    try{
-      return TaskRepository().readTask(id);
+  Future<Response> readColumnTasks(
+    String id, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TaskRepository>();
 
-    }catch(e){
-      throw Exception(e);
-    }
+        return repository.readTask(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            update
   //-----------------------------
   ///Solicitação de atualização
-  Future<Response> updateTask(String id, TaskModel task) async{
-    try{
-      return TaskRepository().updateTask(id, task);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> updateTask(
+    String id, 
+    TaskModel task, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TaskRepository>();
+
+        return repository.updateTask(id, task);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 
   //-----------------------------
   //            delete
   //-----------------------------
   ///Solicitação de remoção
-  Future<Response> deleteTask(String id) async{
-    try{
-      return TaskRepository().deleteTask(id);
-    }catch(e){
-      throw Exception(e);
-    }
+  Future<Response> deleteTask(
+    String id, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<TaskRepository>();
+
+        return repository.deleteTask(id);
+      }catch(e){
+        throw Exception(e);
+      }
   }
 }

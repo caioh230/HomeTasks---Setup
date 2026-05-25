@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/basic_textfield.dart';
+import 'package:hometasks/widgets/input_field.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -11,13 +12,13 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   void signUserUp() async {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
     if(email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Preencha o campo de e-mail e tente novamente.')),
@@ -30,7 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    if (passwordController.text != confirmPasswordController.text) {
+    if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('As senhas não coincidem!')),
       );
@@ -47,8 +48,8 @@ class _RegisterPageState extends State<RegisterPage> {
     bool success = false;
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
       success = true;
     } on FirebaseAuthException catch (e) {
@@ -77,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
+      backgroundColor: Color(0xFFF2F3FB),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -86,86 +87,115 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
-                //logo
-                const Icon(
-                  Icons.lock,
-                  size: 100,
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1067B4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.house_outlined,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+
                 ),
                 const SizedBox(height: 10),
-                //welcome back you been missed
-
-                const SizedBox(height: 25),
-
-                //username
-                BasicTextField(
-                  controller: emailController,
-                  hintText: 'Nome de usuário ou email',
-                  obscureText: false,
-                ),
-
-                const SizedBox(height: 15),
-                //password
-                BasicTextField(
-                  controller: passwordController,
-                  hintText: 'Senha',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 15),
-
-                BasicTextField(
-                  controller: confirmPasswordController,
-                  hintText: 'Confirmar senha',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 15),
-
-                //sign in button
-                BasicButton(
-                  onTap: signUserUp,
-                  text: 'Cadastrar',
-                ),
-                const SizedBox(height: 20),
-
-                // continue with
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 80),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
+                      Text(
+                        "Criar sua conta",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: Text(
-                          'OU',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey.shade400,
+                      const SizedBox(height: 10),
+                      Text(
+                        'Comece sua jornada para um lar mais organizado.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 15,
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+                Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0, bottom: 40.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InputField(
+                              label: 'Nome de usuário ou email',
+                              controller: _emailController,
+                              backgroundColor:
+                              Color(0xFFF2F3FB),
+                              prefixIcon: Icon(Icons.mail_outline),
+                            ),
+                            const SizedBox(height: 20),
+                            InputField(
+                              label: 'Senha',
+                              controller: _passwordController,
+                              isPassword: true,
+                              backgroundColor: Color(0xFFF2F3FB),
+                              prefixIcon: Icon(Icons.lock_outline),
+                            ),
+                            const SizedBox(height: 20),
+                            InputField(
+                              label: 'Confirmar senha',
+                              controller: _confirmPasswordController,
+                              isPassword: true,
+                              backgroundColor: Color(0xFFF2F3FB),
+                              prefixIcon: Icon(Icons.lock_outline),
+                            ),
+                            const SizedBox(height: 35),
+                            BasicButton(
+                              margin: EdgeInsetsGeometry.zero,
+                              padding: EdgeInsetsGeometry.symmetric(vertical: 16),
+                              onTap: signUserUp,
+                              text: 'Criar conta',
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Text(
+                      'Já possui uma conta? ',
+                      style: TextStyle(
+                        fontSize: 15
+                      ),
+                    ),
                     GestureDetector(
                       onTap: () => Navigator.pushReplacementNamed(context, '/login'),
                       child: Text(
-                        'Já tenho uma conta.',
+                        "Entrar.",
                         style: TextStyle(
-                            color: Colors.blue[900],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                          color: Colors.blue[900],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15
+                        ),
                       ),
                     ),
                   ],

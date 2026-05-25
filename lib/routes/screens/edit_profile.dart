@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/widgets/input_field.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -151,13 +152,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputField(label: 'Nome Completo', controller: _nameController),
+                    InputField(label: 'Nome Completo', controller: _nameController),
                     //const SizedBox(height: 20),
-                    //_buildInputField(label: 'Email', controller: _emailController),
+                    //InputField(label: 'Email', controller: _emailController),
                     const SizedBox(height: 20),
-                    _buildInputField(label: 'Trocar senha', controller: _passwordController, isPassword: true),
+                    InputField(label: 'Trocar senha', controller: _passwordController, isPassword: true),
                     const SizedBox(height: 20),
-                    _buildInputField(label: 'Confirmar nova senha', controller: _confirmPasswordController, isPassword: true),
+                    InputField(label: 'Confirmar nova senha', controller: _confirmPasswordController, isPassword: true),
                   ],
                 ),
               ),
@@ -187,47 +188,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildInputField({
-    required String label,
-    required TextEditingController controller,
-    bool isPassword = false,
-  }) {
-    return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF334155),
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: TextField(
-              controller: controller,
-              obscureText: isPassword,
-              style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              ),
-            ),
-          ),
-        ],
-      )
     );
   }
 }

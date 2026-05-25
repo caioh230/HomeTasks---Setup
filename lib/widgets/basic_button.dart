@@ -5,7 +5,7 @@ class BasicButton extends StatefulWidget {
   final String text;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
-  final Icon? icon;
+  final Widget? icon;
   final double textSize;
   final Color pressedColor;
   final Color backgroundColor;

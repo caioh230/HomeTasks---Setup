@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 
 import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/widgets/profile_widget.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
 import 'screens/profile.dart';
@@ -82,87 +83,7 @@ class DashboardPageState extends State<DashboardPage> {
             showDialog(
               context: context,
               barrierColor: Colors.black54,
-              builder: (context) {
-                return Dialog(
-                  backgroundColor: Colors.transparent,
-                  child: Center(
-                    child: Container(
-                      width: 280,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Stack(
-                        children: [
-                          // X button
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(
-                                Icons.close,
-                                size: 24,
-                              ),
-                            ),
-                          ),
-
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(height: 10),
-
-                              // Avatar
-                              ClipOval(
-                                child: Image.network(
-                                  "https://i.pravatar.cc/100?img=1",
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Name
-                              const Text(
-                                "Nome de Usuário",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              const SizedBox(height: 6),
-
-                              // Email
-                              Text(
-                                user!.email!,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              // Logout button
-                              BasicButton(onTap: () {
-                                signUserOut();
-                                Navigator.pop(context);
-                                Navigator.pushReplacementNamed(context, '/login');
-                              },
-                              text: "Sair da conta",
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+              builder: (context) => ProfileWidget(user: user!)
             );
           },
           child: BoardCard.avatar(id: "1", size: 40),

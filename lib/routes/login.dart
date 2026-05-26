@@ -72,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
   Future<UserCredential?> signInWithGoogle() async {
+    // TO DO: Test this
     try {
       await signIn.initialize();
       final GoogleSignInAccount user = await signIn.authenticate();

@@ -234,7 +234,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ),
                           border: InputBorder.none,
                           counterText: '',
-                          suffixIcon: Icon(Icons.calendar_today),
+                          prefixIcon: Icon(Icons.calendar_today),
                         ),
                         style: TextStyle(
                           fontSize: 18,

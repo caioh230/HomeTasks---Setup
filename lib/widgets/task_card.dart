@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/models/lists.dart';
 import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/widgets/edit_task.dart';
 import 'package:intl/intl.dart';
 import 'package:hometasks/extensions/string.dart';
 
@@ -79,132 +80,140 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: task.status == TaskStatus.complete ? Colors.black.withValues(alpha: 0.05) : Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(2, 2),
-              )
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    Lists.boards[task.board]?.title ?? 'Indisponível',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (task.priority != null) ... [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: task.priority!.backgroundColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text(
-                        task.priority!.value.toUpperCase(),
-                        style: TextStyle(
-                          color: task.priority!.mainColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              Text(
-                task.title,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  decoration: task.status == TaskStatus.complete ? TextDecoration.lineThrough : null,
-                  color: task.status == TaskStatus.complete ? Colors.grey.shade600 : null
-                ),
-              ),
-
-              if (task.description != null && task.description!.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text(
-                  task.description!,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+    return GestureDetector(
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: task.status == TaskStatus.complete ? Colors.black.withValues(alpha: 0.05) : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(2, 2),
+                )
               ],
-
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 70,
-                    child: Stack(
-                      children: BoardCard.prepareAvatars(members: task.members),
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        task.status.icon,
-                        size: 20,
-                        color: _dateColor
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      Lists.boards[task.board]?.title ?? 'Indisponível',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        dateFormat(task.status == TaskStatus.complete ? task.completedAt! : task.expiration),
-                        style: TextStyle(
-                          color: _dateColor,
-                          fontSize: 15,
+                    ),
+                    const Spacer(),
+                    if (task.priority != null) ... [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: task.priority!.backgroundColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          task.priority!.value.toUpperCase(),
+                          style: TextStyle(
+                            color: task.priority!.mainColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
-                  )
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  task.title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    decoration: task.status == TaskStatus.complete ? TextDecoration.lineThrough : null,
+                    color: task.status == TaskStatus.complete ? Colors.grey.shade600 : null
+                  ),
+                ),
+
+                if (task.description != null && task.description!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    task.description!,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
-              ),
-            ],
+
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 70,
+                      child: Stack(
+                        children: BoardCard.prepareAvatars(members: task.members),
+                      ),
+                    ),
+
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          task.status.icon,
+                          size: 20,
+                          color: _dateColor
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          dateFormat(task.status == TaskStatus.complete ? task.completedAt! : task.expiration),
+                          style: TextStyle(
+                            color: _dateColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        if (task.status == TaskStatus.inProgress) ... [
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 5,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(15),
+          if (task.status == TaskStatus.inProgress) ... [
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 5,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(15),
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
+      onTap: () {
+        // TO DO
+        showDialog(context: context, builder: (context) =>
+          EditTaskWidget(task: task),
+        );
+      },
     );
   }
 

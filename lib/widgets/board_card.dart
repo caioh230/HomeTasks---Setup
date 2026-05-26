@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/routes/screens/tasks.dart';
 
 enum UserRole {
@@ -136,24 +137,29 @@ class BoardCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 18),
-          Row(
-            children: [
-              SizedBox(
-                width: 70,
-                child: Stack(
-                  children: prepareAvatars(members: board.members),
+          GestureDetector(
+            onTap: () {
+              DashboardPage.globalKey.currentState!.showOverlay(MembersListScreen());
+            },
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 70,
+                  child: Stack(
+                    children: prepareAvatars(members: board.members),
+                  ),
                 ),
-              ),
 
-              const SizedBox(width: 12),
-              Text(
-                '${board.members.length} ${board.members.length != 1 ? "membros" : "membro"}',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 15,
+                const SizedBox(width: 12),
+                Text(
+                  '${board.members.length} ${board.members.length != 1 ? "membros" : "membro"}',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 15,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(height: 35),

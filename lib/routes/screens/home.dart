@@ -72,8 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: 22,
             child: PlusButton(
               onTap: () {
-                DashboardPage.globalKey.currentState
-                    ?.showOverlay(NewBoardScreen());
+                DashboardPage.globalKey.currentState?.showOverlay(NewBoardScreen());
               },
             ),
           ),

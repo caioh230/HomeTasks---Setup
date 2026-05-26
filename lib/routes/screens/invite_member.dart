@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/members_list.dart';
+import 'package:hometasks/widgets/basic_button.dart';
 
-class InviteMemberPage extends StatefulWidget {
-  const InviteMemberPage({super.key});
+class InviteMemberScreen extends StatefulWidget {
+  const InviteMemberScreen({super.key});
 
   @override
-  State<InviteMemberPage> createState() => _InviteMemberPageState();
+  State<InviteMemberScreen> createState() => _InviteMemberScreenState();
 }
 
-class _InviteMemberPageState extends State<InviteMemberPage> {
+class _InviteMemberScreenState extends State<InviteMemberScreen> {
   final _emailController = TextEditingController();
   String _selectedRole = 'editor'; // Valor inicial selecionado
 
@@ -17,35 +20,52 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
     super.dispose(); // CORREÇÃO 1: O correto é super.dispose()
   }
 
+  void sendInvite() async {
+    final email = _emailController.text;
+    final navigator = Navigator.of(context, rootNavigator: true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // TO DO
+    // Trocar o "await Future.delayed" por uma
+    // chamada de API para convidar novo usuário
+    await Future.delayed(Duration(seconds: 1)); //placeholder
+    //
+
+    navigator.pop(); 
+    DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFE),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0056B3)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Convidar Membro',
-          style: TextStyle(
-            color: Color(0xFF1E293B),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+    return Container(
+      color: const Color(0xFFF8F9FF),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(22),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen())),
+                const SizedBox(width: 12),
+                const Text(
+                  'Convidar Membro',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
             // 1. Card de Boas-Vindas (Topo)
             _buildHeaderCard(),
-            const SizedBox(height: 28),
+            const SizedBox(height: 30),
 
             // 2. Campo de E-mail
             const Text(
@@ -106,35 +126,16 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
               subtitle: 'Controle total sobre o quadro e membros',
               icon: Icons.admin_panel_settings_outlined,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
 
-            // 4. Botão Enviar Convite
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  print('Enviar para: ${_emailController.text} como $_selectedRole');
-                },
-                // CORREÇÃO 2: Invertidos icon e label para seguir o padrão do Flutter
-                icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                label: const Text(
-                  'Enviar Convite',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0056B3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
-                ),
-              ),
+            BasicButton(
+              onTap: sendInvite,
+              text: "Enviar Convite",
+              margin: EdgeInsetsGeometry.zero,
+              padding: EdgeInsetsGeometry.all(20),
+              suffixIcon: Icon(Icons.send_outlined, color: Colors.white),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -146,7 +147,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1FF),
+        color: const Color(0xFFE0EAF6),
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
@@ -166,7 +167,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
             'Convide pessoas para colaborarem na organização do seu espaço.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 18,
               color: Color(0xFF475569),
             ),
           ),
@@ -236,7 +237,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

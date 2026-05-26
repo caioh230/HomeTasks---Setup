@@ -138,7 +138,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.logout,
                     label: 'Sair da conta',
                     color: const Color(0xFFE53E3E),
-                    onTap: FirebaseAuth.instance.signOut
+                    onTap: () {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
                   ),
                   _Divider(),
                   _ActionRow(

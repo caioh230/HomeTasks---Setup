@@ -142,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InputField(
-                              label: 'Nome de usuário ou email',
+                              label: 'E-mail',
                               controller: _emailController,
                               backgroundColor:
                               Color(0xFFF2F3FB),

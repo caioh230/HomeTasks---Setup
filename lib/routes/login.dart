@@ -66,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       if (success && navigator.canPop()) {
         navigator.pop();
       }
+      Navigator.pushReplacementNamed(context, '/dashboard');
     }
   }
 
@@ -79,7 +80,9 @@ class _LoginPageState extends State<LoginPage> {
       final credential = GoogleAuthProvider.credential(
         idToken: authentication.idToken,
       );
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      final logged = await FirebaseAuth.instance.signInWithCredential(credential);
+      Navigator.pushReplacementNamed(context, '/dashboard');
+      return logged;
     } catch (e) {
       debugPrint('Google sign-in error: $e');
       return null;

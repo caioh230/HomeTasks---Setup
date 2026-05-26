@@ -151,6 +151,7 @@ class DashboardPageState extends State<DashboardPage> {
                               BasicButton(onTap: () {
                                 signUserOut();
                                 Navigator.pop(context);
+                                Navigator.pushReplacementNamed(context, '/login');
                               },
                               text: "Sair da conta",
                               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12)),

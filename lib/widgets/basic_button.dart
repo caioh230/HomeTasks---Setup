@@ -5,7 +5,8 @@ class BasicButton extends StatefulWidget {
   final String text;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
-  final Widget? icon;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final double textSize;
   final Color pressedColor;
   final Color backgroundColor;
@@ -14,7 +15,8 @@ class BasicButton extends StatefulWidget {
     super.key,
     required this.onTap,
     required this.text,
-    this.icon,
+    this.prefixIcon,
+    this.suffixIcon,
     this.padding = const EdgeInsets.all(22),
     this.margin = const EdgeInsets.symmetric(horizontal: 25),
     this.textSize = 15,
@@ -54,15 +56,19 @@ class _BasicButtonState extends State<BasicButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if(widget.icon != null) ... [
-                widget.icon!,
+              if(widget.prefixIcon != null) ... [
+                widget.prefixIcon!,
                 const SizedBox(width: 5),
               ],
               Text(
                 widget.text,
                 style: TextStyle(
                 color: _textColor, fontWeight: FontWeight.bold, fontSize: widget.textSize),
-              )
+              ),
+              if(widget.suffixIcon != null) ... [
+                const SizedBox(width: 5),
+                widget.suffixIcon!,
+              ],
             ],
           ),
         ),

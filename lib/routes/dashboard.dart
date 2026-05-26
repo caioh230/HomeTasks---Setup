@@ -181,15 +181,15 @@ class DashboardPageState extends State<DashboardPage> {
       ),
       body: Stack(
         children: [
-          if (DashboardPage.globalKey.currentState?.overlayPage == null)
+          if (overlayPage == null)
             IndexedStack(
               index: _selectedIndex,
               children: _pages.map((e) => e.page).toList(),
             ),
-          if (DashboardPage.globalKey.currentState?.overlayPage != null)
+          if (overlayPage != null)
             Container(
               color: Colors.white,
-              child: DashboardPage.globalKey.currentState?.overlayPage!,
+              child: overlayPage!,
             ),
         ],
       ),

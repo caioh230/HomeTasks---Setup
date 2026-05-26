@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/routes/forgot_password.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hometasks/routes/dashboard.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (context) => DashboardPage(key: DashboardPage.globalKey),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
+        '/forgot_password': (context) => ForgotPasswordPage(),
       },
     );
   }

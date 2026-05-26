@@ -3,73 +3,90 @@ import 'package:flutter/material.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
-  void signUserUp() async {
+  void confirmEmailSend() async {
     String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-    if(email.isEmpty) {
+
+    if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha o campo de e-mail e tente novamente.')),
-      );
-      return;
-    }
-    if(password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha o campo de senha e tente novamente.')),
-      );
-      return;
-    }
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As senhas não coincidem!')),
+        const SnackBar(
+          content: Text(
+            'Preencha o campo de e-mail e tente novamente.',
+          ),
+        ),
       );
       return;
     }
 
-    final navigator = Navigator.of(context, rootNavigator: true);
+    final navigator = Navigator.of(
+      context,
+      rootNavigator: true,
+    );
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator()),
     );
 
     bool success = false;
+
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: email,
       );
       success = true;
     } on FirebaseAuthException catch (e) {
-      navigator.pop(); 
+      if (navigator.canPop()) {
+        navigator.pop();
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(switch(e.code) {
-        'invalid-email' => 'E-mail inválido!',
-        'invalid-credential' => 'Senha ou e-mail estão incorretas.',
-        'weak-password' => 'Senha fraca!\nDeixe-a mais forte adicionando caracteres especiais, números e letras maiúsculas.',
-        'email-already-in-use' => 'Esse e-mail já está sendo usado por outra conta.',
-        _ => e.code
-      })));
-    } catch (e) {
-      navigator.pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(
+          content: Text(
+            switch (e.code) {
+              'invalid-email' => 'E-mail inválido!',
+              'user-not-found' => 'Nenhuma conta encontrada com esse e-mail.',
+              _ => e.message ?? e.code,
+            },
+          ),
+        ),
       );
-    } finally {
+    }
+    catch (e) {
+        if (navigator.canPop()) {
+          navigator.pop();
+        }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+    finally {
       if (success) {
-        if(navigator.canPop()) navigator.pop();
-        navigator.pushReplacementNamed('/dashboard');
+        if (navigator.canPop()) {
+          navigator.pop();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Se o e-mail estiver cadastrado, você receberá um link de recuperação.\nOlhe sua caixa de entrada ou spam.',
+            ),
+          ),
+        );
       }
     }
   }
@@ -87,28 +104,28 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 50),
                 Container(
-                  width: 70,
-                  height: 70,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: Color(0xFF1067B4),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.house_outlined,
-                    size: 35,
+                    Icons.lock_reset_outlined,
+                    size: 50,
                     color: Colors.white,
                   ),
 
                 ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 80),
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 60),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Criar sua conta",
+                        "Recuperar senha",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 36,
@@ -117,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Comece sua jornada para um lar mais organizado.',
+                        'Insira seu e-mail para receber as instruções de recuperação.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey.shade700,
@@ -142,34 +159,19 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InputField(
-                              label: 'Nome de usuário ou email',
+                              label: 'E-mail da conta',
                               controller: _emailController,
                               backgroundColor:
                               Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.mail_outline),
                             ),
-                            const SizedBox(height: 20),
-                            InputField(
-                              label: 'Senha',
-                              controller: _passwordController,
-                              isPassword: true,
-                              backgroundColor: Color(0xFFF2F3FB),
-                              prefixIcon: Icon(Icons.lock_outline),
-                            ),
-                            const SizedBox(height: 20),
-                            InputField(
-                              label: 'Confirmar senha',
-                              controller: _confirmPasswordController,
-                              isPassword: true,
-                              backgroundColor: Color(0xFFF2F3FB),
-                              prefixIcon: Icon(Icons.lock_outline),
-                            ),
                             const SizedBox(height: 35),
                             BasicButton(
                               margin: EdgeInsetsGeometry.zero,
                               padding: EdgeInsetsGeometry.symmetric(vertical: 16),
-                              onTap: signUserUp,
-                              text: 'Criar conta',
+                              onTap: confirmEmailSend,
+                              text: 'Enviar Link de Recuperação',
+                              suffixIcon: Icon(Icons.send_outlined, color: Colors.white),
                             )
                           ],
                         ),
@@ -177,28 +179,28 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Já possui uma conta? ',
-                      style: TextStyle(
-                        fontSize: 15
+                const SizedBox(height: 50),
+                GestureDetector(
+                  onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.arrow_back_rounded,
+                        size: 20,
+                        color: Colors.blue[900],
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pushReplacementNamed(context, '/login'),
-                      child: Text(
-                        "Entrar.",
+                      Text(
+                        " Voltar para a tela de login",
                         style: TextStyle(
                           color: Colors.blue[900],
                           fontWeight: FontWeight.bold,
                           fontSize: 15
                         ),
                       ),
-                    ),
-                  ],
-                )
+                    ],
+                  ),
+          ),
               ],
             ),
           ),

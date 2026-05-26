@@ -167,9 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                               isPassword: true,
                               backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.lock_outline),
-                              onForgotPassword: () {
-                                // TO DO
-                              }
+                              onForgotPassword: () => Navigator.pushReplacementNamed(context, '/forgot_password'),
                             ),
                             const SizedBox(height: 35),
                             BasicButton(
@@ -209,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                               padding: EdgeInsetsGeometry.symmetric(vertical: 6),
                               onTap: signInWithGoogle,
                               text: 'Entrar com Google',
-                              icon: SvgPicture.asset('assets/images/google.svg', width: 40, height: 40),
+                              prefixIcon: SvgPicture.asset('assets/images/google.svg', width: 40, height: 40),
                             ),
                           ],
                         ),

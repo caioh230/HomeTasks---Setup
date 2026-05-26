@@ -56,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 30),
               BasicButton(
                 onTap: () => DashboardPage.globalKey.currentState!.showOverlay(EditProfileScreen()),
-                icon: Icon(Icons.edit_note, color: Colors.white),
+                prefixIcon: Icon(Icons.edit_note, color: Colors.white),
                 text: 'Editar perfil',
                 textSize: 18,
                 padding: EdgeInsetsGeometry.all(12),

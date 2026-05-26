@@ -264,7 +264,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
               ),
               BasicButton(
                 onTap: () => finishCreatingBoard(),
-                icon: Icon(Icons.add, color: Colors.white),
+                prefixIcon: Icon(Icons.add, color: Colors.white),
                 text: 'Criar Quadro',
                 textSize: 18,
                 padding: EdgeInsetsGeometry.all(12),

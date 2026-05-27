@@ -1,0 +1,32 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: ${LOKI_URL}/loki/api/v1/push
+    basic_auth:
+      username: ${LOKI_USER}
+      password: ${LOKI_API_KEY}
+
+scrape_configs:
+  - job_name: hometasks
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: dart_frog
+          app: hometasks
+          env: ${APP_ENV}
+          __path__: /tmp/hometasks.log
+
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            logger: logger
+      - labels:
+          level:
+          logger:

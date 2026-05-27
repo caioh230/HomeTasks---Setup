@@ -5,4 +5,4 @@
 | Isabela Guedes de Morais | Tela de Configurações e revisão de telas no fim do projeto |
 | Lucas Machado Delgado | Tela de editar perfil  e tela de perfil|
 | Pedro Afonso Quintela Pedrosa | Revisão de Telas |
-| Raphael José Laurindo Santana | Revisão de telas no fim do projeto e adição da mensageria dentro do projeto |
+| Raphael José Laurindo Santana | Revisão de telas no fim do projeto e adição do monitoramento dentro do projeto |

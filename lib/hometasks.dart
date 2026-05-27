@@ -26,3 +26,13 @@ export 'src/User/models/UserDBModel.dart';
 export 'src/User/models/UserModel.dart';
 export 'src/User/repositories/UserRepository.dart';
 export 'src/User/services/UserService.dart';
+
+
+import 'dart:io';
+import 'package:dart_frog/dart_frog.dart';
+import 'package:hometasks/config/observability.dart';
+
+Future<HttpServer> run(Handler handler, InternetAddress ip, int port) async {
+  await Observability.initialize();
+  return serve(handler, ip, port);
+}

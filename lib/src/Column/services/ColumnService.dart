@@ -16,7 +16,7 @@ class ColumnService {
       try{
         final repository = context.read<ColumnRepository>();
 
-        return repository.createColumn(column);
+        return repository.createColumn(column.idTable, column, context);
       }catch(e){
         throw Exception(e);
       }
@@ -27,13 +27,31 @@ class ColumnService {
   //-----------------------------
   ///Solicitação de leitura
   Future<Response> readColumn(
+    String idTable,
     String id, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<ColumnRepository>();
+                
+        return repository.readColumn(idTable ,id, context);
+      }catch(e){
+        throw Exception(e);
+      }
+  }
 
-        return repository.readColumn(id);
+  //-----------------------------
+  //            read
+  //-----------------------------
+  ///Solicitação de leitura
+  Future<Response> readAllColumns(
+    String idTable,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<ColumnRepository>();
+
+        return repository.readAllColumns(idTable, context);
       }catch(e){
         throw Exception(e);
       }
@@ -51,7 +69,7 @@ class ColumnService {
       try{
         final repository = context.read<ColumnRepository>();
 
-        return repository.updateColumn(id, column);
+        return repository.updateColumn(column.idTable, id, column,context);
       }catch(e){
         throw Exception(e);
       }
@@ -62,13 +80,14 @@ class ColumnService {
   //-----------------------------
   ///Solicitação de remoção
   Future<Response> deleteColumn(
+    String idTable,
     String id,
     RequestContext context
     ) async{
       try{
         final repository = context.read<ColumnRepository>();
 
-        return repository.deleteColumn(id);
+        return repository.deleteColumn(idTable, id, context);
       }catch(e){
         throw Exception(e);
       }

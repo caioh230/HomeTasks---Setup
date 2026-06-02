@@ -1,6 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:hometasks/src/Column/models/ColumnModel.dart';
+import 'package:hometasks/src/Column/models/RequestModel.dart';
 import 'package:hometasks/src/Column/services/ColumnService.dart';
 
 //-----------------------------
@@ -38,8 +39,11 @@ Future<dynamic> readColumn(
   ) async{
     try{
       final service = context.read<ColumnService>();
+
+      final data = await context.request.json() as Map<String, dynamic>;
       
       return service.readColumn(
+        RequestModel.toModel(data).idTable,
         id, 
         context
       );
@@ -80,7 +84,10 @@ Future<Response> deleteColumn(
     try{
       final service = context.read<ColumnService>();
 
+      final data = await context.request.json() as Map<String, dynamic>;
+
       return service.deleteColumn(
+        RequestModel.toModel(data).idTable,
         id,
         context
       );

@@ -4,7 +4,8 @@ class RelationshipModel {
   RelationshipModel({
     required this.idUser,
     required this.idTable,
-    required this.idRole,
+    required this.roleName,
+    required this.tableName,
   });
 
   ///Conversão de map para model
@@ -12,7 +13,8 @@ class RelationshipModel {
     return RelationshipModel(
       idUser: map['idUser'].toString(),
       idTable:  map['idTable'].toString(),
-      idRole:  map['idRole'].toString(),
+      roleName:  map['roleName'].toString(),
+      tableName: map['tableName'].toString(),
     );
   }
 
@@ -20,8 +22,10 @@ class RelationshipModel {
   final String idUser;
   ///Campo idTable
   final String idTable;
-  ///Campo idRole
-  final String idRole;
+  ///Campo roleName
+  final String roleName;
+  ///Campo tableName
+  final String tableName;
 
   
   ///Conversão do Model para Map
@@ -29,7 +33,8 @@ class RelationshipModel {
     return {
       'idUser': idUser,
       'idTable': idTable,
-      'idRole': idRole,
+      'roleName': roleName,
+      'tableName': tableName,
     };
   }  
 }

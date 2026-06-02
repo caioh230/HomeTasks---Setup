@@ -1,5 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
+
+import 'package:hometasks/src/Task/models/RequestModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
+
 import 'package:hometasks/src/Task/services/TaskService.dart';
 
 //-----------------------------
@@ -40,7 +43,8 @@ Future<Response> readColumnTasks(
       final data = await context.request.json() as Map<String, dynamic>;
 
       return service.readColumnTasks(
-        TaskModel.toModel(data).idColumn, 
+        RequestModel.toModel(data).idTable, 
+        RequestModel.toModel(data).idColumn, 
         context
       );
     }catch(e){

@@ -9,7 +9,7 @@ class UserModel{
   
   ///Conversão para o model
   factory UserModel.toModel ( Map<String, dynamic> map){
-    final regex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
     
     if(regex.hasMatch(map['email'].toString())){
       return UserModel(

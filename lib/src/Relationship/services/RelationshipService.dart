@@ -1,15 +1,7 @@
-import 'dart:io';
-
 import 'package:dart_frog/dart_frog.dart';
-
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:dotenv/dotenv.dart';
 
 import 'package:hometasks/src/Relationship/models/RelationshipModel.dart';
 import 'package:hometasks/src/Relationship/repositories/RelationshipRepository.dart';
-
-///Importação de dados sensíveis
-final env = DotEnv()..load();
 
 ///Intermediário das requisições
 class RelationshipService {
@@ -24,7 +16,10 @@ class RelationshipService {
       try{
         final repository = context.read<RelationshipRepository>();
 
-        return repository.createRelationship(relationship);
+        return repository.createRelationship(
+          relationship,
+          context
+        );
       }catch(e){
         throw Exception(e);
       }
@@ -40,16 +35,13 @@ class RelationshipService {
     RequestContext context
     ) async{
       try{
-        final repository = context.read<RelationshipRepository>();
-
-        if(validateid(idUser, context)){        
-          return repository.readRelationship(idUser, idTable);
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'Não é possível alterar os campos de outro usuário'
-          );
-        }
+        final repository = context.read<RelationshipRepository>();  
+        
+        return repository.readRelationship(
+          idUser, 
+          idTable,
+          context
+        );
       }catch(e){
         throw Exception(e);
     }
@@ -65,15 +57,10 @@ class RelationshipService {
     ) async{
       try{
         final repository = context.read<RelationshipRepository>();
-
-        if(validateid(idUser, context)){        
-          return repository.readAllRelationships(idUser);
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'Não é possível alterar os campos de outro usuário'
-          );
-        }
+        
+        return repository.readAllRelationships(
+          idUser
+        );
       }catch(e){
         throw Exception(e);
       }
@@ -92,14 +79,12 @@ class RelationshipService {
       try{
         final repository = context.read<RelationshipRepository>();
 
-        if(validateid(idUser, context)){        
-          return repository.updateRelationship(idUser,idTable, relationship);
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'Não é possível alterar os campos de outro usuário'
-          );
-        }
+        return repository.updateRelationship(
+          idUser,
+          idTable, 
+          relationship, 
+          context
+        );
       }catch(e){
         throw Exception(e);
       }
@@ -117,42 +102,13 @@ class RelationshipService {
       try{
         final repository = context.read<RelationshipRepository>();
 
-        if(validateid(idUser, context)){        
-          return repository.deleteRelationship(idUser, idTable);
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'Não é possível alterar os campos de outro usuário'
-          );
-        }
+        return repository.deleteRelationship(
+          idUser, 
+          idTable, 
+          context
+        );
       }catch(e){
         throw Exception(e);
       }
   }
-}
-
-//-----------------------------
-//            RLS
-//-----------------------------
-///Garante que o usuário só altere as próprias coleções
-bool validateid(
-  String id, 
-    RequestContext context
-  ){
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
-    final jwt = JWT.verify(
-      header!, 
-      SecretKey(env['jwtSecretKey'].toString())
-    );
-
-    final payload = jwt.payload as Map<String, dynamic>;
-  
-    if(payload['id'].toString() == id){
-      return true;
-    }
-    else{
-      return false;
-    }
 }

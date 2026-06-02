@@ -8,6 +8,7 @@ class ColumnDBModel{
     required this.idTable,
     required this.name,
     required this.colorBackground,
+    required this.criadoPor,  
   });
 
 
@@ -17,7 +18,8 @@ class ColumnDBModel{
       id: map['id'].toString(),
       idTable: map['idTable'].toString(),
       name: map['name'].toString(),
-      colorBackground: map['colorBackground'].toString()
+      colorBackground: map['colorBackground'].toString(),
+      criadoPor: map['criadoPor'].toString()
     );
   }
 
@@ -27,12 +29,13 @@ class ColumnDBModel{
     ){
       final dados = doc.data()!;
 
-    return ColumnDBModel(
-      id: doc.id,
-      idTable: dados['idTable'].toString(),
-      name: dados['name'].toString(),
-      colorBackground: dados['colorBackground'].toString()
-    );
+      return ColumnDBModel(
+        id: doc.id,
+        idTable: dados['idTable'].toString(),
+        name: dados['name'].toString(),
+        colorBackground: dados['colorBackground'].toString(),
+        criadoPor: dados['criadoPor'].toString()
+      );
   }
 
   ///Campo id
@@ -43,6 +46,8 @@ class ColumnDBModel{
   final String name;
   ///Campo colorBackground
   final String colorBackground;
+  ///Campo criadoPor
+  final String criadoPor;
 
   
 
@@ -52,7 +57,8 @@ class ColumnDBModel{
       'id': id,
       'idTable': idTable,
       'name': name,
-      'colorBackground': colorBackground
+      'colorBackground': colorBackground,
+      'criadoPor': criadoPor
     };
   }
 }

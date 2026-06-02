@@ -1,5 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
 import 'package:hometasks/src/Task/models/TaskModel.dart';
 import 'package:hometasks/src/Task/repositories/TaskRepository.dart';
 
@@ -16,7 +18,7 @@ class TaskService {
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.createTask(task);
+        return repository.createTask(task, context);
       }catch(e){
         throw Exception(e);
       }
@@ -27,13 +29,14 @@ class TaskService {
   //-----------------------------
   ///Solicitação de leitura individual
   Future<Response> readTask(
+    String idTable,
     String id, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.readTask(id);
+        return repository.readTask(idTable, id, context);
       }catch(e){
         throw Exception(e);
       }
@@ -44,13 +47,14 @@ class TaskService {
   //-----------------------------
   ///Solicitação de leitura conjunta
   Future<Response> readColumnTasks(
+    String idTable,
     String id, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.readTask(id);
+        return repository.readTask(idTable, id, context);
       }catch(e){
         throw Exception(e);
       }
@@ -68,7 +72,7 @@ class TaskService {
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.updateTask(id, task);
+        return repository.updateTask(id, task, context);
       }catch(e){
         throw Exception(e);
       }
@@ -79,15 +83,43 @@ class TaskService {
   //-----------------------------
   ///Solicitação de remoção
   Future<Response> deleteTask(
+    String idTable,
     String id, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.deleteTask(id);
+        return repository.deleteTask(idTable, id, context);
       }catch(e){
         throw Exception(e);
       }
   }
+}
+
+
+//-----------------------------
+//            RLS
+//-----------------------------
+///Garante que o usuário só altere as próprias coleções
+bool validateid(
+  String id, 
+  RequestContext context
+  ){
+    final request = context.request;
+    final header = request.headers['authorization'];
+                
+    final jwt = JWT.verify(
+      header!, 
+      SecretKey(env['jwtSecretKey'].toString())
+    );
+
+    final payload = jwt.payload as Map<String, dynamic>;
+  
+    if(payload['id'].toString() == id){
+      return true;
+    }
+    else{
+      return false;
+    }
 }

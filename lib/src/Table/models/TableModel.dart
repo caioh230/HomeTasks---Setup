@@ -19,8 +19,6 @@ class TableModel {
   ///Campo colorBackground
   final String colorBackground;
 
-  
-
   ///Converção de model para Map
   Map<String, dynamic> toMap(){
     return {

@@ -7,9 +7,10 @@ class TaskDBModel {
     required this.id,
     required this.idColumn,
     required this.name,
+    required this.criadoPor,
+     required this.idTable,
     this.description,
     this.timeLimit,
-    this.idUser,
   });
 
   ///Conversão de Map para DBModel
@@ -18,11 +19,12 @@ class TaskDBModel {
       id: map['id'].toString(),
       idColumn: map['idColumn'].toString(),
       name:  map['name'].toString(),
+      criadoPor:  map['criadoPor'].toString(),
       description:  map['description'].toString(),
       timeLimit: DateTime
         .parse(map['timeLimit'].toString())
         .toIso8601String(),
-      idUser: map['idUser'].toString()
+      idTable: map['idTable'].toString()
     );
   }
 
@@ -32,16 +34,17 @@ class TaskDBModel {
     ){
       final dados = doc.data()!;
 
-    return TaskDBModel(
-      id: doc.id,
-      idColumn: dados['idColumn'].toString(),
-      name:  dados['name'].toString(),
-      description:  dados['description'].toString(),
-      timeLimit: DateTime
-        .parse(dados['timeLimit'].toString())
-        .toIso8601String(),
-      idUser: dados['idUser'].toString()
-    );
+      return TaskDBModel(
+        id: doc.id,
+        idColumn: dados['idColumn'].toString(),
+        name:  dados['name'].toString(),
+        criadoPor:  dados['criadoPor'].toString(),
+        description:  dados['description'].toString(),
+        timeLimit: DateTime
+          .parse(dados['timeLimit'].toString())
+          .toIso8601String(),
+        idTable: dados['idTable'].toString()
+      );
   }
 
   ///Campo id
@@ -50,12 +53,14 @@ class TaskDBModel {
   final String idColumn;
   ///Campo name
   final String name;
+  ///Campo criadoPor
+  final String criadoPor;
   ///Campo description
   final String? description;
   ///Campo timeLimit
   final String? timeLimit;
-  ///Campo idUser
-  final String? idUser;
+  ///Campo idTable
+  final String idTable;
 
   
   ///Conversão para tipo Map
@@ -64,9 +69,10 @@ class TaskDBModel {
       'id': id,
       'idColumn': idColumn,
       'name': name,
+      'criadoPor': criadoPor,
       'description': description,
       'timeLimit': timeLimit,
-      'idUser': idUser
+      'idTable': idTable
     };
   }
 }

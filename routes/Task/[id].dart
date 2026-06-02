@@ -1,4 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
+
+import 'package:hometasks/src/Task/models/RequestModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
 import 'package:hometasks/src/Task/services/TaskService.dart';
 
@@ -37,8 +39,13 @@ Future<dynamic> readTask(
   ) async{
     try{
       final service = context.read<TaskService>();
+      final data = await context.request.json() as Map<String, dynamic>;
       
-      return service.readTask(id, context);
+      return service.readTask(
+        RequestModel.toModel(data).idTable, 
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -56,7 +63,11 @@ Future<Response> updateTask(
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.updateTask(id, TaskModel.toModel(data), context);
+      return service.updateTask(
+        id, 
+        TaskModel.toModel(data), 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }
@@ -71,8 +82,13 @@ Future<Response> deleteTask(
   )async{
     try{
       final service = context.read<TaskService>();
+      final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.deleteTask(id, context);
+      return service.deleteTask(
+        RequestModel.toModel(data).idTable, 
+        id, 
+        context
+      );
     }catch(e){
       throw Exception(e);
     }

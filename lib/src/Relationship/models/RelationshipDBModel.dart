@@ -5,7 +5,6 @@ class RelationshipDBModel {
   ///Componentes do modelo
   RelationshipDBModel({
     required this.id,
-    required this.idRole,
     required this.idTable,
     required this.idUser,
     required this.roleName,
@@ -16,7 +15,6 @@ class RelationshipDBModel {
   factory RelationshipDBModel.toModel ( Map<String, dynamic> map){
     return RelationshipDBModel(
       id: map['id'].toString(),
-      idRole: map['idRole'].toString(),
       idTable: map['idTable'].toString(),
       idUser: map['idUser'].toString(),
       roleName: map['roleName'].toString(),
@@ -32,7 +30,6 @@ class RelationshipDBModel {
 
     return RelationshipDBModel(
       id: doc.id,
-      idRole: dados['idRole'].toString(),
       idTable: dados['idTable'].toString(),
       idUser: dados['idUser'].toString(),
       roleName: dados['roleName'].toString(),
@@ -42,8 +39,6 @@ class RelationshipDBModel {
 
   ///Campo id
   final String id;
-  ///Campo idRole
-  final String idRole;
   ///Campo idTable
   final String idTable;
   ///Campo idUser
@@ -57,7 +52,6 @@ class RelationshipDBModel {
   Map<String, dynamic> toMap(){
     return {
       'id': id,
-      'idRole': idRole,
       'idTable': idTable,
       'idUser': idUser,
       'roleName': roleName,

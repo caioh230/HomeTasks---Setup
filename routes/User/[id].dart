@@ -41,7 +41,6 @@ Future<dynamic> readUser(
       final service = context.read<UserService>();
       
       return service.readUser(
-        id, 
         context
       );
     }catch(e){
@@ -63,7 +62,6 @@ Future<Response> updateUser(
       final data = await context.request.json() as Map<String, dynamic>;
 
       return service.updateUser(
-        id, 
         UserModel.toModel(data), 
         context
       );
@@ -84,7 +82,6 @@ Future<Response> deleteUser(
       final service = context.read<UserService>();
 
       return service.deleteUser(
-        id, 
         context
       );
     }catch(e){

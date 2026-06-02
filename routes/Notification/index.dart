@@ -1,8 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:hometasks/src/Column/models/ColumnModel.dart';
-import 'package:hometasks/src/Column/models/RequestModel.dart';
-import 'package:hometasks/src/Column/services/ColumnService.dart';
+import 'package:hometasks/src/Notification/models/NotificationModel.dart';
+import 'package:hometasks/src/Notification/services/NotificationService.dart';
 
 //-----------------------------
 //            main
@@ -13,10 +12,10 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return readAllColumns(context);
+          return readAllNotifications(context);
 
         case HttpMethod.post:
-          return createColumn(context);
+          return createNotification(context);
 
         case HttpMethod.put:
         case HttpMethod.delete:
@@ -34,16 +33,16 @@ Future<Response> onRequest(
 //-----------------------------
 //            Create
 //-----------------------------
-Future<Response> createColumn(
+Future<Response> createNotification(
   RequestContext context
   )async{
     try{
-      final service = context.read<ColumnService>();
+      final service = context.read<NotificationService>();
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.createColumn(
-        ColumnModel.toModel(data),
+      return service.createNotification(
+        NotificationModel.toModel(data),
         context
       );
     }catch(e){
@@ -54,16 +53,13 @@ Future<Response> createColumn(
 //-----------------------------
 //            Read
 //-----------------------------
-Future<Response> readAllColumns(
+Future<Response> readAllNotifications(
   RequestContext context
   )async{
     try{
-      final service = context.read<ColumnService>();
-      
-      final data = await context.request.json() as Map<String, dynamic>;
+      final service = context.read<NotificationService>();
 
-      return service.readAllColumns(
-        RequestModel.toModel(data).idTable,
+      return service.readAllNotifications(
         context
       );
     }catch(e){

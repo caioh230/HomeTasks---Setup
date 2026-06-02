@@ -4,34 +4,44 @@ class TaskModel {
   TaskModel({
     required this.idColumn,
     required this.name,
+    required this.criadoPor,
+    required this.idTable,
     this.description,
     this.timeLimit,
-    this.idUser,
   });
 
   ///Conversão de map para model
   factory TaskModel.toModel ( Map<String, dynamic> map){
-    return TaskModel(
-      idColumn: map['idColumn'].toString(),
-      name:  map['name'].toString(),
-      description: map['description'].toString(),
-      timeLimit: DateTime
-        .parse(map['timeLimit'].toString())
-        .toIso8601String(),
-      idUser: map['idUser'].toString()
-    );
+    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
+    
+    if(regex.hasMatch(map['criadoPor'].toString())){
+      return TaskModel(
+        idColumn: map['idColumn'].toString(),
+        name:  map['name'].toString(),
+        description: map['description'].toString(),
+        timeLimit: DateTime
+          .parse(map['timeLimit'].toString())
+          .toIso8601String(),
+        idTable: map['idTable'].toString(),
+        criadoPor: map['criadoPor'].toString()
+      );
+    }else{
+      throw Exception('Erro: email  da conta criadora não formatado');
+    }
   }
 
   ///Campo idColumn
   final String idColumn;
   ///Campo name
   final String name;
+  ///Campo criadoPor
+  final String criadoPor;
   ///Campo description
   final String? description;
   ///Campo timeLimit
   final String? timeLimit;
-  ///Campo idUser
-  final String? idUser;
+  ///Campo idTable
+  final String idTable;
 
   
   ///Conversão do Model para Map
@@ -41,7 +51,8 @@ class TaskModel {
       'name': name,
       'description': description,
       'timeLimit': timeLimit,
-      'idUser': idUser
+      'idTable': idTable,
+      'criadoPor': criadoPor
     };
   }  
 }

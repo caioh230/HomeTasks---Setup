@@ -16,10 +16,10 @@ class TableService {
       try{
         final repository = context.read<TableRepository>();
 
-        return repository.createTable(table);
+        return repository.createTable(table, context);
       }catch(e){
         throw Exception(e);
-      }
+    }
   }
 
   //-----------------------------
@@ -33,7 +33,7 @@ class TableService {
       try{
         final repository = context.read<TableRepository>();
 
-        return repository.readTable(id);
+        return repository.readTable(id, context);
       }catch(e){
         throw Exception(e);
       }
@@ -48,13 +48,14 @@ class TableService {
     TableModel table,
     RequestContext context
     ) async{
-      try{
-        final repository = context.read<TableRepository>();
+    try{
+      final repository = context.read<TableRepository>();
 
-        return repository.updateTable(id, table);
-      }catch(e){
-        throw Exception(e);
-      }
+      return repository.updateTable(id, table, context);
+    }catch(e){
+      throw Exception(e);
+    }
+
   }
 
   //-----------------------------
@@ -65,12 +66,12 @@ class TableService {
     String id,
     RequestContext context
     ) async{
-      try{
-        final repository = context.read<TableRepository>();
-        
-        return repository.deleteTable(id);
-      }catch(e){
-        throw Exception(e);
-      }
+    try{
+      final repository = context.read<TableRepository>();
+      
+      return repository.deleteTable(id, context);
+    }catch(e){
+      throw Exception(e);
+    }
   }
 }

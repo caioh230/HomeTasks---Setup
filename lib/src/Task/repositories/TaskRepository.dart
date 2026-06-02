@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
+import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
 import 'package:hometasks/src/Task/models/TaskDBModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
+
+///Importação de dados sensíveis
+final env = DotEnv()..load();
 
 ///Repositório de conexão com o banco remoto 
 class TaskRepository {
@@ -18,19 +23,24 @@ class TaskRepository {
   //-----------------------------
   ///Registro de Nova instância
   Future<Response> createTask(
-    TaskModel task
+    TaskModel task,
+    RequestContext context
     ) async {
-      try{
-        await ref
-        .doc()
-        .set(task.toMap());
-        
-        return Response.json(
-          statusCode: HttpStatus.created, 
-          body: 'Criação bem sucedida'
-        );
-      }catch(e){
-        throw Exception(e);
+      if(await validateOpr(task.idTable, 'Editor', context)){
+        try{
+          await ref
+          .doc()
+          .set(task.toMap());
+          
+          return Response.json(
+            statusCode: HttpStatus.created, 
+            body: 'Criação bem sucedida'
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
       }
   }
 
@@ -39,21 +49,27 @@ class TaskRepository {
   //-----------------------------
   ///Leitura de tarefa pré-registrada
   Future<Response> readTask(
-    String id
-    ) async{
-      try{
-        final val = await ref
-        .doc(id)
-        .get();
+    String idTable,
+    String id,
+    RequestContext context
+    ) async {
+      if(await validateOpr(idTable, 'Reader', context)){
+        try{
+          final val = await ref
+          .doc(id)
+          .get();
 
-        final formDados = TaskDBModel.fromFirestore(val);
-        
-        return Response.json(
-          statusCode: HttpStatus.found, 
-          body: formDados.toMap()
-        );
-      }catch(e){
-        throw Exception(e);
+          final formDados = TaskDBModel.fromFirestore(val);
+          
+          return Response.json(
+            statusCode: HttpStatus.found, 
+            body: formDados.toMap()
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
       }
   }
 
@@ -62,23 +78,29 @@ class TaskRepository {
   //-----------------------------
   ///Leitura de tarefas pertencentes à mesma coluna
   Future<Response> readColumnTasks(
-    String id
-    ) async{
-      try{
-        final val = ref
-        .where(
-            'idColumns', 
-            WhereFilter.equal, 
-            id
-          )
-        .get();
-        
-        return Response.json(
-          statusCode: HttpStatus.found, 
-          body: val
-        );
-      }catch(e){
-        throw Exception(e);
+    String idTable,
+    String id,
+    RequestContext context
+    ) async {
+      if(await validateOpr(idTable, 'Reader', context)){
+        try{
+          final val = ref
+          .where(
+              'idColumns', 
+              WhereFilter.equal, 
+              id
+            )
+          .get();
+          
+          return Response.json(
+            statusCode: HttpStatus.found, 
+            body: val
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
       }
   }
 
@@ -88,20 +110,25 @@ class TaskRepository {
   ///Atualização de tarefa única
   Future<Response> updateTask(
     String id, 
-    TaskModel task
-    ) async{ 
-      try{
+    TaskModel task,
+    RequestContext context
+    ) async {
+      if(await validateOpr(task.idTable, 'Editor', context)){
+        try{
 
-        await ref
-        .doc(id)
-        .update(task.toMap());
+          await ref
+          .doc(id)
+          .update(task.toMap());
 
-        return Response.json(
-          statusCode: HttpStatus.accepted, 
-          body: 'Atualização bem sucedida'
-        );
-      }catch(e){
-        throw Exception(e);
+          return Response.json(
+            statusCode: HttpStatus.accepted, 
+            body: 'Atualização bem sucedida'
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
       }
   }
 
@@ -110,19 +137,76 @@ class TaskRepository {
   //-----------------------------
   ///Deleção de tarefa única
   Future<Response> deleteTask(
-    String id
-    ) async{
-      try{
-        await ref
-        .doc(id)
-        .delete();
+    String idTable,
+    String id,
+    RequestContext context
+    ) async {
+      if(await validateOpr(idTable, 'Editor', context)){
+        try{
+          await ref
+          .doc(id)
+          .delete();
 
-        return Response(
-          statusCode: HttpStatus.accepted, 
-          body: 'Deleção bem sucedida'
-        );
-      }catch(e){
-        throw Exception(e);
+          return Response(
+            statusCode: HttpStatus.accepted, 
+            body: 'Deleção bem sucedida'
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
       }
+  }
+}
+
+//-----------------------------
+//      Permissão Cargos + RLS
+//-----------------------------
+///Limitar as operações a depender do cargo do usuário
+Future<bool> validateOpr(
+  String idTable,
+  String cargo,
+  RequestContext context,
+)async{
+  try{
+    //Obtenção de dados do usuário
+    final request = context.request;
+    final header = request.headers['authorization'];
+                
+    final jwt = JWT.verify(
+      header!, 
+      SecretKey(env['jwtSecretKey'].toString())
+    );
+
+    final payload = jwt.payload as Map<String, dynamic>;
+    
+    //Busca pelo cargo do usuário
+    final relationships = firestore.collection('Relationship');
+
+    final data = await relationships
+      .where(
+        'idUser', 
+        WhereFilter.equal, 
+        payload['id'].toString()
+      )
+      .where(
+        'idTable', 
+        WhereFilter.equal, 
+        idTable
+      )
+      .get();
+
+    if(
+      data.docs.first.data().isNotEmpty
+      &&
+      data.docs.first.data()['cargo'] == cargo
+    ){
+      return true;
+    }else{
+      return false;
+    }
+  }catch(e){
+    return false;
   }
 }

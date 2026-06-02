@@ -14,7 +14,9 @@ Handler middleware(Handler handler) {
     final header = request.headers['authorization'];
     
     if(
-      context.request.method.value == 'GET' 
+      (context.request.method.value == 'GET'
+      ||
+      context.request.method.value == 'POST' )
       && 
       context.request.url.toString() == 'User'
     ){

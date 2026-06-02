@@ -27,21 +27,42 @@ class UserRepository {
     UserModel user
     ) async {
       try{
-        await ref
-          .doc()
-          .set(user.toMap());
+        late final bool val;
+        try{  
+          await ref.where(
+            'email', 
+            WhereFilter.equal, 
+            user.email
+          ).get();
 
-        final token = _jwtToken(user.toMap());
+          val = false;
+        }catch(_){
+        }
 
-        if(token != ''){
-          return Response.json(
-            statusCode: HttpStatus.created, 
-            body: token
-          );
+        if(
+          !val
+        ){
+          await ref
+            .doc()
+            .set(user.toMap());
+          //Criação do tokenJWT
+          final token = _jwtToken(user.toMap());
+
+          if(token != ''){
+            return Response.json(
+              statusCode: HttpStatus.created, 
+              body: token
+            );
+          }else{
+            return Response.json(
+              statusCode: HttpStatus.badRequest, 
+              body: 'Faltam campos para cadastrar o usuário'
+            );
+          }
         }else{
           return Response.json(
             statusCode: HttpStatus.badRequest, 
-            body: 'Faltam campos para cadastrar o usuário'
+            body: 'Email já cadastrado no sistema'
           );
         }
       }catch(e){

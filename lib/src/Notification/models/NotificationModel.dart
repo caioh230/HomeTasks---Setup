@@ -26,10 +26,9 @@ class NotificationModel {
           read:     bool.parse(map['read'].toString())
         );
     }else{
-      throw Exception('Erro: email  da conta criadora não formatado');
+      throw Exception('Erro: emails de endereço não formatados');
     }
   }
-
 
   ///Campo content
   final String content;

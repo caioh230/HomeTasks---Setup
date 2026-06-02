@@ -16,7 +16,7 @@ Handler middleware(Handler handler) {
     if(
       (context.request.method.value == 'GET'
       ||
-      context.request.method.value == 'POST' )
+      context.request.method.value == 'POST')
       && 
       context.request.url.toString() == 'User'
     ){

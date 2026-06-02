@@ -8,6 +8,7 @@ class TaskModel {
     required this.idTable,
     this.description,
     this.timeLimit,
+    this.accountable
   });
 
   ///Conversão de map para model
@@ -23,7 +24,8 @@ class TaskModel {
           .parse(map['timeLimit'].toString())
           .toIso8601String(),
         idTable: map['idTable'].toString(),
-        criadoPor: map['criadoPor'].toString()
+        criadoPor: map['criadoPor'].toString(),
+        accountable: map['accountable'].toString()
       );
     }else{
       throw Exception('Erro: email  da conta criadora não formatado');
@@ -36,12 +38,14 @@ class TaskModel {
   final String name;
   ///Campo criadoPor
   final String criadoPor;
+  ///Campo idTable
+  final String idTable;
   ///Campo description
   final String? description;
   ///Campo timeLimit
   final String? timeLimit;
-  ///Campo idTable
-  final String idTable;
+  ///Campo accountable
+  final String? accountable;
 
   
   ///Conversão do Model para Map
@@ -52,7 +56,8 @@ class TaskModel {
       'description': description,
       'timeLimit': timeLimit,
       'idTable': idTable,
-      'criadoPor': criadoPor
+      'criadoPor': criadoPor,
+      'accountable': accountable
     };
   }  
 }

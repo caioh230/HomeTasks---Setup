@@ -30,7 +30,6 @@ class RelationshipService {
   //-----------------------------
   ///Solicitação de leitura individual
   Future<Response> readRelationship(
-    String idUser,
     String idTable,
     RequestContext context
     ) async{
@@ -38,7 +37,6 @@ class RelationshipService {
         final repository = context.read<RelationshipRepository>();  
         
         return repository.readRelationship(
-          idUser, 
           idTable,
           context
         );
@@ -52,14 +50,13 @@ class RelationshipService {
   //-----------------------------
   ///Solicitação de leitura conjunta
   Future<Response> readAllRelationships(
-    String idUser, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<RelationshipRepository>();
         
         return repository.readAllRelationships(
-          idUser
+          context
         );
       }catch(e){
         throw Exception(e);
@@ -71,7 +68,6 @@ class RelationshipService {
   //-----------------------------
   ///Solicitação de atualização
   Future<Response> updateRelationship(
-    String idUser,
     String idTable, 
     RelationshipModel relationship,
     RequestContext context
@@ -80,7 +76,6 @@ class RelationshipService {
         final repository = context.read<RelationshipRepository>();
 
         return repository.updateRelationship(
-          idUser,
           idTable, 
           relationship, 
           context
@@ -95,15 +90,13 @@ class RelationshipService {
   //-----------------------------
   ///Solicitação de remoção
   Future<Response> deleteRelationship(
-    String idUser,
     String idTable,
     RequestContext context
     ) async{
       try{
         final repository = context.read<RelationshipRepository>();
 
-        return repository.deleteRelationship(
-          idUser, 
+        return repository.deleteRelationship( 
           idTable, 
           context
         );

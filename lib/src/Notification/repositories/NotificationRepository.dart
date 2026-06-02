@@ -186,7 +186,7 @@ class NotificationRepository {
 //-----------------------------
 //             RLS
 //-----------------------------
-///Limitar as operações relacionadas ao usuário
+///Buscar o id do usuário
 Future<String> _validateUsr(
   RequestContext context,
 )async{

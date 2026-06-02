@@ -52,7 +52,6 @@ class RelationshipRepository {
   //-----------------------------
   ///Leitura de relacionamento único
   Future<Response> readRelationship(
-    String idUser,
     String idTable,
     RequestContext context
     ) async {
@@ -62,7 +61,7 @@ class RelationshipRepository {
           .where(
             'idUser', 
             WhereFilter.equal, 
-            idUser
+            _validateUsr(context)
           )
           .where(
             'idTable', 
@@ -93,14 +92,16 @@ class RelationshipRepository {
   //-----------------------------
   ///Leitura de todos os relacionamentos do usuário
   Future<Response> readAllRelationships(
-    String id
+    RequestContext context
     ) async {
       try{
+        final idUser = _validateUsr(context).toString();
+        
         final val = await ref
         .where(
           'idUser', 
           WhereFilter.equal, 
-          id
+          idUser
         )
         .get();
 
@@ -123,43 +124,44 @@ class RelationshipRepository {
   //-----------------------------
   ///Atualização de relacionamento único - Convidados
   Future<Response> updateRelationship(
-    String idUser,
     String idTable,
     RelationshipModel relationship,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, context)){ 
         try{
-          final val = await ref
-          .where(
-            'idUser', 
-            WhereFilter.equal, 
-            idUser
-          )
-          .where(
-            'idTable', 
-            WhereFilter.equal, 
-            idTable
-          )
-          .get();
+          final idUser = _validateUsr(context);
 
-          await ref
-          .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
-          .update(relationship.toMap());
+          if(await _validateOpr(idTable, context)){ 
+            final val = await ref
+            .where(
+              'idUser', 
+              WhereFilter.equal, 
+              idUser
+            )
+            .where(
+              'idTable', 
+              WhereFilter.equal, 
+              idTable
+            )
+            .get();
 
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Atualização bem sucedida'
-          );
+            await ref
+            .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
+            .update(relationship.toMap());
+
+            return Response.json(
+              statusCode: HttpStatus.accepted, 
+              body: 'Atualização bem sucedida'
+            );
+          }else{
+            return Response.json(
+              statusCode: HttpStatus.badRequest, 
+              body: 'Você não possui autorização para esta operação'
+            );
+          }
         }catch(e){
           throw Exception(e);
         }
-      }else{
-        return Response.json(
-          statusCode: HttpStatus.badRequest, 
-          body: 'Você não possui autorização para esta operação'
-        );
-      }
   }
 
   //-----------------------------
@@ -167,11 +169,12 @@ class RelationshipRepository {
   //-----------------------------
   ///Deleção de relacionamento único
   Future<Response> deleteRelationship(
-    String idUser,
     String idTable,
     RequestContext context
     ) async {
         try{
+          final idUser = _validateUsr(context);
+
           if(
             await _validateOpr(idTable, context)
           ){
@@ -258,5 +261,30 @@ Future<bool> _validateOpr(
     }
   }catch(e){
     return false;
+  }
+}
+
+//-----------------------------
+//             RLS
+//-----------------------------
+///Buscar o id do usuário
+Future<String> _validateUsr(
+  RequestContext context,
+)async{
+  try{
+    //Obtenção de dados do usuário
+    final request = context.request;
+    final header = request.headers['authorization'];
+                
+    final jwt = JWT.verify(
+      header!, 
+      SecretKey(_env['jwtSecretKey'].toString())
+    );
+
+    final payload = jwt.payload as Map<String, dynamic>;
+    
+    return payload['id'].toString();
+  }catch(e){
+    return '';
   }
 }

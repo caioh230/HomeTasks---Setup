@@ -40,7 +40,7 @@ class TableRepository {
         //Operação cascata
         final relationship = firestore.collection('Relationship');
         
-        final idUser = _jwtId(context);
+        final idUser = _jwtId(context).toString();
 
         final map = {
           'idUser': idUser,

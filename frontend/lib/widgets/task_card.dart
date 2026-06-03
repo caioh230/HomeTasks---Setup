@@ -1,61 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/models/lists.dart';
-import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/models/task.dart';
+import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/edit_task.dart';
 import 'package:intl/intl.dart';
 import 'package:hometasks/extensions/string.dart';
-
-enum TaskPriority {
-  high('Alta', Color(0x3FFF0000), Color(0xFFDF0000)),
-  medium('Média', Color(0x3FFFCA00), Color(0xFFD38800)),
-  low('Baixa', Color(0x3F00CF3F), Color(0xFF006D36));
-
-  final String value;
-  final Color mainColor;
-  final Color backgroundColor;
-  const TaskPriority(
-    this.value,
-    this.backgroundColor,
-    this.mainColor
-  );
-}
-
-enum TaskStatus {
-  notStarted('Não iniciado', Icons.calendar_today_outlined),
-  inProgress('Em andamento', Icons.trending_up_outlined),
-  complete('Concluído', Icons.check);
-
-  final String value;
-  final IconData icon;
-  const TaskStatus(
-    this.value,
-    this.icon
-  );
-}
-
-class Task {
-  String? id;
-  String title;
-  String? description;
-  String? board;
-  List<String> members;
-  TaskPriority? priority;
-  DateTime expiration;
-  DateTime? completedAt;
-  TaskStatus status;
-
-  Task({
-    this.id,
-    required this.title,
-    required this.members,
-    required this.expiration,
-    this.description,
-    this.priority,
-    this.board,
-    this.status = TaskStatus.notStarted,
-    this.completedAt,
-  });
-}
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -103,7 +52,7 @@ class TaskCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      Lists.boards[task.board]?.title ?? 'Indisponível',
+                      Lists.boards[task.table]?.title ?? 'Indisponível',
                       style: TextStyle(
                         color: Colors.grey.shade600,
                       ),
@@ -163,7 +112,7 @@ class TaskCard extends StatelessWidget {
                     SizedBox(
                       width: 70,
                       child: Stack(
-                        children: BoardCard.prepareAvatars(members: task.members),
+                        children: TableCard.prepareAvatars(members: task.members),
                       ),
                     ),
 

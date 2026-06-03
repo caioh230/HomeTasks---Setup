@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+
+enum TaskPriority {
+  high('Alta', Color(0x3FFF0000), Color(0xFFDF0000)),
+  medium('Média', Color(0x3FFFCA00), Color(0xFFD38800)),
+  low('Baixa', Color(0x3F00CF3F), Color(0xFF006D36));
+
+  final String value;
+  final Color mainColor;
+  final Color backgroundColor;
+  const TaskPriority(
+    this.value,
+    this.backgroundColor,
+    this.mainColor
+  );
+}
+
+enum TaskStatus {
+  notStarted('Não iniciado', Icons.calendar_today_outlined),
+  inProgress('Em andamento', Icons.trending_up_outlined),
+  complete('Concluído', Icons.check);
+
+  final String value;
+  final IconData icon;
+  const TaskStatus(
+    this.value,
+    this.icon
+  );
+}
+
+class Task {
+  String? id;
+  String title;
+  String? description;
+  String? table;
+  List<String> members;
+  TaskPriority? priority;
+  DateTime expiration;
+  DateTime? completedAt;
+  TaskStatus status;
+
+  Task({
+    this.id,
+    required this.title,
+    required this.members,
+    required this.expiration,
+    this.description,
+    this.priority,
+    this.table,
+    this.status = TaskStatus.notStarted,
+    this.completedAt,
+  });
+}

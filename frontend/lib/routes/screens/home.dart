@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
-import 'package:hometasks/routes/screens/new_board.dart';
-import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/routes/screens/new_table.dart';
+import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/plus_button.dart';
 import 'package:hometasks/models/lists.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,10 +15,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isTablesLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTables();
+  }
+
+  Future<void> _loadTables() async {
+    await Lists.reloadTables();
+
+    setState(() {
+      isTablesLoaded = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    Lists.reloadBoards();
-    List<BoardCard> boards = Lists.boards.values.map((board) => BoardCard(board: board)).toList();
+    List<TableCard> boards = Lists.boards.values.map((table) => TableCard(table: table)).toList();
     return SafeArea(
       child: Stack(
         children: [
@@ -44,11 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    boards.isNotEmpty
+                    isTablesLoaded ?
+                      Lists.boards.isNotEmpty
                         ? Column(
                             children: [
-                              for (final board in boards) ...[
-                                board,
+                              for (final table in boards) ...[
+                                table,
                                 const SizedBox(height: 20),
                               ],
                             ],
@@ -59,7 +77,25 @@ class _HomeScreenState extends State<HomeScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.grey),
                             ),
+                          )
+                      : Skeletonizer(
+                          enabled: true,
+                          child: Column(
+                            children: [
+                              for (int i = 0; i < 2; i++) ...[
+                                TableCard(
+                                  table: Table(
+                                    title: "Carregando...",
+                                    members: const [],
+                                    role: UserRole.reader,
+                                    isActive: true,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ],
                           ),
+                        ),
 
                     const SizedBox(height: 60),
                   ],
@@ -72,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: 22,
             child: PlusButton(
               onTap: () {
-                DashboardPage.globalKey.currentState?.showOverlay(NewBoardScreen());
+                DashboardPage.globalKey.currentState?.showOverlay(NewTableScreen());
               },
             ),
           ),

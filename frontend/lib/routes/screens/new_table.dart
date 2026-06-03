@@ -1,17 +1,20 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/board_card.dart';
+import 'package:http/http.dart' as http;
 
-class NewBoardScreen extends StatefulWidget {
-  const NewBoardScreen({super.key});
+class NewTableScreen extends StatefulWidget {
+  const NewTableScreen({super.key});
   
   @override
-  State<NewBoardScreen> createState() => _NewBoardScreenState();
+  State<NewTableScreen> createState() => _NewTableScreenState();
 }
 
-class _NewBoardScreenState extends State<NewBoardScreen> {
-  Board newBoard = Board(
+class _NewTableScreenState extends State<NewTableScreen> {
+  Table newTable = Table(
     title: "",
     members: const [],
     role: UserRole.owner,
@@ -19,8 +22,8 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
     icon: Icons.home_outlined,
   );
 
-  void finishCreatingBoard() async {
-    if(newBoard.title.trim().isEmpty) {
+  void finishCreatingTable() async {
+    if(newTable.title.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('O nome do quadro não pode ser vazio!')),
       );
@@ -33,17 +36,45 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    String title = newBoard.title;
-    String? description = newBoard.description;
+    String title = newTable.title;
+    String? description = newTable.description;
 
-    // TO DO
-    // Trocar o "await Future.delayed" por uma
-    // chamada de API para salvar o novo quadro no backend
-    await Future.delayed(Duration(seconds: 1)); //placeholder
-    //
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/Table'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'title': newTable.title,
+          'description': newTable.description,
+        }),
+      );
 
-    navigator.pop(); 
-    DashboardPage.globalKey.currentState?.closeOverlay();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        navigator.pop();
+
+        DashboardPage.globalKey.currentState?.closeOverlay();
+      } else {
+        navigator.pop();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao criar quadro (${response.statusCode})',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      navigator.pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Falha na conexão: ${e.toString()}'),
+        ),
+      );
+    }
   }
 
   @override
@@ -104,7 +135,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                     style: TextStyle(
                       fontSize: 20,
                     ),
-                    onChanged: (value) => setState(() => newBoard.title = value),
+                    onChanged: (value) => setState(() => newTable.title = value),
                   ),
                 )
               ),
@@ -114,7 +145,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Nome do Espaço',
+                    'Escolha um Ícone',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -145,14 +176,14 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                       Builder(
                         builder: (context) {
                           final option = entry.value;
-                          final isSelected = newBoard.icon == option['icon'] as IconData;
+                          final isSelected = newTable.icon == option['icon'] as IconData;
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 5),
                             child: Material(
                               color: Colors.transparent,
                               borderRadius: BorderRadius.circular(16),
                               child: InkWell(
-                                onTap: () => setState(() => newBoard.icon = option['icon'] as IconData),
+                                onTap: () => setState(() => newTable.icon = option['icon'] as IconData),
                                 borderRadius: BorderRadius.circular(16),
                                 hoverColor: const Color(0xFF1067B4).withValues(alpha: 0.08),
                                 splashColor: const Color(0xFF1067B4).withValues(alpha: 0.15),
@@ -227,7 +258,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                   style: TextStyle(
                     fontSize: 20,
                   ),
-                  onChanged: (value) => setState(() => newBoard.description = value),
+                  onChanged: (value) => setState(() => newTable.description = value),
                 ),
               ),
               const SizedBox(height: 20),
@@ -263,7 +294,7 @@ class _NewBoardScreenState extends State<NewBoardScreen> {
                 ),
               ),
               BasicButton(
-                onTap: () => finishCreatingBoard(),
+                onTap: () => finishCreatingTable(),
                 prefixIcon: Icon(Icons.add, color: Colors.white),
                 text: 'Criar Quadro',
                 textSize: 18,

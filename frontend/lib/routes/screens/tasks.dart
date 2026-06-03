@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/new_task.dart';
 import 'package:hometasks/widgets/plus_button.dart';
@@ -9,10 +10,10 @@ import 'package:hometasks/widgets/task_card.dart';
 
 
 class TasksScreen extends StatefulWidget {
-  final String? board; //Board filtering
+  final String? table; //Table filtering
   const TasksScreen({
     super.key,
-    this.board,
+    this.table,
   });
   
   @override
@@ -87,7 +88,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                       children: [
                         for (final status in [TaskStatus.notStarted, TaskStatus.inProgress, TaskStatus.complete]) ... [
                           (() {
-                            final filteredTasks = Lists.tasks.values.where((task) => task.status == status && (widget.board == null || task.board == widget.board)).toList();
+                            final filteredTasks = Lists.tasks.values.where((task) => task.status == status && (widget.table == null || task.table == widget.table)).toList();
                             return Padding(
                               padding: const EdgeInsets.only(right: 18),
                               child: Column(

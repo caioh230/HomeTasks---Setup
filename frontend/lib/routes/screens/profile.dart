@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/edit_profile.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/widgets/table_card.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,20 +12,20 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
-    List<Board> userBoards = [
-      Board(
+    List<Table> userTables = [
+      Table(
         title: "Residência Principal",
         icon: Icons.home_outlined,
         role: UserRole.owner,
         members: ["1", "2", "3", "4"]
       ),
-      Board(
+      Table(
         title: "Estúdio Criativo",
         icon: Icons.home_work_outlined,
         role: UserRole.editor,
         members: ["1", "7", "10", "9"]
       ),
-      Board(
+      Table(
         title: "Refúgio do Fim de Semana",
         icon: Icons.lock_outline,
         role: UserRole.reader,
@@ -40,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              BoardCard.avatar(id: "1", size: 100),
+              TableCard.avatar(id: "1", size: 100),
               const SizedBox(height: 10),
 
               const Text(
@@ -104,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              for (final board in userBoards) ... [
+              for (final table in userTables) ... [
                 Column(
                   children: [
                     Container(
@@ -116,18 +117,18 @@ class ProfileScreen extends StatelessWidget {
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: board.role.backgroundColor,
+                            color: table.role.backgroundColor,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(board.icon, color: board.role.mainColor),
+                          child: Icon(table.icon, color: table.role.mainColor),
                         ),
                         title: Text(
-                          board.title,
+                          table.title,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        subtitle: Text(_boardDescriptor(board)),
-                        trailing: !board.isPrivate ?
-                            SizedBox(width: 80, child: Stack(children: BoardCard.prepareAvatars(members: board.members))) :
+                        subtitle: Text(_boardDescriptor(table)),
+                        trailing: !table.isPrivate ?
+                            SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members))) :
                             Icon(Icons.lock_outline, color: Colors.grey),
                       ),
                     ),
@@ -173,15 +174,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  String _boardDescriptor(Board board) {
-    if(board.isPrivate) return "Privado";
+  String _boardDescriptor(Table table) {
+    if(table.isPrivate) return "Privado";
     
     String ambient = "Ambiente";
-    switch(board.icon) {
+    switch(table.icon) {
       case Icons.home_outlined: ambient = "Residência";
       case Icons.home_work_outlined: ambient = "Trabalho";
       case Icons.apartment_outlined: ambient = "Apartamento";
     }
-    return "$ambient • ${board.members.length} ${board.members.length != 1 ? 'membros' : 'membro'}";
+    return "$ambient • ${table.members.length} ${table.members.length != 1 ? 'membros' : 'membro'}";
   }
 }

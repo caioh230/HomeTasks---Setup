@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/models/task.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/task_card.dart';
 
 class EditTaskWidget extends StatefulWidget {
   final Task task;
@@ -112,7 +112,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                               Icon(Icons.folder_outlined, size: 16),
                               const SizedBox(width: 10),
                               Text(
-                                Lists.boards[widget.task.board!]?.title.toUpperCase() ?? "INVÁLIDO",
+                                Lists.boards[widget.task.table!]?.title.toUpperCase() ?? "INVÁLIDO",
                                 style: TextStyle(
                                   letterSpacing: 1,
                                 ),

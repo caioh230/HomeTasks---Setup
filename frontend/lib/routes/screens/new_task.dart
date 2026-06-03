@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/board_card.dart';
+import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/task_card.dart';
 import 'package:dotted_border/dotted_border.dart';
 
@@ -35,7 +37,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       return;
     }
 
-    if(newTask.board == null) {
+    if(newTask.table == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Selecione um quadro ativo para a tarefa!')),
       );
@@ -157,11 +159,11 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       ),
                       child: DropdownButtonFormField<String>(
                         items: Lists.boards.values
-                            .where((Board board) => board.isActive)
-                            .map((Board board) => DropdownMenuItem<String>(
-                                  value: board.id,
+                            .where((Table table) => table.isActive)
+                            .map((Table table) => DropdownMenuItem<String>(
+                                  value: table.id,
                                   child: Text(
-                                    board.title,
+                                    table.title,
                                     style: TextStyle(fontSize: 18),
                                   ),
                                 ))
@@ -169,7 +171,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
                         onChanged: (newValue) {
                           setState(() {
-                            newTask.board = newValue;
+                            newTask.table = newValue;
                           });
                         },
 
@@ -327,7 +329,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                BoardCard.avatar(
+                                TableCard.avatar(
                                   id: member,
                                   size: 58.0,
                                   offset: 0.0,

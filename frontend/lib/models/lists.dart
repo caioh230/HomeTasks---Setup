@@ -1,20 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:hometasks/widgets/board_card.dart';
-import 'package:hometasks/widgets/task_card.dart';
-import 'package:hometasks/widgets/notification_card.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
+import 'package:hometasks/models/notification.dart';
+import 'package:hometasks/models/task.dart';
 import 'package:hometasks/models/member.dart';
 
 class Lists {
-  static Map<String, Board> boards = {};
+  static Map<String, Table> boards = {};
   static Map<String, Task> tasks = {};
   static Map<String, Member> users = {};
   static List<AppNotification> notifications = [];
-  static void reloadBoards() async {
+  static Future<void> reloadTables() async {
     boards.clear();
+    
     // TO DO: Load boards from backend
+    await Future.delayed(Duration(seconds: 5)); //placeholder
 
     // PLACEHOLDER:
-    boards["asdhuhawrihasr"] = Board(
+    boards["asdhuhawrihasr"] = Table(
       id: "asdhuhawrihasr",
       title: "Minha Casa",
       members: const [
@@ -25,7 +27,7 @@ class Lists {
       role: UserRole.owner,
       isActive: true,
     );
-    boards["greasodkwqeasd"] = Board(
+    boards["greasodkwqeasd"] = Table(
       id: "greasodkwqeasd",
       title: "Apartamento República",
       members: const [
@@ -38,7 +40,7 @@ class Lists {
       isActive: true,
       icon: Icons.apartment_outlined,
     );
-    boards["vpoxcjfdwermk"] = Board(
+    boards["vpoxcjfdwermk"] = Table(
       id: "vpoxcjfdwermk",
       title: "Oficina do João",
       members: const [
@@ -51,7 +53,7 @@ class Lists {
     );
   }
   
-  static void reloadTasks({String? boardId}) async {
+  static Future<void> reloadTasks({String? boardId}) async {
     tasks.clear();
     // TO DO: Load tasks from backend
     // Filter tasks with ID == boardId
@@ -62,7 +64,7 @@ class Lists {
       title: "Limpar caixa do gato",
       description: "Trocar toda a areia e higienizar a base com desinfetante pet.",
       members: ["125432315"],
-      board: "asdhuhawrihasr",
+      table: "asdhuhawrihasr",
       priority: TaskPriority.high,
       expiration: DateTime.now().add(const Duration(hours: 6)),
       status: TaskStatus.notStarted,
@@ -72,7 +74,7 @@ class Lists {
       title: "Compras da Semana",
       description: "Lista no bloco de notas da geladeira. Focar em frutas, carne e produtos de limpeza.",
       members: ["125432315", "654123453"],
-      board: "greasodkwqeasd",
+      table: "greasodkwqeasd",
       expiration: DateTime.now().subtract(const Duration(days: 1)),
       status: TaskStatus.notStarted,
     );
@@ -81,7 +83,7 @@ class Lists {
       title: "Organizar Home Office",
       description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
       members: ["125432315"],
-      board: "asdhuhawrihasr",
+      table: "asdhuhawrihasr",
       expiration: DateTime.now().add(const Duration(days: 5)),
       status: TaskStatus.inProgress,
     );
@@ -90,7 +92,7 @@ class Lists {
       title: "Regar as Plantas",
       description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
       members: ["125432315"],
-      board: "greasodkwqeasd",
+      table: "greasodkwqeasd",
       expiration: DateTime.now().add(const Duration(hours: 3)),
       status: TaskStatus.inProgress,
     );
@@ -98,14 +100,14 @@ class Lists {
       id: "gregfsdaz",
       title: "Lavar a louça do jantar",
       members: ["125432315"],
-      board: "asdhuhawrihasr",
+      table: "asdhuhawrihasr",
       expiration: DateTime.now().add(const Duration(hours: 8)),
       status: TaskStatus.complete,
       completedAt: DateTime.now().subtract(const Duration(hours: 2))
     );
   }
 
-  static void reloadNotifications() async {
+  static Future<void> reloadNotifications() async {
     notifications.clear();
     // TO DO: Load notifications from backend
 
@@ -114,7 +116,7 @@ class Lists {
       AppNotification.taskInvite(Task(
         id: "awuieyu120qiwla",
         title: "Compras da semana",
-        board: "greasodkwqeasd",
+        table: "greasodkwqeasd",
         members: [],
         expiration: DateTime.now().add(const Duration(hours: 2)),
       ),
@@ -129,7 +131,7 @@ class Lists {
       AppNotification.taskExpiringIn(Task(
         id: "bvocjdfklg43091lm",
         title: "Limpar caixa do gato",
-        board: "asdhuhawrihasr",
+        table: "asdhuhawrihasr",
         members: [],
         expiration: DateTime.now().add(const Duration(hours: 2)),
       ),
@@ -140,7 +142,7 @@ class Lists {
       AppNotification.taskCompleted(Task(
         id: "bvocjdfklg43091lm",
         title: "Limpar caixa do gato",
-        board: "asdhuhawrihasr",
+        table: "asdhuhawrihasr",
         members: [],
         expiration: DateTime.now().add(const Duration(hours: 1)),
       ),
@@ -151,7 +153,7 @@ class Lists {
       DateTime.now().subtract(const Duration(days: 1)))
     );
     notifications.add(
-      AppNotification.invitedToBoard(Board(
+      AppNotification.invitedToTable(Table(
         id: "lsdfmklsdnfxcv",
         title: "Escritório Central",
         members: const [

@@ -1,73 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/routes/screens/tasks.dart';
 
-enum UserRole {
-  owner(
-    value: 'Proprietário',
-    icon: Icons.admin_panel_settings_outlined,
-    description: 'Pode gerenciar todos os aspectos do board, incluindo membros e assinaturas.',
-    backgroundColor: Color(0x3F007FFF),
-    mainColor: Color(0xFF005DA7),
-  ),
-  editor(
-    value: 'Editor',
-    icon: Icons.edit_square,
-    description: 'Pode criar, editar e concluir tarefas, mas não pode gerenciar membros.',
-    backgroundColor: Color(0x3F00CF3F),
-    mainColor: Color(0xFF006D36),
-  ),
-  reader(
-    value: 'Leitor',
-    icon: Icons.visibility_outlined,
-    description: 'Visualização apenas. Ideal para acompanhamento de tarefas sem permissão de alteração.',
-    backgroundColor: Color(0x3F7A7F8C),
-    mainColor: Color(0xFF414751),
-  );
+class TableCard extends StatelessWidget {
+  final Table table;
 
-  final String value;
-  final IconData icon;
-  final String description;
-  final Color mainColor;
-  final Color backgroundColor;
-  const UserRole({
-    required this.value,
-    required this.icon,
-    required this.description,
-    required this.backgroundColor,
-    required this.mainColor
-  });
-}
-
-class Board {
-  String? id;
-  String title;
-  String? description;
-  List<String> members;
-  UserRole role;
-  bool isActive;
-  bool isPrivate;
-  IconData icon;
-
-  Board({
-    this.id,
-    required this.title,
-    required this.members,
-    this.description,
-    this.role = UserRole.reader,
-    this.isActive = true,
-    this.icon = Icons.home_outlined,
-    this.isPrivate = false,
-  });
-}
-
-class BoardCard extends StatelessWidget {
-  final Board board;
-
-  const BoardCard({
+  const TableCard({
     super.key,
-    required this.board,
+    required this.table,
   });
 
   @override
@@ -92,12 +34,12 @@ class BoardCard extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: board.role.backgroundColor,
+                  color: table.role.backgroundColor,
                   borderRadius: BorderRadius.circular(1000),
                 ),
                 child: Icon(
-                  board.icon,
-                  color: board.role.mainColor,
+                  table.icon,
+                  color: table.role.mainColor,
                   size: 28,
                 ),
               ),
@@ -108,13 +50,13 @@ class BoardCard extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: board.role.backgroundColor,
+                  color: table.role.backgroundColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  board.role.value.toUpperCase(),
+                  table.role.value.toUpperCase(),
                   style: TextStyle(
-                    color: board.role.mainColor,
+                    color: table.role.mainColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                     letterSpacing: 1,
@@ -128,7 +70,7 @@ class BoardCard extends StatelessWidget {
 
           // Title
           Text(
-            board.title,
+            table.title,
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -146,13 +88,13 @@ class BoardCard extends StatelessWidget {
                 SizedBox(
                   width: 70,
                   child: Stack(
-                    children: prepareAvatars(members: board.members),
+                    children: prepareAvatars(members: table.members),
                   ),
                 ),
 
                 const SizedBox(width: 12),
                 Text(
-                  '${board.members.length} ${board.members.length != 1 ? "membros" : "membro"}',
+                  '${table.members.length} ${table.members.length != 1 ? "membros" : "membro"}',
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 15,
@@ -176,7 +118,7 @@ class BoardCard extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: board.isActive ? Colors.green : Colors.grey.shade400,
+                      color: table.isActive ? Colors.green : Colors.grey.shade400,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -184,7 +126,7 @@ class BoardCard extends StatelessWidget {
                   const SizedBox(width: 8),
 
                   Text(
-                    board.isActive ? 'Ativo' : 'Visualização apenas',
+                    table.isActive ? 'Ativo' : 'Visualização apenas',
                     style: TextStyle(
                       color: Colors.grey.shade700,
                       fontSize: 15,
@@ -194,7 +136,7 @@ class BoardCard extends StatelessWidget {
               ),
 
               IconButton(
-                onPressed: () => DashboardPage.globalKey.currentState!.showOverlay(TasksScreen(board: board.id)),
+                onPressed: () => DashboardPage.globalKey.currentState!.showOverlay(TasksScreen(table: table.id)),
                 icon: Icon(
                   Icons.arrow_forward,
                   color: Colors.grey.shade500,

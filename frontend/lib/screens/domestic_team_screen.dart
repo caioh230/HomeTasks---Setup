@@ -164,7 +164,7 @@ class DomesticTeamScreen extends StatelessWidget {
                             SizedBox(height: 8),
 
                             Text(
-                              'Envie um convite para entrar no board',
+                              'Envie um convite para entrar no quadro',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 16,
@@ -249,7 +249,7 @@ class DomesticTeamScreen extends StatelessWidget {
                         icon: Icons.admin_panel_settings_outlined,
                         title: 'Proprietário',
                         description:
-                        'Pode gerenciar todos os aspectos do board, incluindo membros e assinaturas.',
+                        'Pode gerenciar todos os aspectos do quadro, incluindo membros e assinaturas.',
                         color: const Color(0xFF1565C0),
                       ),
 

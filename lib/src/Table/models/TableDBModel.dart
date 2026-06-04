@@ -7,7 +7,8 @@ class TableDBModel{
   const TableDBModel({
     required this.id,
     required this.name,
-    required this.colorBackground,
+    required this.description,
+    required this.icon, 
   });
 
   ///Conversão de Map para DBModel
@@ -15,7 +16,8 @@ class TableDBModel{
     return TableDBModel(
       id: map['id'].toString(),
       name: map['name'].toString(),
-      colorBackground: map['colorBackground'].toString()
+      description: map['description'].toString(),
+      icon: int.parse(map['icon'].toString())
     );
   }
 
@@ -28,7 +30,8 @@ class TableDBModel{
     return TableDBModel(
       id: doc.id,
       name: dados['name'].toString(),
-      colorBackground: dados['colorBackground'].toString()
+      description: dados['description'].toString(),
+      icon: int.parse(dados['icon'].toString())
     );
   }
 
@@ -36,16 +39,18 @@ class TableDBModel{
   final String id;
   ///Campo name
   final String name;
-  ///Campo colorBackground
-  final String colorBackground;
-
+  ///Campo description
+  final String description;
+  ///Campo de ícone
+  final int icon;
   
   ///Conversão de DBModel para Map
   Map<String, dynamic> toMap(){
     return {
       'id': id,
       'name': name,
-      'colorBackground': colorBackground
+      'description': description,
+      'icon': icon
     };
   }   
 }

@@ -65,6 +65,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
 
     String title = newTask.title;
+    String? description = newTask.description;
     List<String> members = newTask.members;
     DateTime expiration = newTask.expiration;
     TaskPriority? priority = newTask.priority;

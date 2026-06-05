@@ -8,9 +8,11 @@ class TaskDBModel {
     required this.idColumn,
     required this.name,
     required this.criadoPor,
-     required this.idTable,
+    required this.idTable,
+    required this.priority,
     this.description,
     this.timeLimit,
+    this.accountable
   });
 
   ///Conversão de Map para DBModel
@@ -24,7 +26,8 @@ class TaskDBModel {
       timeLimit: DateTime
         .parse(map['timeLimit'].toString())
         .toIso8601String(),
-      idTable: map['idTable'].toString()
+      idTable: map['idTable'].toString(),
+      priority: map['priority'].toString()
     );
   }
 
@@ -43,7 +46,9 @@ class TaskDBModel {
         timeLimit: DateTime
           .parse(dados['timeLimit'].toString())
           .toIso8601String(),
-        idTable: dados['idTable'].toString()
+        idTable: dados['idTable'].toString(),
+        accountable: (dados['accountable'] as List).cast<String>(),
+        priority: dados['priority'].toString()
       );
   }
 
@@ -55,12 +60,16 @@ class TaskDBModel {
   final String name;
   ///Campo criadoPor
   final String criadoPor;
+  ///Campo priority
+  final String priority;
   ///Campo description
   final String? description;
   ///Campo timeLimit
   final String? timeLimit;
   ///Campo idTable
   final String idTable;
+  ///Campo accountable
+  final List<String>? accountable;
 
   
   ///Conversão para tipo Map
@@ -72,7 +81,9 @@ class TaskDBModel {
       'criadoPor': criadoPor,
       'description': description,
       'timeLimit': timeLimit,
-      'idTable': idTable
+      'idTable': idTable,
+      'priority': priority,
+      'accountable': accountable
     };
   }
 }

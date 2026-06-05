@@ -6,6 +6,7 @@ class TaskModel {
     required this.name,
     required this.criadoPor,
     required this.idTable,
+    required this.priority,
     this.description,
     this.timeLimit,
     this.accountable
@@ -15,7 +16,10 @@ class TaskModel {
   factory TaskModel.toModel ( Map<String, dynamic> map){
     final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
     
-    if(regex.hasMatch(map['criadoPor'].toString())){
+    if(
+      regex.hasMatch(map['criadoPor'].toString())
+      //&& evaluate(map['criadoPor'].toString(), regex)
+    ){
       return TaskModel(
         idColumn: map['idColumn'].toString(),
         name:  map['name'].toString(),
@@ -25,7 +29,8 @@ class TaskModel {
           .toIso8601String(),
         idTable: map['idTable'].toString(),
         criadoPor: map['criadoPor'].toString(),
-        accountable: map['accountable'].toString()
+        accountable: (map['accountable'] as List).cast<String>(),
+        priority: map['priority'].toString()
       );
     }else{
       throw Exception('Erro: email  da conta criadora não formatado');
@@ -40,12 +45,14 @@ class TaskModel {
   final String criadoPor;
   ///Campo idTable
   final String idTable;
+  ///Campo priority
+  final String priority;
   ///Campo description
   final String? description;
   ///Campo timeLimit
   final String? timeLimit;
   ///Campo accountable
-  final String? accountable;
+  final List<String>? accountable;
 
   
   ///Conversão do Model para Map
@@ -56,8 +63,31 @@ class TaskModel {
       'description': description,
       'timeLimit': timeLimit,
       'idTable': idTable,
+      'priority': priority,
       'criadoPor': criadoPor,
       'accountable': accountable
     };
   }  
+}
+
+///Definir se um campo opcional segue as regras
+bool evaluate(
+  String data,
+  RegExp regex
+){
+  if (
+    data.isEmpty
+    ||
+    data == ''
+  ){
+      return true;
+  }else{
+    if(
+      regex.hasMatch(data)
+    ){
+      return true;
+    }else{
+      return false;
+    }
+  }
 }

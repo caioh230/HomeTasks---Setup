@@ -13,11 +13,12 @@ Future<dynamic> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return readAllRelationships(context);
-        case HttpMethod.post:
-          return createRelationship(context);
+          return readRelationship(id, context);
         case HttpMethod.put:
+          return updateRelationship(id, context);
         case HttpMethod.delete:
+          return deleteRelationship(id, context);
+        case HttpMethod.post:
         case HttpMethod.head:
         case HttpMethod.options:
         case HttpMethod.patch:
@@ -47,15 +48,39 @@ Future<dynamic> readRelationship(
 }
 
 //-----------------------------
-//            Read
+//            Update
 //-----------------------------
-Future<Response> readAllRelationships(
+Future<Response> updateRelationship(
+  String id,
   RequestContext context
-  ) async{
+  )async{
     try{
       final service = context.read<RelationshipService>();
-      
-      return service.readAllRelationships(
+
+      final data = await context.request.json() as Map<String, dynamic>;
+
+      return service.updateRelationship(
+        id,
+        RelationshipModel.toModel(data), 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//          Delete
+//-----------------------------
+Future<Response> deleteRelationship(
+  String id,
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<RelationshipService>();
+
+      return service.deleteRelationship(
+        id,
         context
       );
     }catch(e){

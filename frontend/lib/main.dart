@@ -3,6 +3,8 @@ import 'package:hometasks/routes/forgot_password.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hometasks/routes/dashboard.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'firebase_options.dart';
 
 import 'package:hometasks/routes/auth.dart';
@@ -15,6 +17,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializeDateFormatting('pt_BR', null);
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

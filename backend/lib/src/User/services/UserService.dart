@@ -57,6 +57,23 @@ class UserService {
   }
 
   //-----------------------------
+  //            read
+  //-----------------------------
+  ///Requisição de verificação de instância por token
+  Future<Response> isUserByToken(
+    String token, 
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<UserRepository>();
+
+        return repository.isUserByToken(token);
+      }catch(e){
+        throw Exception(e);
+      }
+  }
+
+  //-----------------------------
   //            update
   //-----------------------------
   ///Requisição de atualização de instância

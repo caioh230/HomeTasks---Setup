@@ -4,7 +4,7 @@ import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/new_table.dart';
 import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/plus_button.dart';
-import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadTables() async {
     await Lists.reloadTables();
 
-    setState(() {
+    this?.setState(() {
       isTablesLoaded = true;
     });
   }

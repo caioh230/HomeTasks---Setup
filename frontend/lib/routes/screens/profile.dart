@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide Table;
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/edit_profile.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/table_card.dart';
 
@@ -41,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              TableCard.avatar(id: "1", size: 100),
+              Avatar(id: "1", size: 100),
               const SizedBox(height: 10),
 
               const Text(

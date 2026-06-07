@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -40,14 +41,21 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    bool success = false;
+    //bool success = false;
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      /*await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      success = true;
-    } on FirebaseAuthException catch (e) {
+      success = true;*/
+
+      await UserAccount.login(
+        email: email,
+        password: password,
+      );
+      navigator.pop();
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } /*on FirebaseAuthException catch (e) {
       navigator.pop(); 
       
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,17 +65,19 @@ class _LoginPageState extends State<LoginPage> {
           _ => e.code
         })),
       );
-    } catch (e) {
+    }*/ catch (e) {
       navigator.pop(); 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
-    } finally {
+    } /*finally {
       if (success && navigator.canPop()) {
         navigator.pop();
       }
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    }
+      if(context.mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
+    }*/
   }
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
@@ -82,7 +92,9 @@ class _LoginPageState extends State<LoginPage> {
         idToken: authentication.idToken,
       );
       final logged = await FirebaseAuth.instance.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      if(context.mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
       return logged;
     } catch (e) {
       debugPrint('Google sign-in error: $e');
@@ -158,11 +170,12 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InputField(
-                              label: 'Nome de usuário ou email',
+                              label: 'Nome de usuário ou E-mail',
                               controller: _emailController,
                               backgroundColor:
                               Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.mail_outline),
+                              hintText: "nome@exemplo.com",
                             ),
                             const SizedBox(height: 20),
                             InputField(
@@ -172,6 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                               backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.lock_outline),
                               onForgotPassword: () => Navigator.pushReplacementNamed(context, '/forgot_password'),
+                              hintText: "Senha1234*",
                             ),
                             const SizedBox(height: 35),
                             BasicButton(

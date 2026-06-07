@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/new_task.dart';

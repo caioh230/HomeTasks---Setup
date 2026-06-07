@@ -13,7 +13,7 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return isUser(context);
+          return getUser(context);
         case HttpMethod.post:
           return createUser(context);
 
@@ -34,21 +34,29 @@ Future<Response> onRequest(
 //            Read
 //-----------------------------
 ///Responsável por executar a requisição de verificação
-Future<Response> isUser(
-  RequestContext context
-  ) async{
-    try{
-      final service = context.read<UserService>();
+Future<Response> getUser(RequestContext context) async {
+  try {
+    final service = context.read<UserService>();
 
-      final data = await context.request.json() as Map<String, dynamic>;
+    final authHeader = context.request.headers['authorization'];
 
-      return await service.isUser(
-        UserModel.toModel(data), 
-        context
+    //jwt login
+    if (authHeader == null || !authHeader.startsWith('Bearer ')) {
+      return Response.json(
+        statusCode: 401,
+        body: 'Missing token',
       );
-    }catch(e){
-      throw Exception(e);
     }
+
+    final token = authHeader.substring('Bearer '.length);
+
+    return await service.isUserByToken(token, context);
+  } catch (e) {
+    return Response.json(
+      statusCode: 500,
+      body: 'Error: $e',
+    );
+  }
 }
 
 //-----------------------------

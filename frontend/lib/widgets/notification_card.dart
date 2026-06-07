@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/models/notification.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/task_card.dart';
@@ -173,7 +174,7 @@ class NotificationCard extends StatelessWidget {
   Widget _buildAvatar() {
     return Stack(
       children: [
-        TableCard.avatar(
+        Avatar(
           id: notification.userId!,
           size: 42,
         ),

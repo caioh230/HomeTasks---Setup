@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hometasks/widgets/basic_button.dart';
-
-import 'package:hometasks/widgets/table_card.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/profile_widget.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
@@ -83,10 +81,10 @@ class DashboardPageState extends State<DashboardPage> {
             showDialog(
               context: context,
               barrierColor: Colors.black54,
-              builder: (context) => ProfileWidget(user: user!)
+              builder: (context) => ProfileWidget()
             );
           },
-          child: TableCard.avatar(id: "1", size: 40),
+          child: Avatar(id: "1", size: 40),
         ),
         actions: [
           IconButton(

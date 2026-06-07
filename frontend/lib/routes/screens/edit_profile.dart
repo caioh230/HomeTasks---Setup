@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/input_field.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -95,7 +95,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: Stack(
                         children: [
-                          TableCard.avatar(id: '1', size: 128, borderSize: 4),
+                          Avatar(id: '1', size: 128, borderSize: 4),
                           Positioned(
                             bottom: 0,
                             right: 0,

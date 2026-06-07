@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 

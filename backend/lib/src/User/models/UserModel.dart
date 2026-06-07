@@ -4,35 +4,42 @@ class UserModel{
   UserModel({
     required this.email,
     required this.password,
-    this.nickname,  
+    this.name,
+    this.username,
   });
   
   ///Conversão para o model
-  factory UserModel.toModel ( Map<String, dynamic> map){
-    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
+  factory UserModel.toModel (
+      Map<String, dynamic> map,
+      {bool validateEmail = true}){
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     
-    if(regex.hasMatch(map['email'].toString())){
+    if(!validateEmail || regex.hasMatch(map['email'].toString())){
+      final username = (map['username'] as String?)
+        ?.trim()
+        .toLowerCase()
+        .replaceAll(RegExp('[^a-z0-9]'), '');
       return UserModel(
-        nickname: map['nickname'].toString(),
+        name: map['name'].toString(),
+        username: username,
         email:  map['email'].toString(),
         password: map['password'].toString()
       );
-    }else{
-      throw Exception('Erro: email não formatado');
+    } else {
+      throw Exception('Email inválido');
     }
   }
 
-  ///Campo nickname
-  final String? nickname;
-  ///Campo email
+  final String? name;
+  final String? username;
   final String email;
-  ///Campo password
   final String password;
   
   ///Conversão para Map
   Map<String, dynamic> toMap(){
     return {
-      'nickname': nickname,
+      'name': name,
+      'username': username,
       'email': email,
       'password': password
     };

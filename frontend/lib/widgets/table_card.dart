@@ -3,6 +3,8 @@ import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/routes/screens/tasks.dart';
+import 'package:hometasks/widgets/avatar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class TableCard extends StatelessWidget {
   final Table table;
@@ -157,7 +159,7 @@ class TableCard extends StatelessWidget {
         avatars.add(numAvatar(num: members.length - i, offset: i * offset, size: size));
         break;
       } else {
-        avatars.add(avatar(id: (i+1).toString(), offset: i * offset, size: size));
+        avatars.add(Avatar(id: (i+1).toString(), offset: i * offset, size: size));
       }
     }
     return avatars;
@@ -182,26 +184,6 @@ class TableCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget avatar({required String id, double size = 34.0, double offset = 0.0, double borderSize = 2}) {
-    return Transform.translate(
-      offset: Offset(offset, 0),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: borderSize),
-        ),
-        child: ClipOval(
-          child: Image.network(
-            "https://i.pravatar.cc/100?img=$id",
-            fit: BoxFit.cover,
           ),
         ),
       ),

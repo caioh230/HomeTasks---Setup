@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hometasks/core/services/account.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 
 class ProfileWidget extends StatefulWidget {
-  final User user;
   const ProfileWidget({
     super.key,
-    required this.user,
   });
 
   @override
@@ -14,6 +13,12 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
+  void _signUserOut(context) async {
+    await UserAccount.logout();
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   bool _closePressed = false;
   @override
   Widget build(BuildContext context) {
@@ -58,17 +63,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  ClipOval(
-                    child: Image.network(
-                      "https://i.pravatar.cc/100?img=1",
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  Avatar(id: "1", size: 120),
                   const SizedBox(height: 16),
-                  const Text(
-                    "Nome de Usuário",
+                  Text(
+                    UserAccount.name ?? "Nome",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -76,7 +74,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    widget.user.email!,
+                    "@" + (UserAccount.username ?? "usuario"),
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -84,7 +82,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   ),
                   const SizedBox(height: 20),
                   BasicButton(
-                    onTap: () => signUserOut(context),
+                    onTap: () => _signUserOut(context),
                     text: "Sair da conta",
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -98,10 +96,5 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         ),
       ),
     );
-  }
-
-  void signUserOut(context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.pop(context);
   }
 }

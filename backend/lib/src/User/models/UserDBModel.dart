@@ -5,7 +5,8 @@ class UserDBModel{
   ///Modelo Base
   const UserDBModel({
     required this.id,
-    required this.nickname,
+    required this.name,
+    required this.username,
     required this.email,
     required this.password,
   });
@@ -14,7 +15,8 @@ class UserDBModel{
   factory UserDBModel.toModel(Map<String, dynamic> map){
     return UserDBModel(
       id: map['id'].toString(),
-      nickname: map['nickname'].toString(),
+      name: map['name'].toString(),
+      username: map['username'].toString(),
       email: map['email'].toString(),
       password: map['password'].toString()
     );
@@ -28,26 +30,25 @@ class UserDBModel{
 
     return UserDBModel(
       id: doc.id,
-      nickname: dados['nickname'].toString(),
+      name: dados['name'].toString(),
+      username: dados['username'].toString(),
       email: dados['email'].toString(),
       password: dados['password'].toString()
     );
   }
 
-  ///Campo id
   final String id;
-  ///Campo nickname
-  final String nickname;
-  ///Campo email
+  final String name;
+  final String username;
   final String email;
-  ///Campo password
   final String password;
 
   ///Conversão para Map
   Map<String, dynamic> toMap(){
     return {
       'id': id,
-      'nickname': nickname,
+      'name': name,
+      'username': username,
       'email': email,
       'password': password
     };

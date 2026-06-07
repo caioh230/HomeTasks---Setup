@@ -23,51 +23,72 @@ class UserRepository {
   //            create - Cadastro
   //-----------------------------
   ///Criação de uma nova instância no banco remoto
-  Future<Response> createUser(
-    UserModel user
-    ) async {
-      try{
-        late final bool val;
-        try{  
-          await ref.where(
-            'email', 
-            WhereFilter.equal, 
-            user.email
-          ).get();
+  Future<Response> createUser(UserModel user) async {
+    if (
+      user.email.isEmpty ||
+      user.password.isEmpty ||
+      (user.username?.isEmpty ?? true) ||
+      (user.name?.isEmpty ?? true)
+    ) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: 'Faltam campos para cadastrar o usuário',
+      );
+    }
 
-          val = false;
-        }catch(_){
-        }
+    try {
+      final emailResult = await ref
+          .where(
+            'email',
+            WhereFilter.equal,
+            user.email,
+          )
+          .get();
 
-        if(
-          !val
-        ){
-          await ref
-            .doc()
-            .set(user.toMap());
-          //Criação do tokenJWT
-          final token = _jwtToken(user.toMap());
-
-          if(token != ''){
-            return Response.json(
-              statusCode: HttpStatus.created, 
-              body: token
-            );
-          }else{
-            return Response.json(
-              statusCode: HttpStatus.badRequest, 
-              body: 'Faltam campos para cadastrar o usuário'
-            );
-          }
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'Email já cadastrado no sistema'
-          );
-        }
-      }catch(e){
-        throw Exception(e);
+      if (!emailResult.empty) {
+        return Response.json(
+          statusCode: HttpStatus.badRequest,
+          body: 'Email já cadastrado no sistema',
+        );
       }
+
+      final usernameResult = await ref
+        .where(
+          'username',
+          WhereFilter.equal,
+          user.username!,
+        )
+        .get();
+
+      if (!usernameResult.empty) {
+        return Response.json(
+          statusCode: HttpStatus.conflict,
+          body: 'Nome de usuário já está em uso',
+        );
+      }
+
+      final refDoc = ref.doc();
+      final data = {
+        ...user.toMap(),
+        'id': refDoc.id,
+      };
+
+      await refDoc.set(data);
+
+      final token = _jwtToken(data);
+
+      return Response.json(
+        statusCode: HttpStatus.created,
+        body: {
+          'token': token,
+          'name': user.name!,
+          'username': user.username!,
+        },
+      );
+    } catch (e, stackTrace) {
+      print(stackTrace);
+      throw Exception(e);
+    }
   }
 
   //-----------------------------
@@ -78,11 +99,11 @@ class UserRepository {
     RequestContext context
     ) async{
       try{
-        final id = _validateOpr(context);
+        final id = await _validateOpr(context);
 
         final val = await ref
-          .doc(id.toString())
-          .get(); 
+          .doc(id)
+          .get();
 
         final formDados = UserDBModel.fromFirestore(val);
 
@@ -99,47 +120,135 @@ class UserRepository {
   //            read - Login
   //-----------------------------
   ///Verificar se uma instância existe no banco remoto e retorna um JWT
-  Future<Response> isUser(
-    UserModel user
-    ) async{
-      try{
-        final val = await ref
-          .where(
-            'email', 
-            WhereFilter.equal, 
-            user.email
-          ).where(
-            'password', 
-            WhereFilter.equal, 
-            user.password
-          )
-          .get(); 
+  Future<Response> isUser(UserModel user) async {
+    try {
+      final identifier = user.email; //email/username
+      var val = await ref
+          .where('email', WhereFilter.equal, identifier)
+          .where('password', WhereFilter.equal, user.password)
+          .get();
 
-        final data = UserDBModel.fromFirestore(val.docs.first);
-
-        if (!val.empty){
-          final token = _jwtToken(data.toMap());
-
-          if(token != ''){
-            return Response.json(
-              statusCode: HttpStatus.found, 
-              body:token
-            );
-          }else{
-            return Response.json(
-            statusCode: HttpStatus.notFound,
-            body: 'E-mail ou senha inválidos'
-          );
-          }
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.notFound,
-            body: 'E-mail ou senha inválidos'
-          );
-        }
-      }catch(e){
-        throw Exception(e);
+      if (val.empty &&
+      (identifier.startsWith('@') ||
+      !identifier.contains('@'))) {
+        val = await ref
+            .where('username', WhereFilter.equal, identifier)
+            .where('password', WhereFilter.equal, user.password)
+            .get();
       }
+
+      if (val.empty) {
+        return Response.json(
+          statusCode: HttpStatus.notFound,
+          body: 'E-mail ou senha inválidos',
+        );
+      }
+
+      final doc = val.docs.first;
+      final data = UserDBModel.fromFirestore(doc).toMap();
+
+      final token = _jwtToken({
+        'id': data['id'],
+        'name': data['name'],
+        'username': data['username'],
+      });
+
+      if (token.isEmpty) {
+        return Response.json(
+          statusCode: HttpStatus.internalServerError,
+          body: 'Erro ao gerar token',
+        );
+      }
+
+      return Response.json(
+        statusCode: HttpStatus.ok,
+        body: {
+          'token': token,
+          'name': data['name'],
+          'username': data['username']
+        },
+      );
+    } catch (e) {
+      return Response.json(
+        statusCode: HttpStatus.internalServerError,
+        body: 'Erro interno: $e',
+      );
+    }
+  }
+
+  //-----------------------------
+  //            read - Login (Token)
+  //-----------------------------
+  ///Verificar se uma instância existe com um certo token
+  Future<Response> isUserByToken(
+    String token,
+  ) async {
+    try {
+      final payload = _verifyJwtToken(token);
+
+      if (payload == null || !payload.containsKey('id')) {
+        return Response.json(
+          statusCode: HttpStatus.unauthorized,
+          body: 'Token inválido',
+        );
+      }
+
+      final userId = payload['id'].toString();
+
+      final user = await readUserById(userId);
+
+      if (user == null) {
+        return Response.json(
+          statusCode: HttpStatus.notFound,
+          body: 'Usuário não encontrado',
+        );
+      }
+
+      return Response.json(
+        statusCode: HttpStatus.ok,
+        body: {
+          'id': user.id,
+          'name': user.name,
+          'username': user.username,
+        }
+      );
+    } catch (e) {
+      return Response.json(
+        statusCode: HttpStatus.internalServerError,
+        body: 'Falha ao autenticar por token: $e',
+      );
+    }
+  }
+
+  Map<String, dynamic>? _verifyJwtToken(String token) {
+    try {
+      final jwt = JWT.verify(
+        token,
+        SecretKey(_env['jwtSecretKey'].toString()),
+      );
+
+      return jwt.payload as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  //-----------------------------
+  //            read - User by id
+  //-----------------------------
+  ///Pega dados do usuário pelo firebase através de um ID de usuário
+  Future<UserDBModel?> readUserById(String id) async {
+    try {
+      final doc = await ref.doc(id).get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      return UserDBModel.fromFirestore(doc);
+    } catch (e) {
+      throw Exception('Erro ao buscar usuário por ID: $e');
+    }
   }
 
   //-----------------------------
@@ -151,15 +260,15 @@ class UserRepository {
     UserModel user
     ) async{ 
       try{
-        final id = _validateOpr(context);
+        final id = await _validateOpr(context);
 
         await ref
-          .doc(id.toString())
+          .doc(id)
           .update(user.toMap()); 
 
         return Response.json(
           statusCode: HttpStatus.accepted, 
-          body: 'Atualização bem sucedida'
+          body: 'Atualização bem sucedida',
         );
       }catch(e){
         throw Exception(e);
@@ -174,10 +283,10 @@ class UserRepository {
     RequestContext context,
     ) async{
       try{
-        final id = _validateOpr(context);
+        final id = await _validateOpr(context);
         
         await ref
-          .doc(id.toString())
+          .doc(id)
           .delete();
         
         //Operação cascata
@@ -203,9 +312,9 @@ class UserRepository {
           .delete();
         }
 
-        return Response(
+        return Response.json(
           statusCode: HttpStatus.accepted, 
-          body: 'Deleção bem sucedida'
+          body: 'Deleção bem sucedida',
         );
       }catch(e){
         throw Exception(e);
@@ -222,15 +331,14 @@ String _jwtToken(
         // Payload
         {
           'id': map['id'],
-          'nickname': map['nickname'],
-          'email': map['email'],
-          'password': map['password']
+          'name': map['name'],
+          'username': map['username'],
         },
         issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
       );
 
       // Sign it (default with HS256 algorithm)
-      return jwt.sign(SecretKey(_env['jwtSecretKey'].toString()));
+      return jwt.sign(SecretKey(_env['jwtSecretKey'].toString()), expiresIn: const Duration(days: 30));
     }catch(e){
       return '';
     }
@@ -242,21 +350,25 @@ String _jwtToken(
 ///Limitar as operações relacionadas ao usuário
 Future<String> _validateOpr(
   RequestContext context,
-)async{
-  try{
-    //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
-    final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
-    );
+) async {
+  final authHeader = context.request.headers['authorization'];
 
-    final payload = jwt.payload as Map<String, dynamic>;
-    
-    return payload['id'].toString();
-  }catch(e){
-    return '';
+  if (authHeader == null) {
+    throw Exception('Authorization não informado');
   }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    throw Exception('Token inválido');
+  }
+
+  final token = authHeader.substring('Bearer '.length);
+  print(token);
+  final jwt = JWT.verify(
+    token,
+    SecretKey(_env['jwtSecretKey'].toString()),
+  );
+
+  final payload = jwt.payload as Map<String, dynamic>;
+
+  return payload['id'].toString();
 }

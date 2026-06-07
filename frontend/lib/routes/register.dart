@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
 
@@ -11,13 +11,29 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   void signUserUp() async {
+    String name = _nameController.text.trim();
+    String username = _usernameController.text.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
+    if(email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha o campo de nome completo e tente novamente.')),
+      );
+      return;
+    }
+    if(email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha o campo do nome de usuário e tente novamente.')),
+      );
+      return;
+    }
     if(email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Preencha o campo de e-mail e tente novamente.')),
@@ -44,9 +60,9 @@ class _RegisterPageState extends State<RegisterPage> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    bool success = false;
+    //bool success = false;
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      /*await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -60,18 +76,33 @@ class _RegisterPageState extends State<RegisterPage> {
         'weak-password' => 'Senha fraca!\nDeixe-a mais forte adicionando caracteres especiais, números e letras maiúsculas.',
         'email-already-in-use' => 'Esse e-mail já está sendo usado por outra conta.',
         _ => e.code
-      })));
+      })));*/
+
+      await UserAccount.register(
+        name: name,
+        username: username,
+        email: email,
+        password: password,
+      );
+      navigator.pop();
+      if(context.mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
     } catch (e) {
       navigator.pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
-    } finally {
+    } /*finally {
       if (success) {
-        if(navigator.canPop()) navigator.pop();
-        navigator.pushReplacementNamed('/dashboard');
+        if(navigator.canPop()) {
+          navigator.pop();
+        }
+        if(context.mounted) {
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
       }
-    }
+    }*/
   }
 
   @override
@@ -142,11 +173,32 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InputField(
+                              label: 'Nome completo',
+                              controller: _nameController,
+                              hintText: "Digite seu nome",
+                              backgroundColor: Color(0xFFF2F3FB),
+                              prefixIcon: Icon(Icons.mail_outline),
+                            ),
+                            const SizedBox(height: 20),
+                            InputField(
+                              label: 'Nome de usuário',
+                              controller: _usernameController,
+                              backgroundColor: Color(0xFFF2F3FB),
+                              prefixIcon: Icon(Icons.mail_outline),
+                              hintText: "@nomeusuario",
+                              onChanged: (String str) {
+                                str = str.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+                                if(str.isNotEmpty) _usernameController.text = "@${str}";
+                                else _usernameController.text = "";
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            InputField(
                               label: 'E-mail',
                               controller: _emailController,
-                              backgroundColor:
-                              Color(0xFFF2F3FB),
+                              backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.mail_outline),
+                              hintText: "nome@exemplo.com",
                             ),
                             const SizedBox(height: 20),
                             InputField(
@@ -155,6 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               isPassword: true,
                               backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.lock_outline),
+                              hintText: "Senha1234*",
                             ),
                             const SizedBox(height: 20),
                             InputField(
@@ -163,6 +216,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               isPassword: true,
                               backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.lock_outline),
+                              hintText: "Senha1234*",
                             ),
                             const SizedBox(height: 35),
                             BasicButton(

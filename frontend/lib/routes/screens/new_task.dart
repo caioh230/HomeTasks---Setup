@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart' hide Table;
 import 'package:hometasks/models/table.dart';
-import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/task_card.dart';
@@ -330,7 +331,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                TableCard.avatar(
+                                Avatar(
                                   id: member,
                                   size: 58.0,
                                   offset: 0.0,

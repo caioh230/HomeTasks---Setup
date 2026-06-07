@@ -7,6 +7,8 @@ class InputField extends StatefulWidget {
   final Color backgroundColor;
   final Icon? prefixIcon;
   final Function? onForgotPassword;
+  final String? hintText;
+  final ValueChanged<String>? onChanged;
 
   const InputField({
     super.key,
@@ -16,6 +18,8 @@ class InputField extends StatefulWidget {
     this.backgroundColor = Colors.white,
     this.prefixIcon,
     this.onForgotPassword,
+    this.hintText,
+    this.onChanged,
   });
   @override
   State<InputField> createState() => _InputFieldState();
@@ -73,6 +77,7 @@ class _InputFieldState extends State<InputField> {
             ),
             child: TextField(
               controller: widget.controller,
+              onChanged: widget.onChanged,
               obscureText: _obscureText,
               style: const TextStyle(
                 fontSize: 16,
@@ -83,6 +88,10 @@ class _InputFieldState extends State<InputField> {
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 14,
+                ),
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  color: Colors.black.withValues(alpha: 0.3),
                 ),
                 prefixIcon: widget.prefixIcon,
                 suffixIcon: widget.isPassword

@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/routes/dashboard.dart';
  
 class SettingsScreen extends StatefulWidget {
@@ -138,8 +138,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.logout,
                     label: 'Sair da conta',
                     color: const Color(0xFFE53E3E),
-                    onTap: () {
-                      FirebaseAuth.instance.signOut();
+                    onTap: () async {
+                      await UserAccount.logout();
                       Navigator.pushReplacementNamed(context, '/login');
                     }
                   ),

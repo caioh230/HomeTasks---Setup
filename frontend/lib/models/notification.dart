@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Table;
 
-import 'package:hometasks/models/lists.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/member.dart';
 import 'package:hometasks/models/task.dart';

@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart' hide Table;
+import 'package:http/http.dart' as http;
+import 'package:hometasks/core/services/post.dart';
+import 'package:hometasks/core/utils/env.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:http/http.dart' as http;
+import 'package:hometasks/core/utils/lists.dart';
 
 class NewTableScreen extends StatefulWidget {
   const NewTableScreen({super.key});
@@ -36,20 +40,15 @@ class _NewTableScreenState extends State<NewTableScreen> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    String title = newTable.title;
-    String? description = newTable.description;
-
     try {
-      final response = await http.post(
-        Uri.parse('http://localhost:8080/Table'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'title': newTable.title,
-          'description': newTable.description,
-        }),
-      );
+      final response = await BackendPost.table(name: newTable.title, description: newTable.description, icon: newTable.icon.codePoint);
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
+      print("SUCCESS!!!");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         navigator.pop();
@@ -66,15 +65,34 @@ class _NewTableScreenState extends State<NewTableScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print("ERROR!!!");
+      print(e);
+      print(stackTrace);
       navigator.pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Falha na conexão: ${e.toString()}'),
+          content: Text('Falha na conexão: ${getErrorMessage(e)}'),
         ),
       );
     }
+  }
+
+  String getErrorMessage(Object error) {
+    if (error is SocketException) {
+      return 'Sem conexão com a internet.';
+    }
+    if (error is HttpException) {
+      return 'Erro de comunicação com o servidor.';
+    }
+    if (error is FormatException) {
+      return 'Resposta inválida recebida do servidor.';
+    }
+    if (error is http.ClientException) {
+      return 'Não foi possível conectar ao servidor.';
+    }
+    return 'Ocorreu um erro inesperado.';
   }
 
   @override

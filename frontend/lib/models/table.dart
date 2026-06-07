@@ -41,11 +41,12 @@ class Table {
   String? id;
   String title;
   String? description;
-  List<String> members;
+  Map<String, UserRole> members;
   UserRole role;
   bool isActive;
   bool isPrivate;
   IconData icon;
+  bool isLoading;
 
   Table({
     this.id,
@@ -56,5 +57,22 @@ class Table {
     this.isActive = true,
     this.icon = Icons.home_outlined,
     this.isPrivate = false,
+    this.isLoading = false,
   });
+
+  static getIconFromString(String icon) {
+    return switch(icon) {
+      'work' => Icons.home_work_outlined,
+      'apartment' => Icons.apartment_outlined,
+      _ => Icons.home_outlined,
+    };
+  }
+
+  static getStringFromIcon(IconData icon) {
+    return switch(icon) {
+      Icons.home_work_outlined => 'work',
+      Icons.apartment_outlined => 'apartment',
+      _ => 'home',
+    };
+  }
 }

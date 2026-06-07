@@ -4,30 +4,49 @@ import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/notification.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/models/member.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Lists {
   static Map<String, Table> boards = {};
   static Map<String, Task> tasks = {};
   static Map<String, Member> users = {};
   static List<AppNotification> notifications = [];
+
+  static bool isTablesLoaded = false;
+  static bool isTasksLoaded = false;
   static Future<void> reloadTables() async {
     boards.clear();
+    isTablesLoaded = false;
 
-    final tab = await BackendGet.tableById("OKrBfZs1GXCehzYYXFtL");
-    print(tab.body);
-    
-    // PLACEHOLDER:
-    /*boards["asdhuhawrihasr"] = Table(
-      id: "asdhuhawrihasr",
-      title: "Minha Casa",
-      members: const [
-        "125432315",
-        "654123453",
-        "365435754",
-      ],
-      role: UserRole.owner,
-      isActive: true,
-    );*/
+    final list = jsonDecode((await BackendGet.tableList()).body);
+    for (String id in list) {
+      final http.Response response = await BackendGet.tableById(id);
+      final Map<String, dynamic> body = jsonDecode(response.body);
+
+      final Map<String, UserRole> members = {};
+      for (final entry in Map<String, dynamic>.from(body['members'] ?? {}).entries) {
+        members[entry.key] = switch (entry.value as String) {
+          "owner" => UserRole.owner,
+          "editor" => UserRole.editor,
+          _ => UserRole.reader,
+        };
+      }
+
+      boards[body['id']] = Table(
+        id: body['id'],
+        title: body['name'],
+        members: members,
+        icon: Table.getIconFromString(body['icon']),
+        role: switch(body['roleName']) {
+          'owner' => UserRole.owner,
+          'editor' => UserRole.editor,
+          _ => UserRole.reader,
+        },
+        isActive: true,
+      );
+    }
+    isTablesLoaded = false;
   }
   
   static Future<void> reloadTasks({String? boardId}) async {
@@ -99,7 +118,8 @@ class Lists {
       ),
       Member(
         id: "2",
-        username: "Márcia",
+        name: "Márcia",
+        username: "marcia",
       ),
       DateTime.now().subtract(const Duration(minutes: 20)))
     );
@@ -125,7 +145,8 @@ class Lists {
       ),
       Member(
         id: "1",
-        username: "João Batista",
+        name: "João Batista",
+        username: "joaobat"
       ),
       DateTime.now().subtract(const Duration(days: 1)))
     );
@@ -133,9 +154,9 @@ class Lists {
       AppNotification.invitedToTable(Table(
         id: "lsdfmklsdnfxcv",
         title: "Escritório Central",
-        members: const [
-          "315521531",
-        ],
+        members: const {
+          "315521531": UserRole.owner,
+        },
         role: UserRole.reader,
         isActive: false,
         icon: Icons.home_work_outlined,
@@ -150,7 +171,7 @@ class Lists {
     }
     
     // TO DO: Get user name from API
-    users[id] = Member(id: id, username: "User $id");
+    users[id] = Member(id: id, name: "Carregando...", username: "usuario");
     return users[id];
   }
 }

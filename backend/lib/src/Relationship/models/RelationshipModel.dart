@@ -5,7 +5,6 @@ class RelationshipModel {
     required this.idUser,
     required this.idTable,
     required this.roleName,
-    required this.tableName,
   });
 
   ///Conversão de map para model
@@ -18,10 +17,9 @@ class RelationshipModel {
         idUser: map['idUser'].toString(),
         idTable:  map['idTable'].toString(),
         roleName:  map['roleName'].toString(),
-        tableName: map['tableName'].toString(),
       );
     }else {
-      throw Exception('Email inválido');
+      throw Exception('Cargo inexistente, ignorando acesso');
     }
   }
 
@@ -31,8 +29,6 @@ class RelationshipModel {
   final String idTable;
   ///Campo roleName
   final String roleName;
-  ///Campo tableName
-  final String tableName;
 
   
   ///Conversão do Model para Map
@@ -41,7 +37,6 @@ class RelationshipModel {
       'idUser': idUser,
       'idTable': idTable,
       'roleName': roleName,
-      'tableName': tableName,
     };
   }  
 }

@@ -14,7 +14,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Table> userTables = [
-      Table(
+      /*Table(
         title: "Residência Principal",
         icon: Icons.home_outlined,
         role: UserRole.owner,
@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
         role: UserRole.reader,
         members: [],
         isPrivate: true
-      ),
+      ),*/
     ];
 
     return SafeArea(
@@ -129,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         subtitle: Text(_boardDescriptor(table)),
                         trailing: !table.isPrivate ?
-                            SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members))) :
+                            SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members.keys.toList()))) :
                             Icon(Icons.lock_outline, color: Colors.grey),
                       ),
                     ),

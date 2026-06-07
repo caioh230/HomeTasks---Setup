@@ -12,13 +12,13 @@ Handler middleware(Handler handler) {
 
 
 Middleware serviceProvider() {
-  return provider<RelationshipRepository>(
-    (_) => RelationshipRepository(),
+  return provider<RelationshipService>(
+    (_) => RelationshipService(),
   );
 }
 
 Middleware repoProvider() {
-  return provider<RelationshipService>(
-    (_) => RelationshipService(),
+  return provider<RelationshipRepository>(
+    (_) => RelationshipRepository(),
   );
 }

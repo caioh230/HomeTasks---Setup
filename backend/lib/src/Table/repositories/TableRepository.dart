@@ -46,7 +46,6 @@ class TableRepository {
           'idUser': idUser,
           'idTable': newId,
           'roleName': 'owner',
-          'tableName': table.name,
         };
 
         await relationship
@@ -70,7 +69,8 @@ class TableRepository {
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(id, 'reader', context)){
+      String? role = await _validateOpr(id, context);
+      if(role != null) {
         try{
           final val = await ref
           .doc(id)
@@ -78,9 +78,31 @@ class TableRepository {
 
           final formDados = TableDBModel.fromFirestore(val);
           
+          final relationships = firestore.collection('Relationship');
+          final members = await relationships
+              .where('idTable', WhereFilter.equal, id)
+              .get();
+
+          final membersList = Map<String, String>.fromEntries(
+            members.docs
+                .where((doc) =>
+                    doc.data()['idUser'] != null &&
+                    doc.data()['roleName'] != null)
+                .map(
+                  (doc) => MapEntry(
+                    doc.data()['idUser'].toString(),
+                    doc.data()['roleName'].toString(),
+                  ),
+                ),
+          );
+          
           return Response.json(
-            statusCode: HttpStatus.found, 
-            body: formDados.toMap()
+            statusCode: HttpStatus.ok, 
+            body: {
+              ...formDados.toMap(),
+              'roleName': role,
+              'members': membersList,
+            }
           );
         }catch(e){
           throw Exception(e);
@@ -102,7 +124,7 @@ class TableRepository {
     TableModel table,
     RequestContext context
     ) async { 
-      if(await _validateOpr(id, 'owner', context)){
+      if(await _validateOpr(id, context, 'owner') != null){
         try{
 
           await ref
@@ -132,7 +154,7 @@ class TableRepository {
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(id, 'owner', context)){
+      if(await _validateOpr(id, context, 'owner') != null){
         try{
           await ref
           .doc(id)
@@ -181,14 +203,12 @@ class TableRepository {
 //      Permissão Cargos + RLS
 //-----------------------------
 ///Limitar as operações a depender do cargo do usuário
-Future<bool> _validateOpr(
+Future<String?> _validateOpr(
   String idTable,
-  String cargo,
-  RequestContext context,
-)async{
-  try{
-    final list = ['reader', 'editor', 'owner'];
-    //Obtenção de dados do usuário
+  RequestContext context, [
+  String? minimalRole,
+]) async {
+  try {
     final authHeader = context.request.headers['authorization'];
 
     if (authHeader == null) {
@@ -200,42 +220,40 @@ Future<bool> _validateOpr(
     }
 
     final token = authHeader.substring('Bearer '.length);
+
     final jwt = JWT.verify(
       token,
       SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
-    
-    //Busca pelo cargo do usuário
+
     final relationships = firestore.collection('Relationship');
 
     final data = await relationships
-      .where(
-        'idUser', 
-        WhereFilter.equal, 
-        payload['id'].toString()
-      )
-      .where(
-        'idTable', 
-        WhereFilter.equal, 
-        idTable
-      )
-      .get();
+        .where('idUser', WhereFilter.equal, payload['id'].toString())
+        .where('idTable', WhereFilter.equal, idTable)
+        .get();
 
-    if(
-      data.docs.first.data().isNotEmpty
-      &&
-      list.indexOf(data.docs.first.data()['cargo'].toString()) 
-        >=  
-        list.indexOf(cargo)
-    ){
-      return true;
-    }else{
-      return false;
+    if (data.docs.isEmpty) {
+      return null;
     }
-  }catch(e){
-    return false;
+
+    const validRoles = ['reader', 'editor', 'owner'];
+    final userRole = data.docs.first.data()['roleName']?.toString();
+    if(!validRoles.contains(userRole)) {
+      //Role invalido
+      return null;
+    }
+
+    if (minimalRole == null) {
+      return validRoles.contains(userRole) ? userRole : null;
+    }
+
+    return validRoles.indexOf(userRole!) >=
+            validRoles.indexOf(minimalRole!) ? userRole : null;
+  } catch (_) {
+    return null;
   }
 }
 

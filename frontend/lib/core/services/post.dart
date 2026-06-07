@@ -7,7 +7,7 @@ class BackendPost {
   static Future<http.Response> table({
     required String name,
     required String? description,
-    required int icon,
+    required String icon,
   }) async {
     final token = await UserStorage.getToken();
 

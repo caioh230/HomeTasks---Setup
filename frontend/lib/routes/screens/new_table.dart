@@ -20,7 +20,7 @@ class NewTableScreen extends StatefulWidget {
 class _NewTableScreenState extends State<NewTableScreen> {
   Table newTable = Table(
     title: "",
-    members: const [],
+    members: const {},
     role: UserRole.owner,
     isActive: true,
     icon: Icons.home_outlined,
@@ -41,7 +41,7 @@ class _NewTableScreenState extends State<NewTableScreen> {
     );
 
     try {
-      final response = await BackendPost.table(name: newTable.title, description: newTable.description, icon: newTable.icon.codePoint);
+      final response = await BackendPost.table(name: newTable.title, description: newTable.description, icon: Table.getStringFromIcon(newTable.icon));
       if (response.statusCode == 200 || response.statusCode == 201) {
         navigator.pop();
 

@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/widgets/basic_button.dart';
+import 'package:hometasks/models/table.dart';
 
 class InviteMemberScreen extends StatefulWidget {
-  const InviteMemberScreen({super.key});
+  final Table table;
+  const InviteMemberScreen({super.key, required this.table});
 
   @override
   State<InviteMemberScreen> createState() => _InviteMemberScreenState();
@@ -36,7 +38,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
     //
 
     navigator.pop(); 
-    DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen());
+    DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen(table: widget.table));
   }
 
   @override
@@ -50,7 +52,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
           children: [
             Row(
               children: [
-                BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen())),
+                BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen(table: widget.table))),
                 const SizedBox(width: 12),
                 const Text(
                   'Convidar Membro',

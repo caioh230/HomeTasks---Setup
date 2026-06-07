@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         : Center(
                             child: Text(
-                              "Você não está em nenhum quadro.\nAdicione um novo quadro apertando em \"+\".",
+                              "Você não está em nenhum quadro.\nCrie um novo quadro apertando em \"+\".",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -86,9 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 TableCard(
                                   table: Table(
                                     title: "Carregando...",
-                                    members: const [],
+                                    members: const {},
                                     role: UserRole.reader,
                                     isActive: true,
+                                    isLoading: true,
                                   ),
                                 ),
                                 const SizedBox(height: 20),

@@ -26,7 +26,7 @@ class RelationshipRepository {
     RelationshipModel relationship,
     RequestContext context
     ) async {
-      if(await _validateOpr(relationship.idTable, context)){
+      if(await _validateOpr(relationship.idTable, context, 'owner')){
         try{
           await ref
           .doc()
@@ -53,38 +53,43 @@ class RelationshipRepository {
   ///Leitura de relacionamento único
   Future<Response> readRelationship(
     String idTable,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(idTable, context)){
-        try{
-          final val = await ref
-          .where(
-            'idUser', 
-            WhereFilter.equal, 
-            _validateUsr(context)
-          )
-          .where(
-            'idTable', 
-            WhereFilter.equal, 
-            idTable
-          )
-          .get();
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(idTable, context)) {
+      try {
+        final userId = await _validateUsr(context);
 
-          final formDados = RelationshipDBModel.fromFirestore(val.docs.first);
-          
+        final val = await ref
+            .where('idUser', WhereFilter.equal, userId)
+            .where('idTable', WhereFilter.equal, idTable)
+            .get();
+
+        if (val.docs.isEmpty) {
           return Response.json(
-            statusCode: HttpStatus.found, 
-            body: formDados.toMap()
+            statusCode: HttpStatus.notFound,
+            body: 'Relationship não encontrado',
           );
-        }catch(e){
-          throw Exception(e);
         }
-      }else{
+
+        final formDados =
+            RelationshipDBModel.fromFirestore(val.docs.first);
+
         return Response.json(
-          statusCode: HttpStatus.badRequest, 
-          body: 'Você não possui autorização para esta operação'
+          statusCode: HttpStatus.ok,
+          body: formDados.toMap(),
+        );
+      } catch (e) {
+        return Response.json(
+          statusCode: HttpStatus.internalServerError,
+          body: {'error': e.toString()},
         );
       }
+    }
+
+    return Response.json(
+      statusCode: HttpStatus.forbidden,
+      body: 'Você não possui autorização para esta operação',
+    );
   }
 
   //-----------------------------
@@ -105,13 +110,13 @@ class RelationshipRepository {
         )
         .get();
 
-        final formDados = <Map<String, dynamic>>[];
-        for (var i = 0; i < val.docs.length; i++){
-          formDados.add(RelationshipDBModel.fromFirestore(val.docs[i]).toMap());
+        final formDados = [];
+        for (var i = 0; i < val.docs.length; i++) {
+          formDados.add(val.docs[i].data()['idTable'].toString());
         }
 
         return Response.json(
-          statusCode: HttpStatus.found, 
+          statusCode: HttpStatus.ok,
           body: formDados
         );
       }catch(e){
@@ -131,7 +136,7 @@ class RelationshipRepository {
         try{
           final idUser = await _validateUsr(context);
 
-          if(await _validateOpr(idTable, context)){ 
+          if(await _validateOpr(idTable, context, 'owner')){ 
             final val = await ref
             .where(
               'idUser', 
@@ -176,7 +181,7 @@ class RelationshipRepository {
           final idUser = await _validateUsr(context);
 
           if(
-            await _validateOpr(idTable, context)
+            await _validateOpr(idTable, context, 'owner')
           ){
             final val = await ref
             .where(
@@ -219,47 +224,52 @@ class RelationshipRepository {
 ///Limitar as operações relacionadas ao usuário
 Future<bool> _validateOpr(
   String idTable,
-  RequestContext context,
-)async{
-  try{
-    //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+  RequestContext context, [
+  String? minimalRole,
+]) async {
+  try {
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
+
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
-    
-    //Busca pelo cargo do usuário
+
     final relationships = firestore.collection('Relationship');
 
     final data = await relationships
-      .where(
-        'idUser', 
-        WhereFilter.equal, 
-        payload['id'].toString()
-      )
-      .where(
-        'idTable', 
-        WhereFilter.equal, 
-        idTable
-      )
-      .get();
+        .where('idUser', WhereFilter.equal, payload['id'].toString())
+        .where('idTable', WhereFilter.equal, idTable)
+        .get();
 
-    final dados = data.docs.first.data();
-    if(
-      dados.isNotEmpty
-      &&
-      dados['roleName'] == 'owner'
-    ){
-      return true;
-    }else{
+    if (data.docs.isEmpty) {
       return false;
     }
-  }catch(e){
+
+    const validRoles = ['reader', 'editor', 'owner'];
+    final userRole = data.docs.first.data()['roleName']?.toString();
+    if(!validRoles.contains(userRole)) {
+      //Role invalido
+      return false;
+    }
+
+    if (minimalRole == null) {
+      return true;
+    }
+    return validRoles.indexOf(userRole!) >= validRoles.indexOf(minimalRole);
+  } catch (_) {
     return false;
   }
 }
@@ -273,18 +283,27 @@ Future<String> _validateUsr(
 )async{
   try{
     //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
+
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
     
     return payload['id'].toString();
   }catch(e){
-    return '';
+    throw Exception(e);
   }
 }

@@ -4,7 +4,6 @@ import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/routes/screens/tasks.dart';
 import 'package:hometasks/widgets/avatar.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class TableCard extends StatelessWidget {
   final Table table;
@@ -82,15 +81,15 @@ class TableCard extends StatelessWidget {
 
           const SizedBox(height: 18),
           GestureDetector(
-            onTap: () {
-              DashboardPage.globalKey.currentState!.showOverlay(MembersListScreen());
-            },
+            onTap: !table.isLoading ? () {
+              DashboardPage.globalKey.currentState!.showOverlay(MembersListScreen(table: table));
+            } : null,
             child: Row(
               children: [
                 SizedBox(
                   width: 70,
                   child: Stack(
-                    children: prepareAvatars(members: table.members),
+                    children: prepareAvatars(members: table.members.keys.toList()),
                   ),
                 ),
 
@@ -138,7 +137,7 @@ class TableCard extends StatelessWidget {
               ),
 
               IconButton(
-                onPressed: () => DashboardPage.globalKey.currentState!.showOverlay(TasksScreen(table: table.id)),
+                onPressed: !table.isLoading ? () => DashboardPage.globalKey.currentState!.showOverlay(TasksScreen(table: table.id)) : null,
                 icon: Icon(
                   Icons.arrow_forward,
                   color: Colors.grey.shade500,

@@ -12,7 +12,7 @@ class TableModel {
     return TableModel(
       name:        map['name'].toString(),
       description: map['description'].toString(),
-      icon: int.parse(map['icon'].toString())
+      icon: map['icon'].toString()
     );
   }
 
@@ -21,7 +21,7 @@ class TableModel {
   ///Campo description
   final String description;
   ///Campo de ícone
-  final int icon;
+  final String icon;
 
   ///Converção de model para Map
   Map<String, dynamic> toMap(){

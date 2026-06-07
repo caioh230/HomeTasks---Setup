@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/invite_member.dart';
 
 class MembersListScreen extends StatelessWidget {
-  const MembersListScreen({super.key});
+  final Table table;
+  const MembersListScreen({
+    super.key,
+    required this.table,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +21,8 @@ class MembersListScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              const Text(
-                'NOSSA CASA',
+              Text(
+                table.title.toUpperCase(),
                 style: TextStyle(
                   color: Color(0xFF0B7A42),
                   fontWeight: FontWeight.bold,
@@ -53,7 +58,7 @@ class MembersListScreen extends StatelessWidget {
               /// CARD AZUL
               GestureDetector(
                 onTap: () {
-                  DashboardPage.globalKey.currentState?.showOverlay(InviteMemberScreen());
+                  DashboardPage.globalKey.currentState?.showOverlay(InviteMemberScreen(table: table));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(22),
@@ -129,11 +134,7 @@ class MembersListScreen extends StatelessWidget {
               memberCard(
                 image: 'https://i.pravatar.cc/150?img=32',
                 name: 'Márcia',
-                role: 'Proprietário',
-                roleColor: const Color(0xFFDCEBFF),
-                textColor: const Color(0xFF0F5BB7),
-                roleIcon: Icons.workspace_premium,
-                iconColor: const Color(0xFF1565C0),
+                role: UserRole.owner,
               ),
 
               const SizedBox(height: 22),
@@ -141,11 +142,7 @@ class MembersListScreen extends StatelessWidget {
               memberCard(
                 image: 'https://i.pravatar.cc/150?img=12',
                 name: 'Pedro',
-                role: 'Editor',
-                roleColor: const Color(0xFF8AF19C),
-                textColor: const Color(0xFF087523),
-                roleIcon: Icons.edit_note,
-                iconColor: const Color(0xFF0A8F32),
+                role: UserRole.editor,
               ),
 
               const SizedBox(height: 22),
@@ -153,11 +150,7 @@ class MembersListScreen extends StatelessWidget {
               memberCard(
                 image: 'https://i.pravatar.cc/150?img=20',
                 name: 'João',
-                role: 'Leitor',
-                roleColor: const Color(0xFFE5E7EF),
-                textColor: const Color(0xFF5E6472),
-                roleIcon: Icons.remove_red_eye_outlined,
-                iconColor: const Color(0xFF7A8194),
+                role: UserRole.reader,
               ),
 
               const SizedBox(height: 40),
@@ -228,12 +221,13 @@ class MembersListScreen extends StatelessWidget {
   Widget memberCard({
     required String image,
     required String name,
-    required String role,
-    required Color roleColor,
-    required Color textColor,
-    required IconData roleIcon,
-    required Color iconColor,
+    required UserRole role,
   }) {
+    IconData roleIcon = switch(role) {
+      UserRole.owner => Icons.workspace_premium,
+      UserRole.editor => Icons.edit_note,
+      _ => Icons.remove_red_eye_outlined,
+    };
     return Container(
       padding: const EdgeInsets.all(18),
 
@@ -262,7 +256,7 @@ class MembersListScreen extends StatelessWidget {
                   height: 28,
 
                   decoration: BoxDecoration(
-                    color: iconColor,
+                    color: role.mainColor,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white,
@@ -305,14 +299,14 @@ class MembersListScreen extends StatelessWidget {
                   ),
 
                   decoration: BoxDecoration(
-                    color: roleColor,
+                    color: role.backgroundColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
 
                   child: Text(
-                    role,
+                    role.value,
                     style: TextStyle(
-                      color: textColor,
+                      color: role.mainColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

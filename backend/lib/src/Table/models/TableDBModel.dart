@@ -17,7 +17,7 @@ class TableDBModel{
       id: map['id'].toString(),
       name: map['name'].toString(),
       description: map['description'].toString(),
-      icon: int.parse(map['icon'].toString())
+      icon: map['icon'].toString()
     );
   }
 
@@ -31,7 +31,7 @@ class TableDBModel{
       id: doc.id,
       name: dados['name'].toString(),
       description: dados['description'].toString(),
-      icon: int.parse(dados['icon'].toString())
+      icon: dados['icon'].toString()
     );
   }
 
@@ -42,7 +42,7 @@ class TableDBModel{
   ///Campo description
   final String description;
   ///Campo de ícone
-  final int icon;
+  final String icon;
   
   ///Conversão de DBModel para Map
   Map<String, dynamic> toMap(){

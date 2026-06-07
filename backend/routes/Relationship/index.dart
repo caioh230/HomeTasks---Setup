@@ -60,7 +60,10 @@ Future<Response> readAllRelationships(
       return service.readAllRelationships(
         context
       );
-    }catch(e){
-      throw Exception(e);
-    }
+    } catch (e) {
+    return Response.json(
+      statusCode: 500,
+      body: 'Error: $e',
+    );
+  }
 }

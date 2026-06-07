@@ -8,7 +8,6 @@ class RelationshipDBModel {
     required this.idTable,
     required this.idUser,
     required this.roleName,
-    required this.tableName,
   });
 
   ///Conversão de Map para DBModel
@@ -18,7 +17,6 @@ class RelationshipDBModel {
       idTable: map['idTable'].toString(),
       idUser: map['idUser'].toString(),
       roleName: map['roleName'].toString(),
-      tableName: map['tableName'].toString(),
     );
   }
 
@@ -33,7 +31,6 @@ class RelationshipDBModel {
       idTable: dados['idTable'].toString(),
       idUser: dados['idUser'].toString(),
       roleName: dados['roleName'].toString(),
-      tableName: dados['tableName'].toString(),
     );
   }
 
@@ -45,8 +42,6 @@ class RelationshipDBModel {
   final String idUser;
   ///Campo roleName
   final String roleName;
-  ///Campo tableName
-  final String tableName;
   
   ///Conversão para tipo Map
   Map<String, dynamic> toMap(){
@@ -55,7 +50,6 @@ class RelationshipDBModel {
       'idTable': idTable,
       'idUser': idUser,
       'roleName': roleName,
-      'tableName': tableName,
     };
   }
 }

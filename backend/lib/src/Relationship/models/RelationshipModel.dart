@@ -10,12 +10,19 @@ class RelationshipModel {
 
   ///Conversão de map para model
   factory RelationshipModel.toModel ( Map<String, dynamic> map){
-    return RelationshipModel(
-      idUser: map['idUser'].toString(),
-      idTable:  map['idTable'].toString(),
-      roleName:  map['roleName'].toString(),
-      tableName: map['tableName'].toString(),
-    );
+    final list = ['reader', 'editor', 'owner'];
+    if(
+      list.contains(map['roleName'].toString())
+    ){
+      return RelationshipModel(
+        idUser: map['idUser'].toString(),
+        idTable:  map['idTable'].toString(),
+        roleName:  map['roleName'].toString(),
+        tableName: map['tableName'].toString(),
+      );
+    }else {
+      throw Exception('Email inválido');
+    }
   }
 
   ///Campo idUser

@@ -185,13 +185,22 @@ Future<bool> _validateOpr(
   RequestContext context,
 )async{
   try{
+    final list = ['reader', 'editor', 'owner'];
     //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
@@ -215,7 +224,9 @@ Future<bool> _validateOpr(
     if(
       data.docs.first.data().isNotEmpty
       &&
-      data.docs.first.data()['cargo'] == cargo
+      list.indexOf(data.docs.first.data()['cargo'].toString()) 
+        >=  
+        list.indexOf(cargo)
     ){
       return true;
     }else{

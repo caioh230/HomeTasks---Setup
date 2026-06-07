@@ -1,7 +1,5 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-
 import 'package:hometasks/src/Task/models/TaskModel.dart';
 import 'package:hometasks/src/Task/repositories/TaskRepository.dart';
 
@@ -95,31 +93,4 @@ class TaskService {
         throw Exception(e);
       }
   }
-}
-
-
-//-----------------------------
-//            RLS
-//-----------------------------
-///Garante que o usuário só altere as próprias coleções
-bool validateid(
-  String id, 
-  RequestContext context
-  ){
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
-    final jwt = JWT.verify(
-      header!, 
-      SecretKey(env['jwtSecretKey'].toString())
-    );
-
-    final payload = jwt.payload as Map<String, dynamic>;
-  
-    if(payload['id'].toString() == id){
-      return true;
-    }
-    else{
-      return false;
-    }
 }

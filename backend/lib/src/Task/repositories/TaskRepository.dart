@@ -11,7 +11,7 @@ import 'package:hometasks/src/Task/models/TaskDBModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
 
 ///Importação de dados sensíveis
-final env = DotEnv()..load();
+final _env = DotEnv()..load();
 
 ///Repositório de conexão com o banco remoto 
 class TaskRepository {
@@ -26,7 +26,7 @@ class TaskRepository {
     TaskModel task,
     RequestContext context
     ) async {
-      if(await validateOpr(task.idTable, 'editor', context)){
+      if(await _validateOpr(task.idTable, 'editor', context)){
         try{
           await ref
           .doc()
@@ -53,7 +53,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'reader', context)){
+      if(await _validateOpr(idTable, 'reader', context)){
         try{
           final val = await ref
           .doc(id)
@@ -82,7 +82,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'reader', context)){
+      if(await _validateOpr(idTable, 'reader', context)){
         try{
           final val = ref
           .where(
@@ -113,7 +113,7 @@ class TaskRepository {
     TaskModel task,
     RequestContext context
     ) async {
-      if(await validateOpr(task.idTable, 'editor', context)){
+      if(await _validateOpr(task.idTable, 'editor', context)){
         try{
 
           await ref
@@ -141,7 +141,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'editor', context)){
+      if(await _validateOpr(idTable, 'editor', context)){
         try{
           await ref
           .doc(id)
@@ -164,19 +164,28 @@ class TaskRepository {
 //      Permissão Cargos + RLS
 //-----------------------------
 ///Limitar as operações a depender do cargo do usuário
-Future<bool> validateOpr(
+Future<bool> _validateOpr(
   String idTable,
   String cargo,
   RequestContext context,
 )async{
   try{
+    final list = ['reader', 'editor', 'owner'];
     //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
@@ -200,7 +209,9 @@ Future<bool> validateOpr(
     if(
       data.docs.first.data().isNotEmpty
       &&
-      data.docs.first.data()['cargo'] == cargo
+      list.indexOf(data.docs.first.data()['cargo'].toString()) 
+        >=  
+        list.indexOf(cargo)
     ){
       return true;
     }else{

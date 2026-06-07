@@ -18,7 +18,7 @@ class ColumnRepository {
   final ref = firestore.collection('Column');
 
   //-----------------------------
-  //            create - Editor
+  //            create - editor
   //-----------------------------
   ///Operação de criação
   Future<Response> createColumn(
@@ -26,7 +26,7 @@ class ColumnRepository {
     ColumnModel column,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, 'Editor', context)){
+      if(await _validateOpr(idTable, 'editor', context)){
         try{
 
           await ref
@@ -49,7 +49,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - reader
   //-----------------------------
   ///Operação de leitura individual
   Future<Response> readColumn(
@@ -57,7 +57,7 @@ class ColumnRepository {
     String id,
     RequestContext context
     ) async {
-    if(await _validateOpr(idTable, 'Reader', context)){
+    if(await _validateOpr(idTable, 'reader', context)){
       try{
         final val = await ref
         .doc(id)
@@ -81,14 +81,14 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - reader
   //-----------------------------
   ///Operação de leitura em conjunto
   Future<Response> readAllColumns(
       String idTable,
       RequestContext context
       ) async {
-      if(await _validateOpr(idTable, 'Reader', context)){
+      if(await _validateOpr(idTable, 'reader', context)){
         try{
           final val = await ref
           .get();
@@ -114,7 +114,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            update - Editor
+  //            update - editor
   //-----------------------------
   ///Operação de atualização individual
   Future<Response> updateColumn(
@@ -123,7 +123,7 @@ class ColumnRepository {
     ColumnModel column,
     RequestContext context
     ) async { 
-      if(await _validateOpr(idTable, 'Editor', context)){
+      if(await _validateOpr(idTable, 'editor', context)){
         try{
           await ref
           .doc(id)
@@ -145,7 +145,7 @@ class ColumnRepository {
   }
 
   //-----------------------------
-  //            delete - Editor
+  //            delete - editor
   //-----------------------------
   ///Operação de remoção individual
   Future<Response> deleteColumn(
@@ -153,7 +153,7 @@ class ColumnRepository {
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, 'Editor', context)){
+      if(await _validateOpr(idTable, 'editor', context)){
         try{
           await ref
           .doc(id)

@@ -40,12 +40,12 @@ class TableRepository {
         //Operação cascata
         final relationship = firestore.collection('Relationship');
         
-        final idUser = _jwtId(context).toString();
+        final idUser = await _jwtId(context);
 
         final map = {
           'idUser': idUser,
           'idTable': newId,
-          'roleName': 'Admin',
+          'roleName': 'owner',
           'tableName': table.name,
         };
 
@@ -63,14 +63,14 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - reader
   //-----------------------------
   ///Leitura individual das mesas
   Future<Response> readTable(
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(id, 'Reader', context)){
+      if(await _validateOpr(id, 'reader', context)){
         try{
           final val = await ref
           .doc(id)
@@ -94,7 +94,7 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            update - Admin
+  //            update - owner
   //-----------------------------
   ///Atualização individual da table
   Future<Response> updateTable(
@@ -102,7 +102,7 @@ class TableRepository {
     TableModel table,
     RequestContext context
     ) async { 
-      if(await _validateOpr(id, 'Admin', context)){
+      if(await _validateOpr(id, 'owner', context)){
         try{
 
           await ref
@@ -125,14 +125,14 @@ class TableRepository {
   }
 
   //-----------------------------
-  //            delete - Admin
+  //            delete - owner
   //-----------------------------
   ///Remoção individual das tables
   Future<Response> deleteTable(
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(id,  'Admin', context)){
+      if(await _validateOpr(id, 'owner', context)){
         try{
           await ref
           .doc(id)
@@ -188,12 +188,20 @@ Future<bool> _validateOpr(
 )async{
   try{
     //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
@@ -237,16 +245,24 @@ Future<String> _jwtId(
 )async{
   try{
     //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
+    final authHeader = context.request.headers['authorization'];
+
+    if (authHeader == null) {
+      throw Exception('Authorization não informado');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      throw Exception('Token inválido');
+    }
+
+    final token = authHeader.substring('Bearer '.length);
     final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
+      token,
+      SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
-    
+
     return payload['id'].toString();
   }catch(e){
     return '';

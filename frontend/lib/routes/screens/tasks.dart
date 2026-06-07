@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hometasks/core/utils/lists.dart';
@@ -20,7 +19,12 @@ class TasksScreen extends StatefulWidget {
   State<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin {
+class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin {@override
+  void initState() {
+    super.initState();
+    Lists.reloadTasks();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScrollController horizontalController = ScrollController();
@@ -52,8 +56,6 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
       lastPointer = null;
     }
 
-    User? user = FirebaseAuth.instance.currentUser;
-    Lists.reloadTasks();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(22),

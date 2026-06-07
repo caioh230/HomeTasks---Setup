@@ -95,7 +95,7 @@ class RelationshipRepository {
     RequestContext context
     ) async {
       try{
-        final idUser = _validateUsr(context).toString();
+        final idUser = await _validateUsr(context);
         
         final val = await ref
         .where(
@@ -120,7 +120,7 @@ class RelationshipRepository {
   }
 
   //-----------------------------
-  //            update - Admin
+  //            update - owner
   //-----------------------------
   ///Atualização de relacionamento único - Convidados
   Future<Response> updateRelationship(
@@ -129,7 +129,7 @@ class RelationshipRepository {
     RequestContext context
     ) async {
         try{
-          final idUser = _validateUsr(context);
+          final idUser = await _validateUsr(context);
 
           if(await _validateOpr(idTable, context)){ 
             final val = await ref
@@ -165,7 +165,7 @@ class RelationshipRepository {
   }
 
   //-----------------------------
-  //            delete - JWT ou Admin
+  //            delete - JWT ou owner
   //-----------------------------
   ///Deleção de relacionamento único
   Future<Response> deleteRelationship(
@@ -173,7 +173,7 @@ class RelationshipRepository {
     RequestContext context
     ) async {
         try{
-          final idUser = _validateUsr(context);
+          final idUser = await _validateUsr(context);
 
           if(
             await _validateOpr(idTable, context)
@@ -253,7 +253,7 @@ Future<bool> _validateOpr(
     if(
       dados.isNotEmpty
       &&
-      dados['roleName'] == 'Admin'
+      dados['roleName'] == 'owner'
     ){
       return true;
     }else{

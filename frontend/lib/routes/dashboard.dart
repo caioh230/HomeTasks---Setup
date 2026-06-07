@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/profile_widget.dart';
@@ -51,10 +50,6 @@ class DashboardPageState extends State<DashboardPage> {
   void openSettings() {
     showOverlay(SettingsScreen());
   }
-  
-  void signUserOut() async {
-    await FirebaseAuth.instance.signOut();
-  }
 
   Widget? overlayPage;
   void showOverlay(Widget page) {
@@ -71,7 +66,6 @@ class DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(

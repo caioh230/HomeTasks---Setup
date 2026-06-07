@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/edit_profile.dart';
@@ -12,7 +13,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
     List<Table> userTables = [
       Table(
         title: "Residência Principal",
@@ -45,13 +45,13 @@ class ProfileScreen extends StatelessWidget {
               Avatar(id: "1", size: 100),
               const SizedBox(height: 10),
 
-              const Text(
-                "Nome de Usuário",
+              Text(
+                UserAccount.name ?? "Nome de Usuário",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               Text(
-                user!.email!,
+                "@" + (UserAccount.username ?? "usuario"),
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
 

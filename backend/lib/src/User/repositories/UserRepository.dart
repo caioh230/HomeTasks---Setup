@@ -362,7 +362,7 @@ Future<String> _validateOpr(
   }
 
   final token = authHeader.substring('Bearer '.length);
-  print(token);
+  //print(token);
   final jwt = JWT.verify(
     token,
     SecretKey(_env['jwtSecretKey'].toString()),

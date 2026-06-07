@@ -42,14 +42,6 @@ class _NewTableScreenState extends State<NewTableScreen> {
 
     try {
       final response = await BackendPost.table(name: newTable.title, description: newTable.description, icon: newTable.icon.codePoint);
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-      print("SUCCESS!!!");
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         navigator.pop();
 

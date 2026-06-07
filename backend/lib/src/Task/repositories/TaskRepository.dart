@@ -19,14 +19,14 @@ class TaskRepository {
   final ref = firestore.collection('Task');
 
   //-----------------------------
-  //            create - Editor
+  //            create - editor
   //-----------------------------
   ///Registro de Nova instância
   Future<Response> createTask(
     TaskModel task,
     RequestContext context
     ) async {
-      if(await validateOpr(task.idTable, 'Editor', context)){
+      if(await validateOpr(task.idTable, 'editor', context)){
         try{
           await ref
           .doc()
@@ -45,7 +45,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - reader
   //-----------------------------
   ///Leitura de tarefa pré-registrada
   Future<Response> readTask(
@@ -53,7 +53,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'Reader', context)){
+      if(await validateOpr(idTable, 'reader', context)){
         try{
           final val = await ref
           .doc(id)
@@ -74,7 +74,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            read - Reader
+  //            read - reader
   //-----------------------------
   ///Leitura de tarefas pertencentes à mesma coluna
   Future<Response> readColumnTasks(
@@ -82,7 +82,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'Reader', context)){
+      if(await validateOpr(idTable, 'reader', context)){
         try{
           final val = ref
           .where(
@@ -105,7 +105,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            update - Editor
+  //            update - editor
   //-----------------------------
   ///Atualização de tarefa única
   Future<Response> updateTask(
@@ -113,7 +113,7 @@ class TaskRepository {
     TaskModel task,
     RequestContext context
     ) async {
-      if(await validateOpr(task.idTable, 'Editor', context)){
+      if(await validateOpr(task.idTable, 'editor', context)){
         try{
 
           await ref
@@ -133,7 +133,7 @@ class TaskRepository {
   }
 
   //-----------------------------
-  //            delete - Editor
+  //            delete - editor
   //-----------------------------
   ///Deleção de tarefa única
   Future<Response> deleteTask(
@@ -141,7 +141,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await validateOpr(idTable, 'Editor', context)){
+      if(await validateOpr(idTable, 'editor', context)){
         try{
           await ref
           .doc(id)

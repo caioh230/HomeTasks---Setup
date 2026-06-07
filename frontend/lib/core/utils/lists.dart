@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/core/services/get.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/notification.dart';
 import 'package:hometasks/models/task.dart';
@@ -11,12 +12,12 @@ class Lists {
   static List<AppNotification> notifications = [];
   static Future<void> reloadTables() async {
     boards.clear();
-    
-    // TO DO: Load boards from backend
-    await Future.delayed(Duration(seconds: 5)); //placeholder
 
+    final tab = await BackendGet.tableById("OKrBfZs1GXCehzYYXFtL");
+    print(tab.body);
+    
     // PLACEHOLDER:
-    boards["asdhuhawrihasr"] = Table(
+    /*boards["asdhuhawrihasr"] = Table(
       id: "asdhuhawrihasr",
       title: "Minha Casa",
       members: const [
@@ -26,31 +27,7 @@ class Lists {
       ],
       role: UserRole.owner,
       isActive: true,
-    );
-    boards["greasodkwqeasd"] = Table(
-      id: "greasodkwqeasd",
-      title: "Apartamento República",
-      members: const [
-        "125432315",
-        "654123453",
-        "365435754",
-        "986345122"
-      ],
-      role: UserRole.editor,
-      isActive: true,
-      icon: Icons.apartment_outlined,
-    );
-    boards["vpoxcjfdwermk"] = Table(
-      id: "vpoxcjfdwermk",
-      title: "Oficina do João",
-      members: const [
-        "125432315",
-        "654123453",
-      ],
-      role: UserRole.reader,
-      isActive: false,
-      icon: Icons.home_work_outlined,
-    );
+    );*/
   }
   
   static Future<void> reloadTasks({String? boardId}) async {

@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       final credential = GoogleAuthProvider.credential(
         idToken: authentication.idToken,
       );
-      final logged = await FirebaseAuth.instance.signInWithCredential(credential);
+      final logged = await FirebaseAuth.instance.signInWithCredential(credential); //verificar assinatura do google
       if(context.mounted) {
         Navigator.pushReplacementNamed(context, '/dashboard');
       }

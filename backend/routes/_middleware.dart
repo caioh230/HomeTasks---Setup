@@ -30,7 +30,7 @@ Handler middleware(Handler handler) {
         );
       }
 
-      if (!authHeader.startsWith('Bearer ')) {
+      if (!authHeader.startsWith('Bearer')) {
         return Response.json(
           statusCode: HttpStatus.unauthorized,
           body: {

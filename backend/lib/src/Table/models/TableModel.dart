@@ -5,14 +5,16 @@ class TableModel {
     required this.name,
     required this.description,  
     required this.icon,  
+    required this.isActive,  
   });
   
   ///Conversão de Map para Model
   factory TableModel.toModel ( Map<String, dynamic> map){
     return TableModel(
-      name:        map['name'].toString(),
+      name: map['name'].toString(),
       description: map['description'].toString(),
-      icon: map['icon'].toString()
+      icon: map['icon'].toString(),
+      isActive: map['isActive'] as bool,
     );
   }
 
@@ -22,13 +24,16 @@ class TableModel {
   final String description;
   ///Campo de ícone
   final String icon;
+  ///Campo de não arquivado
+  final bool isActive;
 
   ///Converção de model para Map
   Map<String, dynamic> toMap(){
     return {
       'name': name,
       'description': description,
-      'icon': icon
+      'icon': icon,
+      'isActive': isActive,
     };
   }
 }

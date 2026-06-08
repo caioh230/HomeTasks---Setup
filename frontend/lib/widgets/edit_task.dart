@@ -17,11 +17,13 @@ class EditTaskWidget extends StatefulWidget {
 }
 
 class _EditTaskWidgetState extends State<EditTaskWidget> {
-  late final TextEditingController _dateController = TextEditingController(text: dateFormat(widget.task.expiration));
+  late Task copiedTask = Task.copy(widget.task);
+  late final TextEditingController _dateController = TextEditingController(text: dateFormat(copiedTask.expiration));
+  late final TextEditingController _descriptionController = TextEditingController(text: copiedTask.description ?? "");
   bool _closePressed = false;
 
   void saveChanges() {
-    // TO DO
+    Lists.isTasksLoaded = false;
     Navigator.pop(context);
   }
 
@@ -74,7 +76,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                               Container(
                                 width: 275,
                                 child: Text(
-                                  widget.task.title,
+                                  copiedTask.title,
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontSize: 32,
@@ -112,7 +114,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                               Icon(Icons.folder_outlined, size: 16),
                               const SizedBox(width: 10),
                               Text(
-                                Lists.tables[widget.task.table!]?.title.toUpperCase() ?? "INVÁLIDO",
+                                Lists.tables[copiedTask.table!]?.title.toUpperCase() ?? "INVÁLIDO",
                                 style: TextStyle(
                                   letterSpacing: 1,
                                 ),
@@ -148,7 +150,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: DropdownButtonFormField<TaskStatus>(
-                                    initialValue: widget.task.status,
+                                    initialValue: copiedTask.status,
                                     items: TaskStatus.values.map((TaskStatus status) => DropdownMenuItem<TaskStatus>(
                                               value: status,
                                               child: Text(
@@ -164,7 +166,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                     onChanged: (TaskStatus? newValue) {
                                       if (newValue == null) return;
                                       setState(() {
-                                        widget.task.status = newValue;
+                                        copiedTask.status = newValue;
                                       });
                                     },
                                     decoration: const InputDecoration(
@@ -251,7 +253,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                         if (pickedTime != null) {
                                           setState(() {
                                             _dateController.text = dateFormat(pickedDate);
-                                            widget.task.expiration = pickedDate;
+                                            copiedTask.expiration = pickedDate;
                                           });
                                         }
                                       }
@@ -293,7 +295,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                           GestureDetector(
                                             onTap: () {
                                               setState(() {
-                                                widget.task.priority = (widget.task.priority != priority) ? priority : null;
+                                                copiedTask.priority = (copiedTask.priority != priority) ? priority : null;
                                               });
                                             },
                                             child: Container(
@@ -301,10 +303,10 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                               padding: const EdgeInsets.symmetric(vertical: 8),
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                color: (widget.task.priority != priority) ? priority.backgroundColor.withValues(alpha: 0.12) : priority.backgroundColor,
+                                                color: (copiedTask.priority != priority) ? priority.backgroundColor.withValues(alpha: 0.12) : priority.backgroundColor,
                                                 borderRadius: BorderRadius.circular(12),
                                                 border: Border.all(
-                                                  color: widget.task.priority == priority ? priority.mainColor : Colors.transparent,
+                                                  color: copiedTask.priority == priority ? priority.mainColor : Colors.transparent,
                                                   width: 2,
                                                 ),
                                               ),
@@ -360,7 +362,8 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                               style: TextStyle(
                                 fontSize: 15,
                               ),
-                              onChanged: (value) => setState(() => widget.task.description = value),
+                              controller: _descriptionController,
+                              onChanged: (value) => setState(() => copiedTask.description = value),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -411,6 +414,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
 
   @override
   void dispose() {
+    _descriptionController.dispose();
     _dateController.dispose();
     super.dispose();
   }

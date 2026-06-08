@@ -60,6 +60,20 @@ class Table {
     this.isLoading = false,
   });
 
+  static copy(Table table) {
+    return Table(
+      id: table.id,
+      title: table.title,
+      members: table.members,
+      description: table.description,
+      role: table.role,
+      isActive: table.isActive,
+      icon: table.icon,
+      isPrivate: table.isPrivate,
+      isLoading: table.isLoading,
+    );
+  }
+
   static getIconFromString(String icon) {
     return switch(icon) {
       'work' => Icons.home_work_outlined,

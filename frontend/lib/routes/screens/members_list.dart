@@ -53,81 +53,83 @@ class MembersListScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 35),
 
               /// CARD AZUL
-              GestureDetector(
-                onTap: () {
-                  DashboardPage.globalKey.currentState?.showOverlay(InviteMemberScreen(table: table));
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(22),
+              if(table.role == UserRole.owner) ... [
+                const SizedBox(height: 35),
+                GestureDetector(
+                  onTap: () {
+                    DashboardPage.globalKey.currentState?.showOverlay(InviteMemberScreen(table: table));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(22),
 
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
 
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF1565C0),
-                        Color(0xFF2D7FE0),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF1565C0),
+                          Color(0xFF2D7FE0),
+                        ],
+                      ),
+                    ),
+
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+
+                          child: const Icon(
+                            Icons.person_add_alt_1,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+
+                        const SizedBox(width: 18),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Convidar novo membro',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              SizedBox(height: 8),
+
+                              Text(
+                                'Envie um convite para entrar no quadro',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Icon(
+                          Icons.chevron_right,
+                          color: Colors.white70,
+                          size: 34,
+                        )
                       ],
                     ),
                   ),
-
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-
-                        child: const Icon(
-                          Icons.person_add_alt_1,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Convidar novo membro',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            SizedBox(height: 8),
-
-                            Text(
-                              'Envie um convite para entrar no quadro',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.white70,
-                        size: 34,
-                      )
-                    ],
-                  ),
                 ),
-              ),
+              ],
 
               const SizedBox(height: 38),
 
@@ -210,7 +212,7 @@ class MembersListScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 120),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -315,10 +317,11 @@ class MembersListScreen extends StatelessWidget {
             ),
           ),
 
-          const Icon(
-            Icons.edit_outlined,
-            color: Color(0xFF7A8194),
-          )
+          if(table.role == UserRole.owner)
+            const Icon(
+              Icons.edit_outlined,
+              color: Color(0xFF7A8194),
+            )
         ],
       ),
     );

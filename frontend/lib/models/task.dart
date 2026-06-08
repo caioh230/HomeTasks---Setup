@@ -50,4 +50,18 @@ class Task {
     this.status = TaskStatus.notStarted,
     this.completedAt,
   });
+
+  static copy(Task task) {
+    return Task(
+      id: task.id,
+      title: task.title,
+      expiration: task.expiration,
+      accountable: task.accountable,
+      description: task.description,
+      priority: task.priority,
+      table: task.table,
+      status: task.status,
+      completedAt: task.completedAt,
+    );
+  }
 }

@@ -6,6 +6,7 @@ import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/new_task.dart';
 import 'package:hometasks/widgets/plus_button.dart';
 import 'package:hometasks/widgets/task_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 
 class TasksScreen extends StatefulWidget {
@@ -173,31 +174,50 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                                         child: SingleChildScrollView(
                                           child: Column(
                                             children: [
-                                              for (int i = 0; i < filteredTasks.length; i++) ...[
-                                                if (i != 0) const SizedBox(height: 20),
+                                              if(Lists.isTasksLoaded)
+                                                for (int i = 0; i < filteredTasks.length; i++) ...[
+                                                  if (i != 0) const SizedBox(height: 20),
 
-                                                Draggable<Task>(
-                                                  data: filteredTasks[i],
-                                                  onDragStarted: startAutoScrollTicker,
-                                                  onDragEnd: (_) => stopAutoScrollTicker(),
+                                                  Draggable<Task>(
+                                                    data: filteredTasks[i],
+                                                    onDragStarted: startAutoScrollTicker,
+                                                    onDragEnd: (_) => stopAutoScrollTicker(),
 
-                                                  onDragUpdate: (details) {
-                                                    lastPointer = details.globalPosition;
-                                                  },
-                                                  feedback: Material(
-                                                    color: Colors.transparent,
-                                                    child: SizedBox(
-                                                      width: 320,
+                                                    onDragUpdate: (details) {
+                                                      lastPointer = details.globalPosition;
+                                                    },
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
+                                                      child: SizedBox(
+                                                        width: 320,
+                                                        child: TaskCard(task: filteredTasks[i]),
+                                                      ),
+                                                    ),
+                                                    childWhenDragging: Opacity(
+                                                      opacity: 0.3,
                                                       child: TaskCard(task: filteredTasks[i]),
                                                     ),
-                                                  ),
-                                                  childWhenDragging: Opacity(
-                                                    opacity: 0.3,
                                                     child: TaskCard(task: filteredTasks[i]),
                                                   ),
-                                                  child: TaskCard(task: filteredTasks[i]),
-                                                ),
-                                              ],
+                                                ],
+
+                                              if(!Lists.isTasksLoaded)
+                                                for (int i = 0; i < 3; i++) ...[
+                                                  if (i != 0) const SizedBox(height: 20),
+
+                                                  Skeletonizer(
+                                                    enabled: true,
+                                                    child: SizedBox(
+                                                      width: 320,
+                                                      child: TaskCard(
+                                                        task: Task(
+                                                          title: 'Carregando...', expiration: DateTime.now().add(const Duration(hours: 1)),
+                                                          accountable: [],
+                                                        )
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               const SizedBox(height: 60),
                                             ],
                                           ),

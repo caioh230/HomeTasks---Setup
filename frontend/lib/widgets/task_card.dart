@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hometasks/core/utils/lists.dart';
+import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/edit_task.dart';
 import 'package:intl/intl.dart';
 import 'package:hometasks/extensions/string.dart';
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends StatefulWidget {
   final Task task;
 
   const TaskCard({
@@ -14,157 +15,8 @@ class TaskCard extends StatelessWidget {
     required this.task,
   });
 
-  Color get _dateColor {
-    if(task.status == TaskStatus.complete) {
-      if(task.expiration.difference(task.completedAt!).inMinutes > 0) {
-        return Color(0xFF006D36);
-      } else {
-        return Colors.red.shade300;
-      }
-    } else if(task.expiration.difference(DateTime.now()).inMinutes < 0) {
-      return Colors.red.shade300;
-    }
-    return Colors.grey.shade600;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: task.status == TaskStatus.complete ? Colors.black.withValues(alpha: 0.05) : Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
-                  offset: const Offset(2, 2),
-                )
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      Lists.tables[task.table]?.title ?? 'Indisponível',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const Spacer(),
-                    if (task.priority != null) ... [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: task.priority!.backgroundColor,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          task.priority!.value.toUpperCase(),
-                          style: TextStyle(
-                            color: task.priority!.mainColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  task.title,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    decoration: task.status == TaskStatus.complete ? TextDecoration.lineThrough : null,
-                    color: task.status == TaskStatus.complete ? Colors.grey.shade600 : null
-                  ),
-                ),
-
-                if (task.description != null && task.description!.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    task.description!,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-
-                const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 70,
-                      child: Stack(
-                        children: TableCard.prepareAvatars(members: task.accountable),
-                      ),
-                    ),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          task.status.icon,
-                          size: 20,
-                          color: _dateColor
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          dateFormat(task.status == TaskStatus.complete ? task.completedAt! : task.expiration),
-                          style: TextStyle(
-                            color: _dateColor,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          if (task.status == TaskStatus.inProgress) ... [
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: 5,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(15),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-      onTap: () {
-        // TO DO
-        showDialog(context: context, builder: (context) =>
-          EditTaskWidget(task: task),
-        );
-      },
-    );
-  }
+  State<TaskCard> createState() => _TaskCardState();
 
   static String dateFormat(DateTime date) {
     final now = DateTime.now();
@@ -212,5 +64,160 @@ class TaskCard extends StatelessWidget {
     } else {
       return '${difference.abs()} dias atrás';
     }
+  }
+}
+
+class _TaskCardState extends State<TaskCard> {
+  Color get _dateColor {
+    if (widget.task.status == TaskStatus.complete) {
+      if (widget.task.expiration.difference(widget.task.completedAt!).inMinutes > 0) {
+        return const Color(0xFF006D36);
+      } else {
+        return Colors.red.shade300;
+      }
+    } else if (widget.task.expiration.difference(DateTime.now()).inMinutes < 0) {
+      return Colors.red.shade300;
+    }
+    return Colors.grey.shade600;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: widget.task.status == TaskStatus.complete ? Colors.black.withValues(alpha: 0.05) : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(2, 2),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      Lists.tables[widget.task.table]?.title ?? 'Indisponível',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (widget.task.priority != null) ... [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: widget.task.priority!.backgroundColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          widget.task.priority!.value.toUpperCase(),
+                          style: TextStyle(
+                            color: widget.task.priority!.mainColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  widget.task.title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    decoration: widget.task.status == TaskStatus.complete ? TextDecoration.lineThrough : null,
+                    color: widget.task.status == TaskStatus.complete ? Colors.grey.shade600 : null
+                  ),
+                ),
+
+                if (widget.task.description != null && widget.task.description!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.task.description!,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 70,
+                      child: Stack(
+                        children: TableCard.prepareAvatars(members: widget.task.accountable),
+                      ),
+                    ),
+
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          widget.task.status.icon,
+                          size: 20,
+                          color: _dateColor
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          TaskCard.dateFormat(widget.task.status == TaskStatus.complete ? widget.task.completedAt! : widget.task.expiration),
+                          style: TextStyle(
+                            color: _dateColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (widget.task.status == TaskStatus.inProgress) ... [
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 5,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(15),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+      onTap: () {
+        if(Lists.tables[widget.task.table]?.role != UserRole.reader) {
+          showDialog(context: context, builder: (context) =>
+            EditTaskWidget(task: widget.task),
+          );
+        }
+      },
+    );
   }
 }

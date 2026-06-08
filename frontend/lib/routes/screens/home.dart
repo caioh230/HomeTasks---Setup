@@ -18,10 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadTables();
+    loadTables();
   }
 
-  Future<void> _loadTables() async {
+  Future<void> loadTables() async {
     if(Lists.isTablesLoaded) return;
 
     await Lists.reloadTables();

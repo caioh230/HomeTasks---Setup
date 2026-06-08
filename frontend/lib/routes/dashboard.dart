@@ -28,7 +28,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class DashboardPageState extends State<DashboardPage> {
-  int _selectedIndex = 0;
+  int selectedIndex = 0;
 
   final List<PageItem> _pages = [
     PageItem(page: HomeScreen(), title: "Início"),
@@ -39,7 +39,7 @@ class DashboardPageState extends State<DashboardPage> {
   void _onItemTapped(int index) {
     setState(() {
       overlayPage.clear();
-      _selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
@@ -97,7 +97,7 @@ class DashboardPageState extends State<DashboardPage> {
         children: [
           if (overlayPage.isEmpty)
             IndexedStack(
-              index: _selectedIndex,
+              index: selectedIndex,
               children: _pages.map((e) => e.page).toList(),
             ),
           if (overlayPage.isNotEmpty)
@@ -129,7 +129,7 @@ class DashboardPageState extends State<DashboardPage> {
           ),
           child: BottomNavigationBar(
             backgroundColor: Colors.white,
-            currentIndex: _selectedIndex,
+            currentIndex: selectedIndex,
             onTap: _onItemTapped,
             items: const [
               BottomNavigationBarItem(

@@ -42,7 +42,7 @@ class Lists {
           'editor' => UserRole.editor,
           _ => UserRole.reader,
         },
-        isActive: true,
+        isActive: body['isActive'] as bool,
       );
     }
     isTablesLoaded = true;

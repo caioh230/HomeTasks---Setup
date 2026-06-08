@@ -9,6 +9,7 @@ class TableDBModel{
     required this.name,
     required this.description,
     required this.icon, 
+    required this.isActive,
   });
 
   ///Conversão de Map para DBModel
@@ -17,7 +18,8 @@ class TableDBModel{
       id: map['id'].toString(),
       name: map['name'].toString(),
       description: map['description'].toString(),
-      icon: map['icon'].toString()
+      icon: map['icon'].toString(),
+      isActive: map['isActive'] as bool,
     );
   }
 
@@ -31,7 +33,8 @@ class TableDBModel{
       id: doc.id,
       name: dados['name'].toString(),
       description: dados['description'].toString(),
-      icon: dados['icon'].toString()
+      icon: dados['icon'].toString(),
+      isActive: dados['isActive'] as bool,
     );
   }
 
@@ -43,6 +46,8 @@ class TableDBModel{
   final String description;
   ///Campo de ícone
   final String icon;
+  ///Campo de não arquivado
+  final bool isActive;
   
   ///Conversão de DBModel para Map
   Map<String, dynamic> toMap(){
@@ -50,7 +55,8 @@ class TableDBModel{
       'id': id,
       'name': name,
       'description': description,
-      'icon': icon
+      'icon': icon,
+      'isActive': isActive,
     };
   }   
 }

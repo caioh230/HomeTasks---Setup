@@ -12,7 +12,7 @@ class UserModel{
   factory UserModel.toModel (
       Map<String, dynamic> map,
       {bool validateEmail = true}){
-    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     
     if(
       !validateEmail || regex.hasMatch(map['email'].toString())
@@ -47,7 +47,7 @@ class UserModel{
       'name': name,
       'username': username,
       'email': email,
-      'password': password
+      'password': password,
     };
   }
 }

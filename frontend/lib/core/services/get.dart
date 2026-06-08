@@ -39,4 +39,22 @@ class BackendGet {
       throw Exception('Failed to fetch table by id: $e');
     }
   }
+  
+  static Future<http.Response> tasksList(String idTable) async {
+    try {
+      final token = await UserStorage.getToken();
+
+      final response = await http.get(
+        Uri.parse('${Env.apiUrl}/Task?idTable=${idTable}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      return response;
+    } catch (e) {
+      throw Exception('Failed to fetch table list: $e');
+    }
+  }
 }

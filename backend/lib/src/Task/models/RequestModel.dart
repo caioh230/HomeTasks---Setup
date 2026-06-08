@@ -3,27 +3,27 @@ class RequestModel {
   ///Estrutura do modelo
   RequestModel({
     required this.idTable,
-    required this.idColumn,
+    required this.taskStatus,
   });
 
   ///Converção de Map para Model
   factory RequestModel.toModel ( Map<String, dynamic> map){
     return RequestModel(
       idTable:map['idTable'].toString(),
-      idColumn:map['idColumn'].toString()
+      taskStatus:map['taskStatus'].toString()
     );
   }
 
   ///Campo idTable
   final String idTable;
-  ///Campo idColumn
-  final String idColumn;
+  ///Campo taskStatus
+  final String taskStatus;
   
   ///Converção de Model para Map
   Map<String, dynamic> toMap(){
     return {
       'idTable': idTable,
-      'idColumn': idColumn
+      'taskStatus': taskStatus
     };
   }
 }

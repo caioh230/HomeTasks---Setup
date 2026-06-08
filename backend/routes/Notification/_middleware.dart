@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:hometasks/src/Column/repositories/ColumnRepository.dart';
-import 'package:hometasks/src/Column/services/ColumnService.dart';
+import 'package:hometasks/src/Notification/repositories/NotificationRepository.dart';
+import 'package:hometasks/src/Notification/services/NotificationService.dart';
 
 Handler middleware(Handler handler) {
     return handler
@@ -12,13 +12,13 @@ Handler middleware(Handler handler) {
 
 
 Middleware serviceProvider() {
-  return provider<ColumnRepository>(
-    (_) => ColumnRepository(),
+  return provider<NotificationService>(
+    (_) => NotificationService(),
   );
 }
 
 Middleware repoProvider() {
-  return provider<ColumnService>(
-    (_) => ColumnService(),
+  return provider<NotificationRepository>(
+    (_) => NotificationRepository(),
   );
 }

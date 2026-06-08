@@ -52,7 +52,7 @@ class TaskCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      Lists.boards[task.table]?.title ?? 'Indisponível',
+                      Lists.tables[task.table]?.title ?? 'Indisponível',
                       style: TextStyle(
                         color: Colors.grey.shade600,
                       ),
@@ -112,7 +112,7 @@ class TaskCard extends StatelessWidget {
                     SizedBox(
                       width: 70,
                       child: Stack(
-                        children: TableCard.prepareAvatars(members: task.members),
+                        children: TableCard.prepareAvatars(members: task.accountable),
                       ),
                     ),
 

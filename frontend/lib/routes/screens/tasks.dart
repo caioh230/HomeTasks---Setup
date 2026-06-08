@@ -19,10 +19,22 @@ class TasksScreen extends StatefulWidget {
   State<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin {@override
+class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin {
+  @override
   void initState() {
     super.initState();
-    Lists.reloadTasks();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    if(Lists.isTasksLoaded) return;
+
+    await Lists.reloadTasks();
+
+    Lists.isTasksLoaded = true;
+    if(mounted) {
+      setState(() {});
+    }
   }
 
   @override

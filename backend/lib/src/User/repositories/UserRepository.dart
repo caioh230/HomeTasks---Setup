@@ -81,8 +81,10 @@ class UserRepository {
         statusCode: HttpStatus.created,
         body: {
           'token': token,
+          'id': refDoc.id,
           'name': user.name!,
           'username': user.username!,
+          'email': user.email,
         },
       );
     } catch (e, stackTrace) {
@@ -151,6 +153,7 @@ class UserRepository {
         'id': data['id'],
         'name': data['name'],
         'username': data['username'],
+        'email': data['email'],
       });
 
       if (token.isEmpty) {
@@ -164,8 +167,10 @@ class UserRepository {
         statusCode: HttpStatus.ok,
         body: {
           'token': token,
+          'id': data['id'],
           'name': data['name'],
-          'username': data['username']
+          'username': data['username'],
+          'email': data['email'],
         },
       );
     } catch (e) {
@@ -210,6 +215,7 @@ class UserRepository {
           'id': user.id,
           'name': user.name,
           'username': user.username,
+          'email': user.email,
         }
       );
     } catch (e) {
@@ -333,6 +339,7 @@ String _jwtToken(
           'id': map['id'],
           'name': map['name'],
           'username': map['username'],
+          'email': map['email'],
         },
         issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
       );

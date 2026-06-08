@@ -2,43 +2,38 @@
 class TaskModel {
   ///Componentes do modelo
   TaskModel({
-    required this.idColumn,
+    required this.taskStatus,
     required this.name,
     required this.criadoPor,
     required this.idTable,
-    required this.priority,
+    required this.timeLimit,
+    this.priority,
     this.description,
-    this.timeLimit,
+    this.completedAt,
     this.accountable
   });
 
   ///Conversão de map para model
   factory TaskModel.toModel ( Map<String, dynamic> map){
-    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
-    
-    if(
-      regex.hasMatch(map['criadoPor'].toString())
-      //&& evaluate(map['criadoPor'].toString(), regex)
-    ){
-      return TaskModel(
-        idColumn: map['idColumn'].toString(),
-        name:  map['name'].toString(),
-        description: map['description'].toString(),
-        timeLimit: DateTime
-          .parse(map['timeLimit'].toString())
-          .toIso8601String(),
-        idTable: map['idTable'].toString(),
-        criadoPor: map['criadoPor'].toString(),
-        accountable: (map['accountable'] as List).cast<String>(),
-        priority: map['priority'].toString()
-      );
-    }else{
-      throw Exception('Erro: email  da conta criadora não formatado');
-    }
+    return TaskModel(
+      taskStatus: map['taskStatus'].toString(),
+      name:  map['name'].toString(),
+      description: map['description']?.toString(),
+      timeLimit: DateTime
+        .parse(map['timeLimit'].toString())
+        .toIso8601String(),
+      completedAt: map['completedAt'] != null ? DateTime
+        .parse(map['completedAt'].toString())
+        .toIso8601String() : null,
+      idTable: map['idTable'].toString(),
+      criadoPor: map['criadoPor'].toString(),
+      accountable: (map['accountable'] as List).cast<String>(),
+      priority: map['priority']?.toString()
+    );
   }
 
-  ///Campo idColumn
-  final String idColumn;
+  ///Campo taskStatus
+  final String taskStatus;
   ///Campo name
   final String name;
   ///Campo criadoPor
@@ -46,11 +41,13 @@ class TaskModel {
   ///Campo idTable
   final String idTable;
   ///Campo priority
-  final String priority;
+  final String? priority;
   ///Campo description
   final String? description;
   ///Campo timeLimit
-  final String? timeLimit;
+  final String timeLimit;
+  ///Campo completedAt
+  final String? completedAt;
   ///Campo accountable
   final List<String>? accountable;
 
@@ -58,10 +55,11 @@ class TaskModel {
   ///Conversão do Model para Map
   Map<String, dynamic> toMap(){
     return {
-      'idColumn': idColumn,
+      'taskStatus': taskStatus,
       'name': name,
       'description': description,
       'timeLimit': timeLimit,
+      'completedAt': completedAt,
       'idTable': idTable,
       'priority': priority,
       'criadoPor': criadoPor,

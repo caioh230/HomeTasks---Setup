@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/core/services/post.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
+import 'package:hometasks/routes/screens/invite_member.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/table_card.dart';
-import 'package:hometasks/widgets/task_card.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class NewTaskScreen extends StatefulWidget {
@@ -21,13 +21,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   final initialDate = DateTime.now();
   late final Task newTask = Task(
     title: '',
-    members: ["1", "2", "3", "4"],
+    accountable: [],
     expiration: initialDate,
     status: TaskStatus.notStarted,
   );
 
   void addNewMember() {
-    // TO DO
+    if(newTask.table == null) return;
+    DashboardPage.globalKey.currentState!.showOverlay(InviteMemberScreen(table: Lists.tables[newTask.table!]!));
   }
 
   void saveTask() async {
@@ -58,6 +59,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       );
       return;
     }
+
+    if(newTask.accountable.length == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecione um responsável para a tarefa!')),
+      );
+      return;
+    }
     final navigator = Navigator.of(context, rootNavigator: true);
     showDialog(
       context: context,
@@ -65,20 +73,48 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    String title = newTask.title;
+    String name = newTask.title;
     String? description = newTask.description;
-    List<String> members = newTask.members;
-    DateTime expiration = newTask.expiration;
+    List<String> accountable = newTask.accountable;
+    DateTime timeLimit = newTask.expiration;
     TaskPriority? priority = newTask.priority;
+    TaskStatus status = TaskStatus.notStarted;
+    String idTable = newTask.table!;
 
-    // TO DO
-    // Trocar o "await Future.delayed" por uma
-    // chamada de API para salvar a nova tarefa no backend
-    await Future.delayed(Duration(seconds: 1)); //placeholder
-    //
+    try {
+      final response = await BackendPost.task(
+        idTable: idTable,
+        name: name,
+        timeLimit: timeLimit,
+        status: status,
+        accountable: accountable,
+        description: description,
+        priority: priority,
+      );
 
-    navigator.pop(); 
-    DashboardPage.globalKey.currentState?.closeOverlay();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        navigator.pop();
+        Lists.isTasksLoaded = false;
+        DashboardPage.globalKey.currentState?.closeOverlay();
+      } else {
+        navigator.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao criar tarefa (${response.statusCode})',
+            ),
+          ),
+        );
+      }
+    }
+    catch(e) {
+      navigator.pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao criar tarefa: ${e}'),
+        ),
+      );
+    }
   }
 
   @override
@@ -160,7 +196,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButtonFormField<String>(
-                        items: Lists.boards.values
+                        items: Lists.tables.values
                             .where((Table table) => table.isActive)
                             .map((Table table) => DropdownMenuItem<String>(
                                   value: table.id,
@@ -172,6 +208,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             .toList(),
 
                         onChanged: (newValue) {
+                          newTask.accountable.clear();
                           setState(() {
                             newTask.table = newValue;
                           });
@@ -266,7 +303,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                               final formattedDate = '$day/$month/$year, $hours:$minutes';
                               setState(() {
                                 _dateController.text = formattedDate;
-                                newTask.expiration = pickedDate;
+                                newTask.expiration = DateTime(
+                                  pickedDate.year,
+                                  pickedDate.month,
+                                  pickedDate.day,
+                                  pickedTime.hour,
+                                  pickedTime.minute,
+                                );
                               });
                             }
                           }
@@ -312,81 +355,119 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Responsáveis',
+                        'Responsável',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      alignment: Alignment.topLeft,
-                      child: Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        alignment: WrapAlignment.start,
-                        children: [
-                          for (var member in newTask.members) ...[
+                    if(newTask.table != null)...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        alignment: Alignment.topLeft,
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          alignment: WrapAlignment.start,
+                          children: [
+                            for (var member in Lists.tables[newTask.table]!.members.keys.toList()) ...[
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if(!newTask.accountable.contains(member)) {
+                                      newTask.accountable.add(member);
+                                    } else {
+                                      newTask.accountable.remove(member);
+                                    }
+                                  });
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: newTask.accountable.contains(member)
+                                              ? Colors.green
+                                              : Colors.transparent,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      child: Avatar(
+                                        id: member,
+                                        size: 58.0,
+                                        offset: 0.0,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      width: 90,
+                                      child: Text(
+                                        member,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Avatar(
-                                  id: member,
-                                  size: 58.0,
-                                  offset: 0.0,
+                                GestureDetector(
+                                  onTap: () {
+                                    addNewMember();
+                                  },
+                                  child: DottedBorder(
+                                    options: CircularDottedBorderOptions(
+                                      color: Colors.grey,
+                                      strokeWidth: 2,
+                                      dashPattern: const [6, 4],
+                                    ),
+                                    child: Container(
+                                      width: 54,
+                                      height: 54,
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.add,
+                                        size: 25,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(
-                                  member,
-                                  style: const TextStyle(
+                                const Text(
+                                  'Novo',
+                                  style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ],
-
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  addNewMember();
-                                },
-                                child: DottedBorder(
-                                  options: CircularDottedBorderOptions(
-                                    color: Colors.grey,
-                                    strokeWidth: 2,
-                                    dashPattern: const [6, 4],
-                                  ),
-                                  child: Container(
-                                    width: 54,
-                                    height: 54,
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.add,
-                                      size: 25,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Novo',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
+                    if(newTask.table == null)...[
+                      Center(
+                        child: Text(
+                          'Selecione um quadro antes de selecionar um responsável!',
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                     const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),

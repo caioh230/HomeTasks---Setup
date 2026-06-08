@@ -45,6 +45,7 @@ class _NewTableScreenState extends State<NewTableScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         navigator.pop();
 
+        Lists.isTablesLoaded = false;
         DashboardPage.globalKey.currentState?.closeOverlay();
       } else {
         navigator.pop();

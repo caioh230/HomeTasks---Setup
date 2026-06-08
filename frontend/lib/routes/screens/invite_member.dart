@@ -38,7 +38,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
     //
 
     navigator.pop(); 
-    DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen(table: widget.table));
+    DashboardPage.globalKey.currentState?.closeOverlay();
   }
 
   @override
@@ -52,7 +52,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
           children: [
             Row(
               children: [
-                BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.showOverlay(MembersListScreen(table: widget.table))),
+                BackButton(color: Color(0xFF1067B4), onPressed: () => DashboardPage.globalKey.currentState?.closeOverlay()),
                 const SizedBox(width: 12),
                 const Text(
                   'Convidar Membro',

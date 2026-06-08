@@ -38,7 +38,7 @@ class DashboardPageState extends State<DashboardPage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      overlayPage = null;
+      overlayPage.clear();
       _selectedIndex = index;
     });
   }
@@ -51,16 +51,16 @@ class DashboardPageState extends State<DashboardPage> {
     showOverlay(SettingsScreen());
   }
 
-  Widget? overlayPage;
+  final List<Widget> overlayPage = [];
   void showOverlay(Widget page) {
     setState(() {
-      overlayPage = page;
+      overlayPage.add(page);
     });
   }
 
   void closeOverlay() {
     setState(() {
-      overlayPage = null;
+      overlayPage.removeLast();
     });
   }
 
@@ -95,15 +95,15 @@ class DashboardPageState extends State<DashboardPage> {
       ),
       body: Stack(
         children: [
-          if (overlayPage == null)
+          if (overlayPage.isEmpty)
             IndexedStack(
               index: _selectedIndex,
               children: _pages.map((e) => e.page).toList(),
             ),
-          if (overlayPage != null)
+          if (overlayPage.isNotEmpty)
             Container(
               color: Colors.white,
-              child: overlayPage!,
+              child: overlayPage.last!,
             ),
         ],
       ),

@@ -112,7 +112,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                               Icon(Icons.folder_outlined, size: 16),
                               const SizedBox(width: 10),
                               Text(
-                                Lists.boards[widget.task.table!]?.title.toUpperCase() ?? "INVÁLIDO",
+                                Lists.tables[widget.task.table!]?.title.toUpperCase() ?? "INVÁLIDO",
                                 style: TextStyle(
                                   letterSpacing: 1,
                                 ),

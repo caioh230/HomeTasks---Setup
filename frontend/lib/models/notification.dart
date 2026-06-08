@@ -72,7 +72,7 @@ class AppNotification {
       title: 'Nova tarefa atribuída a você por ${invitedBy.username}:',
       subtitle: task.title,
       time: time,
-      category: Lists.boards[task.table]?.title ?? 'Indisponível',
+      category: Lists.tables[task.table]?.title ?? 'Indisponível',
       titleColor: const Color(0xFF1067B4),
       actions: true,
     );
@@ -101,7 +101,7 @@ class AppNotification {
       title: completedBy.username,
       subtitle: 'Concluiu a tarefa:\n${task.title}',
       time: time,
-      category: Lists.boards[task.table]?.title ?? 'Indisponível',
+      category: Lists.tables[task.table]?.title ?? 'Indisponível',
     );
   }
   

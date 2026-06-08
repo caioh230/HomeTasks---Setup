@@ -15,8 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isTablesLoaded = false;
-
   @override
   void initState() {
     super.initState();
@@ -24,16 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadTables() async {
+    if(Lists.isTablesLoaded) return;
+
     await Lists.reloadTables();
 
-    this?.setState(() {
-      isTablesLoaded = true;
-    });
+    Lists.isTablesLoaded = true;
+    if(mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<TableCard> boards = Lists.boards.values.map((table) => TableCard(table: table)).toList();
+    List<TableCard> tables = Lists.tables.values.map((table) => TableCard(table: table)).toList();
     return SafeArea(
       child: Stack(
         children: [
@@ -61,11 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    isTablesLoaded ?
-                      Lists.boards.isNotEmpty
+                    Lists.isTablesLoaded ?
+                      Lists.tables.isNotEmpty
                         ? Column(
                             children: [
-                              for (final table in boards) ...[
+                              for (final table in tables) ...[
                                 table,
                                 const SizedBox(height: 20),
                               ],

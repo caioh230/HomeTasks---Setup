@@ -12,13 +12,13 @@ Handler middleware(Handler handler) {
 
 
 Middleware serviceProvider() {
-  return provider<TaskRepository>(
-    (_) => TaskRepository(),
+  return provider<TaskService>(
+    (_) => TaskService(),
   );
 }
 
 Middleware repoProvider() {
-  return provider<TaskService>(
-    (_) => TaskService(),
+  return provider<TaskRepository>(
+    (_) => TaskRepository(),
   );
 }

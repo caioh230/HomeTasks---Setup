@@ -5,13 +5,14 @@ class TaskDBModel {
   ///Componentes do modelo
   TaskDBModel({
     required this.id,
-    required this.idColumn,
+    required this.taskStatus,
     required this.name,
     required this.criadoPor,
     required this.idTable,
-    required this.priority,
+    required this.timeLimit,
+    this.priority,
     this.description,
-    this.timeLimit,
+    this.completedAt,
     this.accountable
   });
 
@@ -19,15 +20,18 @@ class TaskDBModel {
   factory TaskDBModel.toModel ( Map<String, dynamic> map){
     return TaskDBModel(
       id: map['id'].toString(),
-      idColumn: map['idColumn'].toString(),
+      taskStatus: map['taskStatus'].toString(),
       name:  map['name'].toString(),
       criadoPor:  map['criadoPor'].toString(),
-      description:  map['description'].toString(),
+      description: map['description']?.toString(),
       timeLimit: DateTime
         .parse(map['timeLimit'].toString())
         .toIso8601String(),
+      completedAt: map['completedAt'] != null ? DateTime
+        .parse(map['completedAt'].toString())
+        .toIso8601String() : null,
       idTable: map['idTable'].toString(),
-      priority: map['priority'].toString()
+      priority: map['priority']?.toString()
     );
   }
 
@@ -39,13 +43,16 @@ class TaskDBModel {
 
       return TaskDBModel(
         id: doc.id,
-        idColumn: dados['idColumn'].toString(),
+        taskStatus: dados['taskStatus'].toString(),
         name:  dados['name'].toString(),
         criadoPor:  dados['criadoPor'].toString(),
-        description:  dados['description'].toString(),
+        description:  dados['description']?.toString(),
         timeLimit: DateTime
           .parse(dados['timeLimit'].toString())
           .toIso8601String(),
+        completedAt: dados['completedAt'] != null ? DateTime
+          .parse(dados['completedAt'].toString())
+          .toIso8601String() : null,
         idTable: dados['idTable'].toString(),
         accountable: (dados['accountable'] as List).cast<String>(),
         priority: dados['priority'].toString()
@@ -54,18 +61,20 @@ class TaskDBModel {
 
   ///Campo id
   final String id;
-  ///Campo idColumn
-  final String idColumn;
+  ///Campo taskStatus
+  final String taskStatus;
   ///Campo name
   final String name;
   ///Campo criadoPor
   final String criadoPor;
   ///Campo priority
-  final String priority;
+  final String? priority;
   ///Campo description
   final String? description;
   ///Campo timeLimit
-  final String? timeLimit;
+  final String timeLimit;
+  ///Campo completedAt
+  final String? completedAt;
   ///Campo idTable
   final String idTable;
   ///Campo accountable
@@ -76,11 +85,12 @@ class TaskDBModel {
   Map<String, dynamic> toMap(){
     return {
       'id': id,
-      'idColumn': idColumn,
+      'taskStatus': taskStatus,
       'name': name,
       'criadoPor': criadoPor,
       'description': description,
       'timeLimit': timeLimit,
+      'completedAt': completedAt,
       'idTable': idTable,
       'priority': priority,
       'accountable': accountable

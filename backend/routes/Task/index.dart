@@ -14,7 +14,7 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return readColumnTasks(context);
+          return readTableTasks(context);
         case HttpMethod.post:
           return createTask(context);
 
@@ -34,22 +34,28 @@ Future<Response> onRequest(
 //-----------------------------
 //            Read
 //-----------------------------
-Future<Response> readColumnTasks(
-  RequestContext context
-  )async{
-    try{
-      final service = context.read<TaskService>();
+Future<Response> readTableTasks(
+  RequestContext context,
+) async {
+  try {
+    final service = context.read<TaskService>();
 
-      final data = await context.request.json() as Map<String, dynamic>;
+    final idTable = context.request.uri.queryParameters['idTable'];
 
-      return service.readColumnTasks(
-        RequestModel.toModel(data).idTable, 
-        RequestModel.toModel(data).idColumn, 
-        context
+    if (idTable == null) {
+      return Response.json(
+        statusCode: 400,
+        body: {'error': 'idTable is required'},
       );
-    }catch(e){
-      throw Exception(e);
     }
+
+    return service.readTableTasks(
+      idTable,
+      context,
+    );
+  } catch (e) {
+    throw Exception(e);
+  }
 }
 
 //-----------------------------

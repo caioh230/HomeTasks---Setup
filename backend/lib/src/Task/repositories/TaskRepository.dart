@@ -26,12 +26,12 @@ class TaskRepository {
     TaskModel task,
     RequestContext context
     ) async {
-      if(await _validateOpr(task.idTable, 'editor', context)){
+      if(await _validateOpr(task.idTable, context, 'editor')){
         try{
           await ref
           .doc()
           .set(task.toMap());
-          
+
           return Response.json(
             statusCode: HttpStatus.created, 
             body: 'Criação bem sucedida'
@@ -40,7 +40,10 @@ class TaskRepository {
           throw Exception(e);
         }
       }else{
-        return Response.json();
+        return Response.json(
+          statusCode: HttpStatus.badRequest, 
+          body: 'Você não possui autorização para esta operação'
+        );
       }
   }
 
@@ -53,7 +56,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, 'reader', context)){
+      if(await _validateOpr(idTable, context, 'reader')){
         try{
           final val = await ref
           .doc(id)
@@ -62,7 +65,7 @@ class TaskRepository {
           final formDados = TaskDBModel.fromFirestore(val);
           
           return Response.json(
-            statusCode: HttpStatus.found, 
+            statusCode: HttpStatus.ok, 
             body: formDados.toMap()
           );
         }catch(e){
@@ -77,24 +80,30 @@ class TaskRepository {
   //            read - reader
   //-----------------------------
   ///Leitura de tarefas pertencentes à mesma coluna
-  Future<Response> readColumnTasks(
+  Future<Response> readTableTasks(
     String idTable,
-    String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, 'reader', context)){
+      if(await _validateOpr(idTable, context, 'reader')){
         try{
-          final val = ref
-          .where(
-              'idColumns', 
-              WhereFilter.equal, 
-              id
-            )
-          .get();
-          
+          final snapshot = await ref
+              .where(
+                'idTable',
+                WhereFilter.equal,
+                idTable,
+              )
+              .get();
+
+          final tasks = snapshot.docs.map((doc) {
+            return {
+              'id': doc.id,
+              ...doc.data(),
+            };
+          }).toList();
+
           return Response.json(
-            statusCode: HttpStatus.found, 
-            body: val
+            statusCode: HttpStatus.ok,
+            body: tasks,
           );
         }catch(e){
           throw Exception(e);
@@ -113,7 +122,7 @@ class TaskRepository {
     TaskModel task,
     RequestContext context
     ) async {
-      if(await _validateOpr(task.idTable, 'editor', context)){
+      if(await _validateOpr(task.idTable, context, 'editor')){
         try{
 
           await ref
@@ -141,7 +150,7 @@ class TaskRepository {
     String id,
     RequestContext context
     ) async {
-      if(await _validateOpr(idTable, 'editor', context)){
+      if(await _validateOpr(idTable, context, 'editor')){
         try{
           await ref
           .doc(id)
@@ -166,12 +175,10 @@ class TaskRepository {
 ///Limitar as operações a depender do cargo do usuário
 Future<bool> _validateOpr(
   String idTable,
-  String cargo,
-  RequestContext context,
-)async{
-  try{
-    final list = ['reader', 'editor', 'owner'];
-    //Obtenção de dados do usuário
+  RequestContext context, [
+  String? minimalRole,
+]) async {
+  try {
     final authHeader = context.request.headers['authorization'];
 
     if (authHeader == null) {
@@ -183,41 +190,37 @@ Future<bool> _validateOpr(
     }
 
     final token = authHeader.substring('Bearer '.length);
+
     final jwt = JWT.verify(
       token,
       SecretKey(_env['jwtSecretKey'].toString()),
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
-    
-    //Busca pelo cargo do usuário
+
     final relationships = firestore.collection('Relationship');
 
     final data = await relationships
-      .where(
-        'idUser', 
-        WhereFilter.equal, 
-        payload['id'].toString()
-      )
-      .where(
-        'idTable', 
-        WhereFilter.equal, 
-        idTable
-      )
-      .get();
+        .where('idUser', WhereFilter.equal, payload['id'].toString())
+        .where('idTable', WhereFilter.equal, idTable)
+        .get();
 
-    if(
-      data.docs.first.data().isNotEmpty
-      &&
-      list.indexOf(data.docs.first.data()['cargo'].toString()) 
-        >=  
-        list.indexOf(cargo)
-    ){
-      return true;
-    }else{
+    if (data.docs.isEmpty) {
       return false;
     }
-  }catch(e){
+
+    const validRoles = ['reader', 'editor', 'owner'];
+    final userRole = data.docs.first.data()['roleName']?.toString();
+    if(!validRoles.contains(userRole)) {
+      //Role invalido
+      return false;
+    }
+
+    if (minimalRole == null) {
+      return true;
+    }
+    return validRoles.indexOf(userRole!) >= validRoles.indexOf(minimalRole);
+  } catch (_) {
     return false;
   }
 }

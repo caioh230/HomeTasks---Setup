@@ -33,7 +33,7 @@ class Task {
   String title;
   String? description;
   String? table;
-  List<String> members;
+  List<String> accountable;
   TaskPriority? priority;
   DateTime expiration;
   DateTime? completedAt;
@@ -42,8 +42,8 @@ class Task {
   Task({
     this.id,
     required this.title,
-    required this.members,
     required this.expiration,
+    required this.accountable,
     this.description,
     this.priority,
     this.table,

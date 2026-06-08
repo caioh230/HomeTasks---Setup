@@ -1,12 +1,6 @@
 ///Documentação central do sistema
 library hometasks;
 
-///Arquivos para Column
-export 'src/Column/models/ColumnDBModel.dart';
-export 'src/Column/models/ColumnModel.dart';
-export 'src/Column/repositories/ColumnRepository.dart';
-export 'src/Column/services/ColumnService.dart';
-
 ///Arquivos para Table
 export 'src/Table/models/TableDBModel.dart';
 export 'src/Table/models/TableModel.dart';

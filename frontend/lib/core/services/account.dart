@@ -4,7 +4,9 @@ import 'package:hometasks/core/utils/env.dart';
 import 'package:http/http.dart' as http;
 
 class UserAccount {
+  static String? userId;
   static String? username;
+  //static String? email;
   static String? name;
 
   /*********************
@@ -34,7 +36,9 @@ class UserAccount {
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final token = json['token'] as String;
+    UserAccount.userId = json['id'] as String?;
     UserAccount.username = json['username'] as String?;
+    //UserAccount.email = json['email'] as String?;
     UserAccount.name = json['name'] as String?;
     UserStorage.saveToken(token);
     return token;
@@ -71,7 +75,9 @@ class UserAccount {
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final token = json['token'] as String;
+    UserAccount.userId = json['id'] as String?;
     UserAccount.username = json['username'] as String?;
+    //UserAccount.email = json['email'] as String?;
     UserAccount.name = json['name'] as String?;
     UserStorage.saveToken(token);
     return token;
@@ -98,7 +104,9 @@ class UserAccount {
       }
 
       final json = jsonDecode(response.body);
+      UserAccount.userId = json['id'] as String?;
       UserAccount.username = json['username'] as String?;
+      //UserAccount.email = json['email'] as String?;
       UserAccount.name = json['name'] as String?;
       return true;
     } catch (_) {
@@ -110,7 +118,7 @@ class UserAccount {
           LOGOUT
   **********************/
   static Future<void> logout() async {
-    username = name = null;
+    userId = username = name = /*email =*/ null;
     await UserStorage.deleteToken();
   }
 }

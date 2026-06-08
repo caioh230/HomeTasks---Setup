@@ -11,7 +11,7 @@ class NotificationModel {
 
   ///Converção de Map para Model
   factory NotificationModel.toModel ( Map<String, dynamic> map){
-    final regex = RegExp(r'^[^\s@]+\.[^\s@]+@souunit\.com\.br$');
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     
     if(
       regex.hasMatch(map['fromUser'].toString()) 

@@ -44,15 +44,14 @@ class TaskService {
   //            read
   //-----------------------------
   ///Solicitação de leitura conjunta
-  Future<Response> readColumnTasks(
+  Future<Response> readTableTasks(
     String idTable,
-    String id, 
     RequestContext context
     ) async{
       try{
         final repository = context.read<TaskRepository>();
 
-        return repository.readTask(idTable, id, context);
+        return repository.readTableTasks(idTable, context);
       }catch(e){
         throw Exception(e);
       }

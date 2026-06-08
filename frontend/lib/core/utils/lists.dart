@@ -8,15 +8,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Lists {
-  static Map<String, Table> boards = {};
+  static Map<String, Table> tables = {};
   static Map<String, Task> tasks = {};
-  static Map<String, Member> users = {};
   static List<AppNotification> notifications = [];
 
   static bool isTablesLoaded = false;
   static bool isTasksLoaded = false;
   static Future<void> reloadTables() async {
-    boards.clear();
+    tables.clear();
     isTablesLoaded = false;
 
     final list = jsonDecode((await BackendGet.tableList()).body);
@@ -33,7 +32,7 @@ class Lists {
         };
       }
 
-      boards[body['id']] = Table(
+      tables[body['id']] = Table(
         id: body['id'],
         title: body['name'],
         members: members,
@@ -46,61 +45,50 @@ class Lists {
         isActive: true,
       );
     }
-    isTablesLoaded = false;
+    isTablesLoaded = true;
   }
   
   static Future<void> reloadTasks({String? boardId}) async {
-    tasks.clear();
-    // TO DO: Load tasks from backend
-    // Filter tasks with ID == boardId
+    while (!isTablesLoaded) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
 
-    // placeholder
-    tasks["asdaiwjekla"] = Task(
-      id: "asdaiwjekla",
-      title: "Limpar caixa do gato",
-      description: "Trocar toda a areia e higienizar a base com desinfetante pet.",
-      members: ["125432315"],
-      table: "asdhuhawrihasr",
-      priority: TaskPriority.high,
-      expiration: DateTime.now().add(const Duration(hours: 6)),
-      status: TaskStatus.notStarted,
-    );
-    tasks["grehlskdpo"] = Task(
-      id: "grehlskdpo",
-      title: "Compras da Semana",
-      description: "Lista no bloco de notas da geladeira. Focar em frutas, carne e produtos de limpeza.",
-      members: ["125432315", "654123453"],
-      table: "greasodkwqeasd",
-      expiration: DateTime.now().subtract(const Duration(days: 1)),
-      status: TaskStatus.notStarted,
-    );
-    tasks["qtriojhksda"] = Task(
-      id: "qtriojhksda",
-      title: "Organizar Home Office",
-      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["125432315"],
-      table: "asdhuhawrihasr",
-      expiration: DateTime.now().add(const Duration(days: 5)),
-      status: TaskStatus.inProgress,
-    );
-    tasks["lfgdnmjhe"] = Task(
-      id: "lfgdnmjhe",
-      title: "Regar as Plantas",
-      description: "Triagem de documentos e organização dos cabos embaixo da mesa.",
-      members: ["125432315"],
-      table: "greasodkwqeasd",
-      expiration: DateTime.now().add(const Duration(hours: 3)),
-      status: TaskStatus.inProgress,
-    );
-    tasks["gregfsdaz"] = Task(
-      id: "gregfsdaz",
-      title: "Lavar a louça do jantar",
-      members: ["125432315"],
-      table: "asdhuhawrihasr",
-      expiration: DateTime.now().add(const Duration(hours: 8)),
-      status: TaskStatus.complete,
-      completedAt: DateTime.now().subtract(const Duration(hours: 2))
-    );
+    tasks.clear();
+    isTasksLoaded = false;
+    
+    for (Table table in tables.values) {
+      final list = jsonDecode((await BackendGet.tasksList(table.id!)).body);
+      for(final obj in list) {
+        TaskStatus status = switch(obj['taskStatus'] as String) {
+          'complete' => TaskStatus.complete,
+          'inProgress' => TaskStatus.inProgress,
+          _ => TaskStatus.notStarted,
+        };
+
+        TaskPriority? priority = switch(obj['priority'] as String?) {
+          'high' => TaskPriority.high,
+          'medium' => TaskPriority.medium,
+          'low' => TaskPriority.low,
+          _ => null,
+        };
+        final expiration = DateTime.parse(obj['timeLimit']);
+        final completedAt = (status == TaskStatus.inProgress ? (obj['completedAt'] != null ? DateTime.parse(obj['completedAt']) : expiration) : null);
+        final accountable = List<String>.from(obj['accountable'] ?? []);
+        final taskId = obj['id'] as String;
+        tasks[taskId] = Task(
+          id: taskId,
+          title: obj['name'] as String,
+          description: obj['description'] as String?,
+          expiration: expiration,
+          completedAt: completedAt,
+          table: obj['idTable'] as String,
+          priority: priority,
+          status: status,
+          accountable: accountable
+        );
+      }
+    }
+    isTasksLoaded = true;
   }
 
   static Future<void> reloadNotifications() async {
@@ -113,7 +101,7 @@ class Lists {
         id: "awuieyu120qiwla",
         title: "Compras da semana",
         table: "greasodkwqeasd",
-        members: [],
+        accountable: [],
         expiration: DateTime.now().add(const Duration(hours: 2)),
       ),
       Member(
@@ -129,7 +117,7 @@ class Lists {
         id: "bvocjdfklg43091lm",
         title: "Limpar caixa do gato",
         table: "asdhuhawrihasr",
-        members: [],
+        accountable: [],
         expiration: DateTime.now().add(const Duration(hours: 2)),
       ),
       DateTime.now().subtract(const Duration(hours: 1)))
@@ -140,7 +128,7 @@ class Lists {
         id: "bvocjdfklg43091lm",
         title: "Limpar caixa do gato",
         table: "asdhuhawrihasr",
-        members: [],
+        accountable: [],
         expiration: DateTime.now().add(const Duration(hours: 1)),
       ),
       Member(
@@ -163,15 +151,5 @@ class Lists {
       ),
       DateTime.now().subtract(const Duration(days: 1)))
     );
-  }
-
-  static Member? loadMember(String id) {
-    if(users[id] != null) {
-      return users[id];
-    }
-    
-    // TO DO: Get user name from API
-    users[id] = Member(id: id, name: "Carregando...", username: "usuario");
-    return users[id];
   }
 }

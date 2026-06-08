@@ -7,8 +7,10 @@ import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
+
 import 'package:hometasks/src/Task/models/TaskDBModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
+import 'package:hometasks/src/Task/models/TaskPatchModel.dart';
 
 ///Importação de dados sensíveis
 final _env = DotEnv()..load();
@@ -159,6 +161,33 @@ class TaskRepository {
           return Response(
             statusCode: HttpStatus.accepted, 
             body: 'Deleção bem sucedida'
+          );
+        }catch(e){
+          throw Exception(e);
+        }
+      }else{
+        return Response.json();
+      }
+  }
+
+  //-----------------------------
+  //            PatchTask - editor
+  //-----------------------------
+  ///Atualização de tarefa única
+  Future<Response> patchTask(
+    String id, 
+    TaskPatchModel task,
+    RequestContext context
+    ) async {
+      if(await _validateOpr(task.idTable!, context, 'editor')){
+        try{
+          await ref
+          .doc(id)
+          .update(task.toMap());
+
+          return Response.json(
+            statusCode: HttpStatus.accepted, 
+            body: 'Atualização bem sucedida'
           );
         }catch(e){
           throw Exception(e);

@@ -1,7 +1,10 @@
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:hometasks/src/Task/models/RequestModel.dart';
+
 import 'package:hometasks/src/Task/models/TaskModel.dart';
+import 'package:hometasks/src/Task/models/TaskPatchModel.dart';
+
 import 'package:hometasks/src/Task/services/TaskService.dart';
 
 //-----------------------------
@@ -19,11 +22,11 @@ Future<dynamic> onRequest(
           return updateTask(id, context);
         case HttpMethod.delete:
           return deleteTask(id, context);
-        
+        case HttpMethod.patch:
+          return patchTask(id, context);
         case HttpMethod.post:
         case HttpMethod.head:
         case HttpMethod.options:
-        case HttpMethod.patch:
       }
     }catch(e){
       throw Exception(e);
@@ -87,6 +90,28 @@ Future<Response> deleteTask(
       return service.deleteTask(
         RequestModel.toModel(data).idTable, 
         id, 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//            Patch
+//-----------------------------
+Future<Response> patchTask(
+  String id, 
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<TaskService>();
+
+      final data = await context.request.json() as Map<String, dynamic>;
+
+      return service.patchTask(
+        id, 
+        TaskPatchModel.toModel(data), 
         context
       );
     }catch(e){

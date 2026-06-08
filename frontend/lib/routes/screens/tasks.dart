@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hometasks/core/services/update.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
@@ -67,6 +68,37 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
     void stopAutoScrollTicker() {
       ticker?.stop();
       lastPointer = null;
+    }
+
+    void changeTaskStatus(Task task, TaskStatus oldStatus, TaskStatus newStatus) async {
+      try {
+        final response = await BackendUpdate.setTaskStatus(
+          id: task.id!,
+          idTable: task.table!,
+          status: newStatus,
+          completedAt: newStatus == TaskStatus.complete ? DateTime.now() : null);
+        if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 202) {
+          setState(() {
+            task.status = oldStatus;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Erro ao mudar status de tarefa (${response.statusCode})',
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          task.status = oldStatus;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao mudar status de tarefa: ${e}'),
+          ),
+        );
+      }
     }
 
     return SafeArea(
@@ -155,8 +187,10 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                                       setState(() {
                                         if(status != task.status) {
                                           task.completedAt = (status == TaskStatus.complete ? DateTime.now() : null);
+                                          TaskStatus oldStatus = task.status;
+                                          task.status = status;
+                                          changeTaskStatus(task, oldStatus, status);
                                         }
-                                        task.status = status;
                                       });
                                     },
 
@@ -190,14 +224,14 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                                                       color: Colors.transparent,
                                                       child: SizedBox(
                                                         width: 320,
-                                                        child: TaskCard(task: filteredTasks[i]),
+                                                        child: TaskCard(task: filteredTasks[i], screen: this),
                                                       ),
                                                     ),
                                                     childWhenDragging: Opacity(
                                                       opacity: 0.3,
-                                                      child: TaskCard(task: filteredTasks[i]),
+                                                      child: TaskCard(task: filteredTasks[i], screen: this),
                                                     ),
-                                                    child: TaskCard(task: filteredTasks[i]),
+                                                    child: TaskCard(task: filteredTasks[i], screen: this),
                                                   ),
                                                 ],
 
@@ -213,7 +247,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                                                         task: Task(
                                                           title: 'Carregando...', expiration: DateTime.now().add(const Duration(hours: 1)),
                                                           accountable: [],
-                                                        )
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -239,7 +273,7 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
                     bottom: 0,
                     child: PlusButton(
                       onTap: () {
-                        DashboardPage.globalKey.currentState?.showOverlay(NewTaskScreen());
+                        DashboardPage.globalKey.currentState?.showOverlay(NewTaskScreen(forceTable: widget.table));
                       },
                     ),
                   ),

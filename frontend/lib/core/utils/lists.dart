@@ -72,7 +72,7 @@ class Lists {
           _ => null,
         };
         final expiration = DateTime.parse(obj['timeLimit']);
-        final completedAt = (status == TaskStatus.inProgress ? (obj['completedAt'] != null ? DateTime.parse(obj['completedAt']) : expiration) : null);
+        final completedAt = (status == TaskStatus.complete ? (obj['completedAt'] != null ? DateTime.parse(obj['completedAt']) : expiration) : null);
         final accountable = List<String>.from(obj['accountable'] ?? []);
         final taskId = obj['id'] as String;
         tasks[taskId] = Task(

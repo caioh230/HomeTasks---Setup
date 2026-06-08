@@ -179,7 +179,7 @@ class TaskRepository {
     TaskPatchModel task,
     RequestContext context
     ) async {
-      if(await _validateOpr(task.idTable!, context, 'editor')){
+      if(await _validateOpr(task.idTable, context, 'editor')){
         try{
           await ref
           .doc(id)

@@ -31,41 +31,27 @@ class BackendUpdate {
   
   static Future<http.Response> editTask({
     required String id,
-    required String name,
-    required String? description,
-    required String icon,
-    required bool isActive,
-  }) async {
-    final token = await UserStorage.getToken();
-
-    return http.patch(
-      Uri.parse('${Env.apiUrl}/Table/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
-        'name': name,
-        'description': description ?? '',
-        'icon': icon,
-        'isActive': isActive,
-      }),
-    );
-  }
-  
-  static Future<http.Response> setTaskStatus({
-    required String id,
-    required TaskStatus status,
+    required String idTable,
+    String? name,
+    String? description,
+    TaskPriority? priority,
+    DateTime? timeLimit,
     DateTime? completedAt,
+    TaskStatus? status
   }) async {
     final token = await UserStorage.getToken();
 
+    String? taskPriority = switch(priority) {
+      TaskPriority.high => 'high',
+      TaskPriority.medium => 'medium',
+      TaskPriority.low => 'low',
+      _ => null,
+    };
     String taskStatus = switch(status) {
       TaskStatus.complete => 'complete',
-      TaskStatus.inProgress => 'notStarted',
+      TaskStatus.inProgress => 'inProgress',
       _ => 'notStarted',
     };
-
     return http.patch(
       Uri.parse('${Env.apiUrl}/Task/$id'),
       headers: {
@@ -73,10 +59,34 @@ class BackendUpdate {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'taskStatus': taskStatus,
+        'idTable': idTable,
+        if(name != null)
+          'name': name,
+        if(description != null)
+          'description': description,
+        if(status != null)
+          'taskStatus': taskStatus,
+        if(priority != null)
+          'priority': taskPriority,
+        if(timeLimit != null)
+          'timeLimit': _formatTime(timeLimit),
         if(completedAt != null)
-          'completedAt': _formatTime(completedAt)
+          'completedAt': _formatTime(completedAt),
       }),
+    );
+  }
+  
+  static Future<http.Response> setTaskStatus({
+    required String id,
+    required String idTable,
+    required TaskStatus status,
+    DateTime? completedAt,
+  }) async {
+    return editTask(
+      id: id,
+      idTable: idTable,
+      status: status,
+      completedAt: completedAt
     );
   }
 

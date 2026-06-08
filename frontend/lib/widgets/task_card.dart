@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/table.dart';
 import 'package:hometasks/models/task.dart';
+import 'package:hometasks/routes/screens/tasks.dart';
 import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/edit_task.dart';
 import 'package:intl/intl.dart';
@@ -9,10 +12,12 @@ import 'package:hometasks/extensions/string.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
+  final State<TasksScreen>? screen;
 
   const TaskCard({
     super.key,
     required this.task,
+    this.screen,
   });
 
   @override
@@ -68,6 +73,26 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
+  Timer? _timer;
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) {
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   Color get _dateColor {
     if (widget.task.status == TaskStatus.complete) {
       if (widget.task.expiration.difference(widget.task.completedAt!).inMinutes > 0) {
@@ -214,7 +239,7 @@ class _TaskCardState extends State<TaskCard> {
       onTap: () {
         if(Lists.tables[widget.task.table]?.role != UserRole.reader) {
           showDialog(context: context, builder: (context) =>
-            EditTaskWidget(task: widget.task),
+            EditTaskWidget(task: widget.task, card: this, screen: widget.screen),
           );
         }
       },

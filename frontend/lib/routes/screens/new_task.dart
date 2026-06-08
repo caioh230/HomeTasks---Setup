@@ -10,7 +10,11 @@ import 'package:hometasks/widgets/basic_button.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class NewTaskScreen extends StatefulWidget {
-  const NewTaskScreen({super.key});
+  final String? forceTable;
+  NewTaskScreen({
+    super.key,
+    this.forceTable,
+  });
   @override
   State<NewTaskScreen> createState() => _NewTaskScreenState();
 }
@@ -149,7 +153,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Nome do Espaço',
+                        'Nome da Tarefa',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -196,30 +200,32 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: DropdownButtonFormField<String>(
+                        initialValue: widget.forceTable,
                         items: Lists.tables.values
                             .where((Table table) => table.isActive)
                             .map((Table table) => DropdownMenuItem<String>(
                                   value: table.id,
                                   child: Text(
                                     table.title,
-                                    style: TextStyle(fontSize: 18),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: widget.forceTable == null ? Colors.black : Colors.grey.shade600,
+                                    ),
                                   ),
                                 ))
                             .toList(),
-
-                        onChanged: (newValue) {
-                          newTask.accountable.clear();
-                          setState(() {
-                            newTask.table = newValue;
-                          });
-                        },
-
-                        decoration: InputDecoration(
+                        onChanged: widget.forceTable == null ?
+                            (newValue) {
+                              newTask.accountable.clear();
+                              setState(() {
+                                newTask.table = newValue;
+                              });
+                            } : null,
+                        decoration: const InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                           border: InputBorder.none,
                           counterText: '',
                         ),
-
                         hint: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -230,16 +236,17 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             ),
                           ),
                         ),
-
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Colors.grey.shade600,
-                        ),
+                        icon: widget.forceTable == null
+                            ? Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Colors.grey.shade600,
+                              )
+                              : const SizedBox.shrink(),
 
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black,
-                          height: 1.2, // 🔥 key fix for alignment consistency
+                          color: widget.forceTable == null ? Colors.black: Colors.grey.shade600,
+                          height: 1.2,
                         ),
                       ),
                     ),

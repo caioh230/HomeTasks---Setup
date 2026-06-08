@@ -5,7 +5,6 @@ class TaskPatchModel {
     required this.idTable,
     this.taskStatus,
     this.name,
-    this.criadoPor,
     this.timeLimit,
     this.priority,
     this.description,
@@ -16,18 +15,18 @@ class TaskPatchModel {
   ///Conversão de map para model
   factory TaskPatchModel.toModel ( Map<String, dynamic> map){
     return TaskPatchModel(
-      taskStatus: map['taskStatus'].toString(),
-      name:  map['name'].toString(),
+      taskStatus: map['taskStatus']?.toString(),
+      name:  map['name']?.toString(),
       description: map['description']?.toString(),
-      timeLimit: DateTime
+      timeLimit: map['timeLimit'] != null ? DateTime
         .parse(map['timeLimit'].toString())
-        .toIso8601String(),
+        .toIso8601String() : null,
       completedAt: map['completedAt'] != null ? DateTime
         .parse(map['completedAt'].toString())
         .toIso8601String() : null,
       idTable: map['idTable'].toString(),
-      criadoPor: map['criadoPor'].toString(),
-      accountable: (map['accountable'] as List).cast<String>(),
+      accountable: map['accountable'] != null ?
+        (map['accountable'] as List).cast<String>() : null,
       priority: map['priority']?.toString()
     );
   }
@@ -36,8 +35,6 @@ class TaskPatchModel {
   final String? taskStatus;
   ///Campo name
   final String? name;
-  ///Campo criadoPor
-  final String? criadoPor;
   ///Campo idTable
   final String idTable;
   ///Campo priority
@@ -55,15 +52,21 @@ class TaskPatchModel {
   ///Conversão do Model para Map
   Map<String, dynamic> toMap(){
     return {
-      'taskStatus': taskStatus,
-      'name': name,
-      'description': description,
-      'timeLimit': timeLimit,
-      'completedAt': completedAt,
       'idTable': idTable,
-      'priority': priority,
-      'criadoPor': criadoPor,
-      'accountable': accountable
+      if(accountable != null)
+        'accountable': accountable,
+      if(taskStatus != null)
+        'taskStatus': taskStatus,
+      if(name != null)
+        'name': name,
+      if(description != null)
+        'description': description,
+      if(timeLimit != null)
+        'timeLimit': timeLimit,
+      if(completedAt != null)
+        'completedAt': completedAt,
+      if(priority != null)
+        'priority': priority,
     };
   }  
 }

@@ -1,15 +1,22 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/update.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
+import 'package:hometasks/routes/screens/tasks.dart';
 import 'package:hometasks/widgets/basic_button.dart';
+import 'package:hometasks/widgets/task_card.dart';
 
 class EditTaskWidget extends StatefulWidget {
   final Task task;
+  final State<TaskCard>? card;
+  final State<TasksScreen>? screen;
   const EditTaskWidget({
     super.key,
     required this.task,
+    this.card,
+    this.screen,
   });
 
   @override
@@ -22,9 +29,68 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
   late final TextEditingController _descriptionController = TextEditingController(text: copiedTask.description ?? "");
   bool _closePressed = false;
 
-  void saveChanges() {
-    Lists.isTasksLoaded = false;
-    Navigator.pop(context);
+  void saveChanges() async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    String idTable = copiedTask.table!;
+    String? description = copiedTask.description;
+    DateTime timeLimit = copiedTask.expiration;
+    TaskPriority? priority = copiedTask.priority;
+    TaskStatus status = copiedTask.status;
+    DateTime? completedAt;
+    if(widget.task.status == TaskStatus.complete && widget.task.completedAt != null) {
+      completedAt = widget.task.completedAt;
+    } else if(status == TaskStatus.complete) {
+      completedAt = DateTime.now();
+    }
+
+    try {
+      final response = await BackendUpdate.editTask(
+        id: copiedTask.id!,
+        idTable: idTable,
+        status: status,
+        timeLimit: timeLimit,
+        priority: priority,
+        description: description,
+        completedAt: completedAt
+      );
+
+      navigator.pop();
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+        widget.screen?.setState(() {
+          widget.card?.setState(() {
+            widget.task.status = status;
+            widget.task.expiration = timeLimit;
+            widget.task.priority = priority;
+            widget.task.description = description;
+            widget.task.completedAt = completedAt;
+          });
+        });
+        navigator.pop();
+      } else {
+        navigator.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao atualizar tarefa (${response.statusCode})',
+            ),
+          ),
+        );
+      }
+    }
+    catch(e) {
+      navigator.pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao atualizar tarefa: ${e}'),
+        ),
+      );
+    }
   }
 
   @override
@@ -253,7 +319,13 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                         if (pickedTime != null) {
                                           setState(() {
                                             _dateController.text = dateFormat(pickedDate);
-                                            copiedTask.expiration = pickedDate;
+                                            copiedTask.expiration = DateTime(
+                                              pickedDate.year,
+                                              pickedDate.month,
+                                              pickedDate.day,
+                                              pickedTime.hour,
+                                              pickedTime.minute,
+                                            );
                                           });
                                         }
                                       }

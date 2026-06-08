@@ -41,7 +41,7 @@ class BackendPost {
 
     String taskStatus = switch(status) {
       TaskStatus.complete => 'complete',
-      TaskStatus.inProgress => 'notStarted',
+      TaskStatus.inProgress => 'inProgress',
       _ => 'notStarted',
     };
 
@@ -67,6 +67,8 @@ class BackendPost {
         'priority': taskPriority,
         'accountable': accountable,
         'criadoPor': UserAccount.userId,
+        if(status == TaskStatus.complete)
+          'completedAt': _formatTime(DateTime.now()),
       }),
     );
   }

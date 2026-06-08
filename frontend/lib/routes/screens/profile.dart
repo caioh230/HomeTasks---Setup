@@ -1,40 +1,37 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' hide Table;
 import 'package:hometasks/core/services/account.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/table.dart';
+import 'package:hometasks/models/task.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/edit_profile.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/table_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  void _checkLoaded() async {
+    while (!Lists.isTablesLoaded) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    setState(() {});
+    
+    while (!Lists.isTasksLoaded) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Table> userTables = [
-      /*Table(
-        title: "Residência Principal",
-        icon: Icons.home_outlined,
-        role: UserRole.owner,
-        members: ["1", "2", "3", "4"]
-      ),
-      Table(
-        title: "Estúdio Criativo",
-        icon: Icons.home_work_outlined,
-        role: UserRole.editor,
-        members: ["1", "7", "10", "9"]
-      ),
-      Table(
-        title: "Refúgio do Fim de Semana",
-        icon: Icons.lock_outline,
-        role: UserRole.reader,
-        members: [],
-        isPrivate: true
-      ),*/
-    ];
-
+    _checkLoaded();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -70,19 +67,21 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _infoSquare(
-                      "24",
+                      Lists.tasks.values.where((Task task) => task.status == TaskStatus.complete).length.toString().padLeft(2, '0'),
                       "TAREFAS",
                       "CONCLUÍDAS",
                       const Color(0xFF005DA7),
+                      !Lists.isTasksLoaded
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: _infoSquare(
-                      "03",
+                      Lists.tables.length.toString().padLeft(2, '0'),
                       "ESPAÇOS",
                       "",
                       const Color(0xFF006B3F),
+                      !Lists.isTablesLoaded
                     ),
                   ),
                 ],
@@ -106,37 +105,71 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              for (final table in userTables) ... [
+              if(Lists.isTablesLoaded)
                 Column(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: ListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: table.role.backgroundColor,
-                            borderRadius: BorderRadius.circular(12),
+                    for (final table in Lists.tables.values.toList()) ... [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: ListTile(
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: table.role.backgroundColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(table.icon, color: table.role.mainColor),
                           ),
-                          child: Icon(table.icon, color: table.role.mainColor),
+                          title: Text(
+                            table.title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(_boardDescriptor(table)),
+                          trailing: !table.isPrivate ?
+                              SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members.keys.toList()))) :
+                              Icon(Icons.lock_outline, color: Colors.grey),
                         ),
-                        title: Text(
-                          table.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(_boardDescriptor(table)),
-                        trailing: !table.isPrivate ?
-                            SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members.keys.toList()))) :
-                            Icon(Icons.lock_outline, color: Colors.grey),
                       ),
-                    ),
-                    const SizedBox(height: 15),
-                  ]
-                )
-              ],
+                      const SizedBox(height: 15),
+                    ],
+                  ],
+                ),
+              if(!Lists.isTablesLoaded)
+                Skeletonizer(
+                  child: 
+                  Column(
+                    children: [
+                      for (int i = 0 ; i < 3 ; i++) ... [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: UserRole.reader.backgroundColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(Icons.apartment_outlined, color: UserRole.reader.mainColor),
+                            ),
+                            title: Text(
+                              "Carregando...",
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text("Ambiente • 0 membros"),
+                            trailing: SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: ['', '', ''])))
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                      ],
+                    ],
+                  ),
+                ),
               const SizedBox(height: 25),
             ],
           ),
@@ -150,8 +183,11 @@ class ProfileScreen extends StatelessWidget {
     String t1,
     String t2,
     Color color,
+    bool skeletonCond
   ) {
     return Container(
+      width: 100,
+      height: 120,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F3F9),
@@ -159,12 +195,15 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            num,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: color,
+          Skeletonizer(
+            enabled: skeletonCond,
+            child: Text(
+              num,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
           ),
           Text(t1, style: const TextStyle(fontSize: 12, color: Colors.grey)),

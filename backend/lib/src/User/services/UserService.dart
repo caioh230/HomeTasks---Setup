@@ -1,6 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:logging/logging.dart';
 
+import 'package:hometasks/src/User/models/UserGetModel.dart';
 import 'package:hometasks/src/User/models/UserModel.dart';
 import 'package:hometasks/src/User/repositories/UserRepository.dart';
 
@@ -53,6 +54,38 @@ class UserService {
       final repository = context.read<UserRepository>();
 
       return repository.readUser(context);
+    } catch (e, stackTrace) {
+      _log.severe(
+        {
+          'event': 'read_user_failed',
+          'error': e.toString(),
+        }.toString(),
+        e,
+        stackTrace,
+      );
+
+      rethrow;
+    }
+  }
+
+  //-----------------------------
+  //            read
+  //-----------------------------
+  /// Requisição de leitura de que não seja o usuário
+  Future<Response> getUserbyUsername(
+    UserGetModel data,
+    RequestContext context,
+  ) async {
+    try {
+      _log.info({
+        'event': 'read_user_requested',
+      }.toString());
+
+      final repository = context.read<UserRepository>();
+
+      return repository.getUserbyUsername(
+        data 
+      );
     } catch (e, stackTrace) {
       _log.severe(
         {

@@ -1,6 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 
+import 'package:hometasks/src/User/models/UserGetModel.dart';
 import 'package:hometasks/src/User/models/UserModel.dart';
+
 import 'package:hometasks/src/User/services/UserService.dart';
 
 //-----------------------------
@@ -13,7 +15,13 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return getUser(context);
+          if(
+            context.request.headers['Login']! == 'true'
+            ){
+              return getUser(context);
+          }else{
+            return getUserbyUsername(context);
+          }
         case HttpMethod.post:
           return createUser(context);
 
@@ -51,6 +59,27 @@ Future<Response> getUser(RequestContext context) async {
     final token = authHeader.substring('Bearer '.length);
 
     return await service.isUserByToken(token, context);
+  } catch (e) {
+    return Response.json(
+      statusCode: 500,
+      body: 'Error: $e',
+    );
+  }
+}
+
+//-----------------------------
+//            Read
+//-----------------------------
+///Responsável por executar a requisição de verificação
+Future<Response> getUserbyUsername(RequestContext context) async {
+  try {
+    final service = context.read<UserService>();
+    final data = await context.request.json() as Map<String, dynamic>;
+
+    return await service.getUserbyUsername( 
+      UserGetModel.toModel(data),
+      context
+    );
   } catch (e) {
     return Response.json(
       statusCode: 500,

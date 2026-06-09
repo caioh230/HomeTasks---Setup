@@ -8,7 +8,9 @@ import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
+
 import 'package:hometasks/src/User/models/UserDBModel.dart';
+import 'package:hometasks/src/User/models/UserGetModel.dart';
 import 'package:hometasks/src/User/models/UserModel.dart';
 
 ///Importação de dados sensíveis
@@ -252,6 +254,31 @@ class UserRepository {
       }
 
       return UserDBModel.fromFirestore(doc);
+    } catch (e) {
+      throw Exception('Erro ao buscar usuário por ID: $e');
+    }
+  }
+
+  //-----------------------------
+  //            read - User by Username
+  //-----------------------------
+  ///Pega dados do usuário pelo firebase através de um Username de usuário
+  Future<Response> getUserbyUsername(
+    UserGetModel data
+  ) async {
+    try {
+      final doc = await ref
+      .where(
+        'username', 
+        WhereFilter.equal, 
+        data.username
+      )
+      .get();
+
+      return Response.json(
+        statusCode: HttpStatus.ok,
+        body: UserDBModel.fromFirestore(doc.docs.first).toMap()
+      );
     } catch (e) {
       throw Exception('Erro ao buscar usuário por ID: $e');
     }

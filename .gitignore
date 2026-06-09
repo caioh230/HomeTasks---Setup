@@ -13,6 +13,9 @@ frontend/build/
 # Test related files
 frontend/coverage/
 
+#build
+build/
+
 #Dados sensíveis
 frontend/.env
 frontend/database-credentials.json

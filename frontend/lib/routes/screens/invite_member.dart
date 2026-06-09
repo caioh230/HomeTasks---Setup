@@ -295,3 +295,27 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
     );
   }
 }
+
+
+//Função a ser salva no post.dart
+
+// static Future<http.Response> postRelationship({
+//       String idUser,
+//       String idTable,
+//       String roleName,
+//   }) async {
+//     final token = await UserStorage.getToken();
+
+//     return http.post(
+//       Uri.parse('${Env.apiUrl}/Relationship'),
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': 'Bearer $token',
+//       },
+//       body: jsonEncode({
+//         'idUser': idUser,
+//         'idTable':  idTable,
+//         'roleName': roleName,
+//       }),
+//     );
+//   }

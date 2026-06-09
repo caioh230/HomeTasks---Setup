@@ -1,6 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:hometasks/src/Relationship/models/RelationshipModel.dart';
+import 'package:hometasks/src/Relationship/models/RelationshipPatchModel.dart';
+
 import 'package:hometasks/src/Relationship/repositories/RelationshipRepository.dart';
 
 ///Intermediário das requisições
@@ -98,6 +100,28 @@ class RelationshipService {
 
         return repository.deleteRelationship( 
           idTable, 
+          context
+        );
+      }catch(e){
+        throw Exception(e);
+      }
+  }
+
+  //-----------------------------
+  //            Patch
+  //-----------------------------
+  ///Solicitação de atualização
+  Future<Response> patchRelationship(
+    String idTable, 
+    RelationshipPatchModel relationship,
+    RequestContext context
+    ) async{
+      try{
+        final repository = context.read<RelationshipRepository>();
+
+        return repository.patchRelationship(
+          idTable, 
+          relationship, 
           context
         );
       }catch(e){

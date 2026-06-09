@@ -2,11 +2,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
+import 'package:dotenv/dotenv.dart';
 
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
-import 'package:hometasks/src/ResetPassword/models/ResetPasswordModel.dart';
+import 'package:hometasks/src/ForgotPassword/models/ForgotPasswordModel.dart';
 import 'package:hometasks/src/User/models/UserDBModel.dart';
 
 import 'package:mailer/mailer.dart';
@@ -14,17 +17,20 @@ import 'package:mailer/smtp_server/gmail.dart';
 
 import 'package:uuid/uuid.dart';
 
+///Importação de dados sensíveis
+final _env = DotEnv()..load();
+
 ///Responsável pela conexão com o banco remoto
-class ResetPasswordRepository {
-  ///Referência à coleção ResetPassword
-  final ref = firestore.collection('ResetPassword');
+class ForgotPasswordRepository {
+  ///Referência à coleção ForgotPassword
+  final ref = firestore.collection('ForgotPassword');
 
   //-----------------------------
   //            create
   //-----------------------------
   ///Criação de uma nova instância no banco remoto
-  Future<Response> createResetPassword(
-    ResetPasswordModel forgotPasswordModel
+  Future<Response> createForgotPassword(
+    ForgotPasswordModel forgotPasswordModel
     ) async {
       try {        
         late final bool val;
@@ -50,10 +56,9 @@ class ResetPasswordRepository {
 
           final random = Random();
 
-          final model = ResetPasswordModel.toModel(
+          final model = ForgotPasswordModel.toModel(
             {
               'email': forgotPasswordModel.email,
-              'newPassword': '',
               'code': (100000 + random.nextInt(900000)).toString()
             }
           );
@@ -68,8 +73,8 @@ class ResetPasswordRepository {
               Message()
                 ..from = const Address('caiohchagas92@gmail.com', 'HomeTasks')
                 ..recipients.add(forgotPasswordModel.email)
-                ..subject = 'Código de alteração de senha'
-                ..text = 'Olá! Seu código de alteração de senha é ${model.code}.'
+                ..subject = 'Código de recuperação de senha'
+                ..text = 'Olá! Seu código de recuperação de senha é ${model.code}.'
                 ..html = '<h1>Olá!</h1><p>Email enviado pela equipe do Hometasks.</p>';
 
           await send(message, smtpServer);
@@ -100,52 +105,60 @@ class ResetPasswordRepository {
   }
 
   //-----------------------------
-  //            update - JWT
+  //            get - JWT
   //-----------------------------
   ///Atualizar uma instância no banco remoto
-  Future<Response> updateResetPassword(
+  Future<Response> getForgotPassword(
     String id,
     RequestContext context,
-    ResetPasswordModel resetPassword
     ) async{ 
       try{
-        if(
-          resetPassword.newPassword != ''
-        ){
-          await ref
-            .doc(id)
-            .update(resetPassword.toMap()); 
+        await ref
+          .doc(id)
+          .get();
 
-          final pesq = firestore.collection('User');
+        final pesq = firestore.collection('User');
 
-          //Atualização de senha do usuário          
-          final user = await pesq.where(
-            'email', 
-            WhereFilter.equal, 
-            resetPassword.email
-          ).get();
+        //Obtendo de senha do usuário          
+        final user = await pesq.where(
+          'email', 
+          WhereFilter.equal, 
+          await _validateUsr(context)
+        ).get();
 
-          final mod = UserDBModel.fromFirestore(user.docs.first);
-          
-          final modMap = mod.toMap();
-          modMap['password'] = resetPassword.newPassword; 
-
-          await pesq
-          .doc(mod.id)
-          .update(modMap);
-
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Senha atualizada com sucesso',
-          );
-        }else{
-          return Response.json(
-            statusCode: HttpStatus.badRequest, 
-            body: 'É necessária uma senha nova, o campo está vazio',
-          );
-        }
+        final mod = UserDBModel.fromFirestore(user.docs.first);
+        
+        return Response.json(
+          statusCode: HttpStatus.accepted, 
+          body: mod.password,
+        );
       }catch(e){
         throw Exception(e);
       }
+  }
+}
+
+//-----------------------------
+//             RLS
+//-----------------------------
+///Buscar o id do usuário
+Future<String> _validateUsr(
+  RequestContext context,
+)async{
+  try{
+    //Obtenção de dados do usuário
+    final request = context.request;
+    final header = request.headers['authorization'];
+                
+    final jwt = JWT.verify(
+      header!, 
+      SecretKey(_env['jwtSecretKey'].toString())
+    );
+
+    final payload = jwt.payload as Map<String, dynamic>;
+    
+    return payload['id'].toString();
+  }catch(e){
+    return '';
   }
 }

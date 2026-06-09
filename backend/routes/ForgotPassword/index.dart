@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:hometasks/src/ResetPassword/models/ResetPasswordModel.dart';
-import 'package:hometasks/src/ResetPassword/services/ResetPasswordService.dart';
+import 'package:hometasks/src/ForgotPassword/models/ForgotPasswordModel.dart';
+import 'package:hometasks/src/ForgotPassword/services/ForgotPasswordService.dart';
 
 //-----------------------------
 //            main
@@ -14,8 +14,7 @@ Future<Response> onRequest(
       switch (context.request.method){
         case HttpMethod.get:
         case HttpMethod.post:
-          return createResetPassword(context);
-
+          return createForgotPassword(context);
         case HttpMethod.put:
         case HttpMethod.delete:
         case HttpMethod.head:
@@ -33,16 +32,16 @@ Future<Response> onRequest(
 //            Create
 //-----------------------------
 ///Responsável por executar a requisição de criação
-Future<Response> createResetPassword(
+Future<Response> createForgotPassword(
   RequestContext context
   )async{
     try{
-      final service = context.read<ResetPasswordService>();
+      final service = context.read<ForgotPasswordService>();
 
       final data = await context.request.json() as Map<String, dynamic>;
 
-      return service.createResetPassword(
-        ResetPasswordModel.toModel(data), 
+      return service.createForgotPassword(
+        ForgotPasswordModel.toModel(data), 
         context
       );
     }catch(e){

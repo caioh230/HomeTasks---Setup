@@ -1,22 +1,21 @@
 import 'package:dart_frog/dart_frog.dart';
 
-import 'package:hometasks/src/ResetPassword/models/ResetPasswordModel.dart';
-
-import 'package:hometasks/src/ResetPassword/repositories/ResetPasswordRepository.dart';
+import 'package:hometasks/src/ForgotPassword/models/ForgotPasswordModel.dart';
+import 'package:hometasks/src/ForgotPassword/repositories/ForgotPasswordRepository.dart';
 
 import 'package:logging/logging.dart';
 
 
 /// Serviço responsável como intermediário entre as requisições e o repository
-class ResetPasswordService {
-  static final _log = Logger('ResetPasswordService');
+class ForgotPasswordService {
+  static final _log = Logger('ForgotPasswordService');
 
   //-----------------------------
   //            create
   //-----------------------------
   /// Requisição de criação de nova instância
-  Future<Response> createResetPassword(
-    ResetPasswordModel forgotPassword,
+  Future<Response> createForgotPassword(
+    ForgotPasswordModel forgotPassword,
     RequestContext context,
   ) async {
     try {
@@ -24,9 +23,9 @@ class ResetPasswordService {
         'event': 'forgot_password_requested',
       }.toString());
 
-      final repository = context.read<ResetPasswordRepository>();
+      final repository = context.read<ForgotPasswordRepository>();
 
-      return repository.createResetPassword(forgotPassword);
+      return repository.createForgotPassword(forgotPassword);
     } catch (e, stackTrace) {
       _log.severe(
         {
@@ -42,12 +41,11 @@ class ResetPasswordService {
   }
 
   //-----------------------------
-  //            update
+  //            get
   //-----------------------------
   /// Requisição de atualização de instância
-  Future<Response> updateResetPassword(
+  Future<Response> getForgotPassword(
     String id,
-    ResetPasswordModel resetPassword,
     RequestContext context,
   ) async {
     try {
@@ -56,12 +54,11 @@ class ResetPasswordService {
         'reset_id': id,
       }.toString());
 
-      final repository = context.read<ResetPasswordRepository>();
+      final repository = context.read<ForgotPasswordRepository>();
 
-      return repository.updateResetPassword(
+      return repository.getForgotPassword(
         id,
-        context,
-        resetPassword,
+        context
       );
     } catch (e, stackTrace) {
       _log.severe(

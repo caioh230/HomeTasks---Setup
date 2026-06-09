@@ -6,6 +6,10 @@
 # =========================
 # Arquivos sensíveis
 # =========================
+backend/.env
+backend/database-credentials.json
+frontend/.env
+frontend/database-credentials.json
 .env
 database-credentials.json
 

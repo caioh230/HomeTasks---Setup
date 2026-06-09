@@ -31,7 +31,7 @@ class TaskDBModel {
       completedAt: map['completedAt'] != null ? DateTime
         .parse(map['completedAt'].toString())
         .toIso8601String() : null,
-      completedBy: map['criadoPor']?.toString(),
+      completedBy: map['completedBy']?.toString(),
       idTable: map['idTable'].toString(),
       priority: map['priority']?.toString()
     );
@@ -55,7 +55,7 @@ class TaskDBModel {
         completedAt: dados['completedAt'] != null ? DateTime
           .parse(dados['completedAt'].toString())
           .toIso8601String() : null,
-        completedBy: dados['criadoPor']?.toString(),
+        completedBy: dados['completedBy']?.toString(),
         idTable: dados['idTable'].toString(),
         accountable: (dados['accountable'] as List).cast<String>(),
         priority: dados['priority'].toString()

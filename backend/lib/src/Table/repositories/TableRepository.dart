@@ -76,26 +76,43 @@ class TableRepository {
           final val = await ref
           .doc(id)
           .get();
+            final formDados = TableDBModel.fromFirestore(val);
 
-          final formDados = TableDBModel.fromFirestore(val);
-          
-          final relationships = firestore.collection('Relationship');
-          final members = await relationships
-              .where('idTable', WhereFilter.equal, id)
-              .get();
+            final relationships = firestore.collection('Relationship');
+            final usersRef = firestore.collection('User');
 
-          final membersList = Map<String, String>.fromEntries(
-            members.docs
-                .where((doc) =>
-                    doc.data()['idUser'] != null &&
-                    doc.data()['roleName'] != null)
-                .map(
-                  (doc) => MapEntry(
-                    doc.data()['idUser'].toString(),
-                    doc.data()['roleName'].toString(),
-                  ),
-                ),
-          );
+            final members = await relationships
+                .where('idTable', WhereFilter.equal, id)
+                .get();
+
+            final entries = await Future.wait(
+              members.docs.map((doc) async {
+                final data = doc.data();
+
+                final idUser = data['idUser'];
+                final roleName = data['roleName'];
+
+                if (idUser == null || roleName == null) return null;
+
+                final userSnap = await usersRef.doc(idUser.toString()).get();
+
+                final username = userSnap.data()?['username'] ?? 'unknown';
+                final name = userSnap.data()?['name'] ?? 'unknown';
+
+                return MapEntry(
+                  idUser.toString(),
+                  {
+                    'roleName': roleName.toString(),
+                    'username': username,
+                    'name': name,
+                  },
+                );
+              }),
+            );
+
+            final membersList = Map<String, dynamic>.fromEntries(
+              entries.whereType<MapEntry<String, dynamic>>(),
+            );
           
           return Response.json(
             statusCode: HttpStatus.ok, 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/core/services/update.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
@@ -76,7 +77,9 @@ class _TasksScreenState extends State<TasksScreen> with TickerProviderStateMixin
           id: task.id!,
           idTable: task.table!,
           status: newStatus,
-          completedAt: newStatus == TaskStatus.complete ? DateTime.now() : null);
+          completedAt: newStatus == TaskStatus.complete ? DateTime.now() : null,
+          completedBy: newStatus == TaskStatus.complete ? UserAccount.userId! : null
+        );
         if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 202) {
           setState(() {
             task.status = oldStatus;

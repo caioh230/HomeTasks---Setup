@@ -362,7 +362,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Responsável',
+                        'Responsáveis',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -378,14 +378,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           runSpacing: 10,
                           alignment: WrapAlignment.start,
                           children: [
-                            for (var member in Lists.tables[newTask.table]!.members.keys.toList()) ...[
+                            for (var entry in Lists.tables[newTask.table]!.members.entries) ...[
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    if(!newTask.accountable.contains(member)) {
-                                      newTask.accountable.add(member);
+                                    if(!newTask.accountable.contains(entry.key)) {
+                                      newTask.accountable.add(entry.key);
                                     } else {
-                                      newTask.accountable.remove(member);
+                                      newTask.accountable.remove(entry.key);
                                     }
                                   });
                                 },
@@ -396,14 +396,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                          color: newTask.accountable.contains(member)
+                                          color: newTask.accountable.contains(entry.key)
                                               ? Colors.green
                                               : Colors.transparent,
                                           width: 3,
                                         ),
                                       ),
                                       child: Avatar(
-                                        id: member,
+                                        id: entry.key,
                                         size: 58.0,
                                         offset: 0.0,
                                       ),
@@ -412,7 +412,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                     Container(
                                       width: 90,
                                       child: Text(
-                                        member,
+                                        entry.value.name,
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,

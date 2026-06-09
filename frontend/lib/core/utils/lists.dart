@@ -24,13 +24,18 @@ class Lists {
       final http.Response response = await BackendGet.tableById(id);
       final Map<String, dynamic> body = jsonDecode(response.body);
 
-      final Map<String, UserRole> members = {};
+      final Map<String, Member> members = {};
       for (final entry in Map<String, dynamic>.from(body['members'] ?? {}).entries) {
-        members[entry.key] = switch (entry.value as String) {
-          "owner" => UserRole.owner,
-          "editor" => UserRole.editor,
-          _ => UserRole.reader,
-        };
+        members[entry.key] = Member(
+          id: entry.key,
+          name: entry.value['name'] as String? ?? "Nome",
+          username: entry.value['username'] as String? ?? "username",
+          role: switch (entry.value['roleName'] as String?) {
+            "owner" => UserRole.owner,
+            "editor" => UserRole.editor,
+            _ => UserRole.reader,
+          }
+        );
       }
 
       tables[body['id']] = Table(
@@ -74,7 +79,7 @@ class Lists {
         };
         final expiration = DateTime.parse(obj['timeLimit']);
         final completedAt = (status == TaskStatus.complete ? (obj['completedAt'] != null ? DateTime.parse(obj['completedAt']) : expiration) : null);
-        final completedBy = (status == TaskStatus.complete ? (obj['completedAt'] as String) : null);
+        final completedBy = (status == TaskStatus.complete ? (obj['completedBy'] as String) : null);
         final accountable = List<String>.from(obj['accountable'] ?? []);
         final taskId = obj['id'] as String;
         tasks[taskId] = Task(

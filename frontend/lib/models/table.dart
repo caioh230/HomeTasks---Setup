@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/models/member.dart';
 
 enum UserRole {
   owner(
@@ -41,7 +42,7 @@ class Table {
   String? id;
   String title;
   String? description;
-  Map<String, UserRole> members;
+  Map<String, Member> members;
   UserRole role;
   bool isActive;
   bool isPrivate;

@@ -28,7 +28,7 @@ class TaskCard extends StatefulWidget {
     final today = DateTime(now.year, now.month, now.day, now.hour, now.minute).toUtc();
     final target = DateTime(date.year, date.month, date.day, date.hour, date.minute).toUtc();
 
-    final difference = target.difference(today).inDays;
+    final difference = DateTime(date.year, date.month, date.day).difference(DateTime(now.year, now.month, now.day)).inDays;
     final time = DateFormat('HH:mm').format(date);
     switch (difference) {
       case 0: {

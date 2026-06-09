@@ -24,7 +24,7 @@ class MembersListScreen extends StatelessWidget {
         }
       }
 
-      return rank(a.value).compareTo(rank(b.value));
+      return rank(a.value.role).compareTo(rank(b.value.role));
     });
 
     return Container(
@@ -154,8 +154,8 @@ class MembersListScreen extends StatelessWidget {
 
                 memberCard(
                   id: entry.key,
-                  name: entry.key,
-                  role: entry.value,
+                  name: entry.value.name,
+                  role: entry.value.role,
                 ),
                 const SizedBox(height: 22),
               ],

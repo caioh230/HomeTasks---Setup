@@ -97,7 +97,7 @@ class BackendPost {
 
     final userJson = jsonDecode(userResponse.body);
     final String idUser = userJson['id'] as String;
-    print(idUser);
+    //print(idUser);
 
     String roleName = switch (role) {
       UserRole.editor => 'editor',

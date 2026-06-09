@@ -110,17 +110,13 @@ class AppNotification {
   }
   
   static AppNotification taskCompleted(Task task, String completedBy, DateTime time) {
-    final member = Member(
-        id: completedBy,
-        name: "João Batista",
-        username: "joaobat"
-      );
+    Member? member = Lists.tables[task.table]?.members[completedBy];
     return AppNotification(
       notificationType: NotificationType.taskCompleted,
       drawType: NotificationDrawType.avatar,
-      userId: member.id,
+      userId: member?.id ?? "",
       checkmark: true,
-      title: member.username,
+      title: member?.username ?? "Inválido",
       subtitle: 'Concluiu a tarefa:\n${task.title}',
       time: time,
       category: Lists.tables[task.table]?.title ?? 'Indisponível',

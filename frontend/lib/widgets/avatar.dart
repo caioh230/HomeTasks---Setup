@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class Avatar extends StatefulWidget {
-  final String id;
+  final String? id;
   final double size;
   final double offset;
   final double borderSize;
 
-  const Avatar({
+  Avatar({
     super.key,
-    required this.id,
+    this.id = "",
     this.size = 34.0,
     this.offset = 0.0,
     this.borderSize = 2.0,

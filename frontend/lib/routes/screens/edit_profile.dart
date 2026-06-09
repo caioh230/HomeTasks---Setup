@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
@@ -12,7 +13,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _nameController = TextEditingController(text: 'Márcia Almeida Costa');
+  final _nameController = TextEditingController(text: UserAccount.name ?? "Meu Nome");
   //final _emailController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final _confirmPasswordController = TextEditingController(text: '');
@@ -31,6 +32,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void saveChanges() async {
+    if(_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Preencha o campo de usuário.',
+          ),
+        ),
+      );
+    }
     final navigator = Navigator.of(context, rootNavigator: true);
     showDialog(
       context: context,
@@ -95,7 +105,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: Stack(
                         children: [
-                          Avatar(id: '1', size: 128, borderSize: 4),
+                          Avatar(id: UserAccount.userId, size: 128, borderSize: 4),
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -152,7 +162,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InputField(label: 'Nome Completo', controller: _nameController),
+                    InputField(
+                      label: 'Nome Completo',
+                      controller: _nameController,
+                    ),
                     //const SizedBox(height: 20),
                     //InputField(label: 'Email', controller: _emailController),
                     const SizedBox(height: 20),

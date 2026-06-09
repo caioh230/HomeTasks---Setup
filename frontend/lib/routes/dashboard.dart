@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/profile_widget.dart';
 import 'screens/home.dart';
@@ -78,7 +79,7 @@ class DashboardPageState extends State<DashboardPage> {
               builder: (context) => ProfileWidget()
             );
           },
-          child: Avatar(id: "1", size: 40),
+          child: Avatar(id: UserAccount.userId, size: 40),
         ),
         actions: [
           IconButton(

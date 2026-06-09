@@ -7,6 +7,7 @@ class RelationshipModel {
     required this.tableName,
     required this.roleName,
     required this.valid,
+    this.createdAt,
   });
 
   ///Conversão de map para model
@@ -20,7 +21,8 @@ class RelationshipModel {
         idTable:    map['idTable'].toString(),
         tableName:    map['tableName'].toString(),
         roleName:   map['roleName'].toString(),
-        valid:      bool.parse(map['valid'].toString())
+        valid:      bool.parse(map['valid'].toString()),
+        createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt'].toString()) : null,
       );
     }else {
       throw Exception('Cargo inexistente, ignorando acesso');
@@ -37,6 +39,8 @@ class RelationshipModel {
   final String roleName;
   ///Campo valid
   final bool valid;
+  ///Campo createdAt
+  final DateTime? createdAt;
   
   ///Conversão do Model para Map
   Map<String, dynamic> toMap(){
@@ -45,7 +49,9 @@ class RelationshipModel {
       'idTable': idTable,
       'tableName': tableName,
       'roleName': roleName,
-      'valid': valid
+      'valid': valid,
+      if(createdAt != null)
+        'createdAt': createdAt!.toIso8601String(),
     };
   }  
 }

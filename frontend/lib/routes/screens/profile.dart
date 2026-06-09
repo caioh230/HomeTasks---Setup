@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              Avatar(id: "1", size: 100),
+              Avatar(id: UserAccount.userId, size: 100),
               const SizedBox(height: 10),
 
               Text(
@@ -106,37 +106,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
 
               if(Lists.isTablesLoaded)
-                Column(
-                  children: [
-                    for (final table in Lists.tables.values.toList()) ... [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: table.role.backgroundColor,
-                              borderRadius: BorderRadius.circular(12),
+                if(Lists.tables.length > 0)
+                  Column(
+                    children: [
+                      for (final table in Lists.tables.values.toList()) ... [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: table.role.backgroundColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(table.icon, color: table.role.mainColor),
                             ),
-                            child: Icon(table.icon, color: table.role.mainColor),
+                            title: Text(
+                              table.title,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(_boardDescriptor(table)),
+                            trailing: !table.isPrivate ?
+                                SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members.keys.toList()))) :
+                                Icon(Icons.lock_outline, color: Colors.grey),
                           ),
-                          title: Text(
-                            table.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(_boardDescriptor(table)),
-                          trailing: !table.isPrivate ?
-                              SizedBox(width: 80, child: Stack(children: TableCard.prepareAvatars(members: table.members.keys.toList()))) :
-                              Icon(Icons.lock_outline, color: Colors.grey),
                         ),
-                      ),
-                      const SizedBox(height: 15),
+                        const SizedBox(height: 15),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
+                if(Lists.tables.length < 1)
+                  Text("Nenhum ambiente ativo.", style: const TextStyle(fontSize: 12, color: Colors.grey)),
               if(!Lists.isTablesLoaded)
                 Skeletonizer(
                   child: 

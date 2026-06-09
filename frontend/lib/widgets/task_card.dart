@@ -24,9 +24,9 @@ class TaskCard extends StatefulWidget {
   State<TaskCard> createState() => _TaskCardState();
 
   static String dateFormat(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day, now.hour, now.minute);
-    final target = DateTime(date.year, date.month, date.day, date.hour, date.minute);
+    final now = DateTime.now().toUtc();
+    final today = DateTime(now.year, now.month, now.day, now.hour, now.minute).toUtc();
+    final target = DateTime(date.year, date.month, date.day, date.hour, date.minute).toUtc();
 
     final difference = target.difference(today).inDays;
     final time = DateFormat('HH:mm').format(date);

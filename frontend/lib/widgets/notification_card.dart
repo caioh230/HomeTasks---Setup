@@ -1,17 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/delete.dart';
+import 'package:hometasks/core/services/update.dart';
 import 'package:hometasks/models/notification.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
-import 'package:hometasks/widgets/table_card.dart';
 import 'package:hometasks/widgets/task_card.dart';
 
-class NotificationCard extends StatelessWidget {
+import '../core/utils/lists.dart';
+
+enum InviteStatus {
+  pending,
+  accepted,
+  declined,
+}
+class NotificationCard extends StatefulWidget {
   final AppNotification notification;
 
   const NotificationCard({
     super.key,
     required this.notification,
   });
+
+  @override
+  State<NotificationCard> createState() => _NotificationCardState();
+}
+
+class _NotificationCardState extends State<NotificationCard> {
+  InviteStatus status = InviteStatus.pending;
+
+  void acceptedInvite() async {
+    switch(widget.notification.notificationType) {
+      case NotificationType.invitedToTable: {
+        // Convidado a um quadro
+        Lists.isTablesLoaded = false;
+        Lists.isTasksLoaded = false;
+        BackendUpdate.acceptInvite(widget.notification.relationshipId!);
+      }
+
+      case NotificationType.taskInvite: {
+        // Adicionado a uma tarefa
+        Lists.isTasksLoaded = false;
+
+      }
+
+      default: {}
+    }
+  }
+  void declinedInvite() async {
+    switch(widget.notification.notificationType) {
+      case NotificationType.invitedToTable: {
+        // Convidado a um quadro
+        BackendDelete.relationship(widget.notification.relationshipId!);
+      }
+
+      case NotificationType.taskInvite: {
+        // Adicionado a uma tarefa
+      }
+      
+      default: {}
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +76,7 @@ class NotificationCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  notification.isAvatar
+                  widget.notification.isAvatar
                       ? _buildAvatar()
                       : _buildIcon(),
 
@@ -46,14 +94,14 @@ class NotificationCard extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: notification.title,
+                                text: widget.notification.title,
                                 style: TextStyle(
-                                  color: notification.titleColor,
+                                  color: widget.notification.titleColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               TextSpan(
-                                text: notification.subtitle.isNotEmpty ? ' ${notification.subtitle}' : '',
+                                text: widget.notification.subtitle.isNotEmpty ? ' ${widget.notification.subtitle}' : '',
                                 style: const TextStyle(
                                   color: Color(0xFF444444),
                                   fontWeight: FontWeight.w500,
@@ -68,14 +116,14 @@ class NotificationCard extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              TaskCard.dateFormat(notification.time),
+                              TaskCard.dateFormat(widget.notification.time),
                               style: const TextStyle(
                                 color: Color(0xFF9A9A9A),
                                 fontSize: 12,
                               ),
                             ),
 
-                            if (notification.category != null) ... [
+                            if (widget.notification.category != null) ... [
                               Text(
                                 " • ",
                                 style: const TextStyle(
@@ -84,9 +132,9 @@ class NotificationCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                notification.category!,
+                                widget.notification.category!,
                                 style: TextStyle(
-                                  color: notification.category == 'Urgente' ? Colors.red : const Color(0xFF9A9A9A),
+                                  color: widget.notification.category == 'Urgente' ? Colors.red : const Color(0xFF9A9A9A),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -95,42 +143,71 @@ class NotificationCard extends StatelessWidget {
                           ],
                         ),
 
-                        if (notification.actions)
+                        if (widget.notification.actions) ... [
                           const SizedBox(height: 14),
-
-                        if (notification.actions)
                           Row(
                             children: [
-                              BasicButton(
-                                text: 'Aceitar',
-                                onTap: () {
-                                  // TODO
-                                },
-                                margin: const EdgeInsets.only(right: 20),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 8,
+                              if(status == InviteStatus.pending)
+                                Row(
+                                  children: [
+                                    BasicButton(
+                                      text: 'Aceitar',
+                                      onTap: () {
+                                        setState(() {
+                                          status = InviteStatus.accepted;
+                                          acceptedInvite();
+                                        });
+                                      },
+                                      margin: const EdgeInsets.only(right: 20),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 8,
+                                      ),
+                                      textSize: 13,
+                                    ),
+                                    BasicButton(
+                                      text: 'Recusar',
+                                      onTap: () {
+                                        setState(() {
+                                          status = InviteStatus.declined;
+                                          declinedInvite();
+                                        });
+                                      },
+                                      margin: const EdgeInsets.only(right: 20),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 8,
+                                      ),
+                                      textSize: 13,
+                                      pressedColor: const Color(0xFFC1C2C9),
+                                      backgroundColor: const Color(0xFFE1E2E9),
+                                      textColor: const Color(0xFF414751),
+                                    ),
+                                  ],
                                 ),
-                                textSize: 13,
-                              ),
 
-                              BasicButton(
-                                text: 'Recusar',
-                                onTap: () {
-                                  // TODO
-                                },
-                                margin: const EdgeInsets.only(right: 20),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 8,
+                              if(status != InviteStatus.pending)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      status == InviteStatus.accepted ? Icons.check : Icons.close_rounded,
+                                      color: status == InviteStatus.accepted ? Color(0xFF006D36) : Color(0xFFBA1A1A),
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      status == InviteStatus.accepted ? 'Convite aceito'  : 'Convite recusado',
+                                      style: TextStyle(
+                                        color: status == InviteStatus.accepted ? Color(0xFF006D36) : Color(0xFFBA1A1A),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                textSize: 13,
-                                pressedColor: const Color(0xFFC1C2C9),
-                                backgroundColor: const Color(0xFFE1E2E9),
-                                textColor: const Color(0xFF414751),
-                              ),
                             ],
                           ),
+                        ],
                       ],
                     ),
                   ),
@@ -139,7 +216,7 @@ class NotificationCard extends StatelessWidget {
             ),
           ),
 
-          if (notification.dangerBorder)
+          if (widget.notification.dangerBorder)
             Container(
               width: 4,
               height: 120,
@@ -161,12 +238,12 @@ class NotificationCard extends StatelessWidget {
       width: 42,
       height: 42,
       decoration: BoxDecoration(
-        color: notification.backgroundColor ?? Colors.grey.shade200,
+        color: widget.notification.backgroundColor ?? Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
-        notification.icon,
-        color: notification.iconColor ?? const Color(0xFF276EF1),
+        widget.notification.icon,
+        color: widget.notification.iconColor ?? const Color(0xFF276EF1),
       ),
     );
   }
@@ -175,11 +252,11 @@ class NotificationCard extends StatelessWidget {
     return Stack(
       children: [
         Avatar(
-          id: notification.userId!,
+          id: widget.notification.userId,
           size: 42,
         ),
 
-        if (notification.checkmark)
+        if (widget.notification.checkmark)
           Positioned(
             bottom: 0,
             right: 0,

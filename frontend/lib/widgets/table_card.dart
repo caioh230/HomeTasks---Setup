@@ -25,7 +25,7 @@ class TableCard extends StatefulWidget {
         avatars.add(numAvatar(num: members.length - i, offset: i * offset, size: size));
         break;
       } else {
-        avatars.add(Avatar(id: (i+1).toString(), offset: i * offset, size: size));
+        avatars.add(Avatar(id: member, offset: i * offset, size: size));
       }
     }
     return avatars;

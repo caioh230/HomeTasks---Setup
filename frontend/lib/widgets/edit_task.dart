@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/core/services/update.dart';
 import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/models/task.dart';
@@ -43,10 +44,13 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
     TaskPriority? priority = copiedTask.priority;
     TaskStatus status = copiedTask.status;
     DateTime? completedAt;
+    String? completedBy;
     if(widget.task.status == TaskStatus.complete && widget.task.completedAt != null) {
       completedAt = widget.task.completedAt;
+      completedBy = widget.task.completedBy;
     } else if(status == TaskStatus.complete) {
       completedAt = DateTime.now();
+      completedBy = UserAccount.userId;
     }
 
     try {
@@ -57,7 +61,8 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
         timeLimit: timeLimit,
         priority: priority,
         description: description,
-        completedAt: completedAt
+        completedAt: completedAt,
+        completedBy: completedBy,
       );
 
       navigator.pop();
@@ -69,6 +74,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
             widget.task.priority = priority;
             widget.task.description = description;
             widget.task.completedAt = completedAt;
+            widget.task.completedBy = completedBy;
           });
         });
         navigator.pop();
@@ -305,7 +311,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                     onTap: () async {
                                       final DateTime? pickedDate = await showDatePicker(
                                         context: context,
-                                        initialDate: DateTime.now(),
+                                        initialDate: copiedTask.expiration.toLocal(),
                                         firstDate: DateTime(2000),
                                         lastDate: DateTime(2100),
                                       );
@@ -313,19 +319,21 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
                                       if (pickedDate != null) {
                                         final TimeOfDay? pickedTime = await showTimePicker(
                                           context: context,
-                                          initialTime: TimeOfDay.now(),
+                                          initialTime: TimeOfDay.fromDateTime(copiedTask.expiration.toLocal()),
                                         );
 
                                         if (pickedTime != null) {
+                                          final localDate = DateTime(
+                                            pickedDate.year,
+                                            pickedDate.month,
+                                            pickedDate.day,
+                                            pickedTime.hour,
+                                            pickedTime.minute,
+                                          );
+
                                           setState(() {
-                                            _dateController.text = dateFormat(pickedDate);
-                                            copiedTask.expiration = DateTime(
-                                              pickedDate.year,
-                                              pickedDate.month,
-                                              pickedDate.day,
-                                              pickedTime.hour,
-                                              pickedTime.minute,
-                                            );
+                                            _dateController.text = dateFormat(localDate);
+                                            copiedTask.expiration = localDate.toUtc();
                                           });
                                         }
                                       }
@@ -492,6 +500,7 @@ class _EditTaskWidgetState extends State<EditTaskWidget> {
   }
 
   String dateFormat(DateTime date) {
+    date = date.toLocal();
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     final year = date.year.toString();

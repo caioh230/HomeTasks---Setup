@@ -2,53 +2,48 @@
 class NotificationModel {
   ///Estrutura do modelo
   NotificationModel({
-    required this.content,
-    required this.subject,
-    required this.toUser,  
-    required this.fromUser,  
-    required this.read,
+    required this.notificationType,
+    required this.toUser,
+    required this.createdAt,
+    this.taskId,
+    this.tableId,
+    this.fromUser,
   });
 
   ///Converção de Map para Model
-  factory NotificationModel.toModel ( Map<String, dynamic> map){
-    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    
-    if(
-      regex.hasMatch(map['fromUser'].toString()) 
-      && 
-      regex.hasMatch(map['toUser'].toString()
-      )){
-        return NotificationModel(
-          content:  map['content'].toString(),
-          subject:  map['subject'].toString(),
-          toUser:   map['toUser'].toString(),
-          fromUser: map['fromUser'].toString(),
-          read:     bool.parse(map['read'].toString())
-        );
-    }else{
-      throw Exception('Erro: emails de endereço não formatados');
-    }
+  factory NotificationModel.toModel(Map<String, dynamic> map) {
+    return NotificationModel(
+      notificationType: map['notificationType'].toString(),
+      taskId: map['taskId']?.toString(),
+      tableId: map['tableId']?.toString(),
+      fromUser: map['fromUser']?.toString(),
+      toUser: map['toUser'].toString(),
+      createdAt: DateTime.parse(map['createdAt'].toString()),
+    );
   }
 
-  ///Campo content
-  final String content;
-  ///Campo subject
-  final String subject;
-  ///Campo toUser
+  /// Campo notificationType
+  final String notificationType;
+  /// Campo fromUser
+  final String? fromUser;
+  /// Campo toUser
   final String toUser;
-  ///Campo fromUser
-  final String fromUser;
-  ///Campo read
-  final bool read;
-  
+  /// Campo taskId
+  final String? taskId;
+  /// Campo tableId
+  final String? tableId;
+  /// Campo createdAt
+  final DateTime createdAt;
+
   ///Converção de Model para Map
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
-      'content': content,
-      'subject': subject,
-      'toUser': toUser,
+      'notificationType': notificationType,
       'fromUser': fromUser,
-      'read': read
+      'toUser': toUser,
+      'taskId': taskId,
+      'tableId': tableId,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 }

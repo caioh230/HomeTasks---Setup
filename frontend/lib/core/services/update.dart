@@ -28,6 +28,22 @@ class BackendUpdate {
       }),
     );
   }
+
+  static Future<http.Response> acceptInvite(String id) async {
+    final token = await UserStorage.getToken();
+
+    return http.patch(
+      Uri.parse('${Env.apiUrl}/Relationship/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'valid': true,
+      }),
+    );
+  }
+
   
   static Future<http.Response> editTask({
     required String id,
@@ -37,6 +53,7 @@ class BackendUpdate {
     TaskPriority? priority,
     DateTime? timeLimit,
     DateTime? completedAt,
+    String? completedBy,
     TaskStatus? status
   }) async {
     final token = await UserStorage.getToken();
@@ -72,6 +89,8 @@ class BackendUpdate {
           'timeLimit': _formatTime(timeLimit),
         if(completedAt != null)
           'completedAt': _formatTime(completedAt),
+        if(completedBy != null)
+          'completedBy': completedBy,
       }),
     );
   }
@@ -81,12 +100,14 @@ class BackendUpdate {
     required String idTable,
     required TaskStatus status,
     DateTime? completedAt,
+    String? completedBy,
   }) async {
     return editTask(
       id: id,
       idTable: idTable,
       status: status,
-      completedAt: completedAt
+      completedAt: completedAt,
+      completedBy: completedBy,
     );
   }
 

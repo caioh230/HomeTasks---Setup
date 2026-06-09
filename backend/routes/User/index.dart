@@ -15,13 +15,8 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          if(
-            context.request.headers['Login']! == 'true'
-            ){
-              return getUser(context);
-          }else{
-            return getUserbyUsername(context);
-          }
+          final isLogin = context.request.headers['Login'] == 'true';
+          return isLogin ? getUser(context) : getUserbyUsername(context);
         case HttpMethod.post:
           return createUser(context);
 
@@ -74,11 +69,19 @@ Future<Response> getUser(RequestContext context) async {
 Future<Response> getUserbyUsername(RequestContext context) async {
   try {
     final service = context.read<UserService>();
-    final data = await context.request.json() as Map<String, dynamic>;
 
-    return await service.getUserbyUsername( 
-      UserGetModel.toModel(data),
-      context
+    final username = context.request.uri.queryParameters['username'];
+
+    if (username == null) {
+      return Response.json(
+        statusCode: 400,
+        body: {'error': 'Username is required'},
+      );
+    }
+
+    return await service.getUserbyUsername(
+      UserGetModel(username: username),
+      context,
     );
   } catch (e) {
     return Response.json(

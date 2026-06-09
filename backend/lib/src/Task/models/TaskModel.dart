@@ -10,6 +10,7 @@ class TaskModel {
     this.priority,
     this.description,
     this.completedAt,
+    this.completedBy,
     this.accountable
   });
 
@@ -25,6 +26,7 @@ class TaskModel {
       completedAt: map['completedAt'] != null ? DateTime
         .parse(map['completedAt'].toString())
         .toIso8601String() : null,
+      completedBy: map['completedBy']?.toString(),
       idTable: map['idTable'].toString(),
       criadoPor: map['criadoPor'].toString(),
       accountable: (map['accountable'] as List).cast<String>(),
@@ -48,6 +50,8 @@ class TaskModel {
   final String timeLimit;
   ///Campo completedAt
   final String? completedAt;
+  ///Campo completedBy
+  final String? completedBy;
   ///Campo accountable
   final List<String>? accountable;
 
@@ -60,6 +64,7 @@ class TaskModel {
       'description': description,
       'timeLimit': timeLimit,
       'completedAt': completedAt,
+      'completedBy': completedBy,
       'idTable': idTable,
       'priority': priority,
       'criadoPor': criadoPor,

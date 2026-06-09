@@ -6,13 +6,22 @@ import 'package:hometasks/models/member.dart';
 import 'package:hometasks/models/task.dart';
 import 'package:hometasks/widgets/task_card.dart';
 
-enum NotificationType {
+enum NotificationDrawType {
   icon,
   avatar,
 }
 
+enum NotificationType {
+  taskInvite,
+  taskExpiringIn,
+  taskCompleted,
+  invitedToTable,
+  dummy,
+}
+
 class AppNotification {
-  final NotificationType type;
+  final NotificationType notificationType;
+  final NotificationDrawType drawType;
 
   // Icon mode
   final IconData? icon;
@@ -34,10 +43,13 @@ class AppNotification {
   final bool actions;
   final bool dangerBorder;
 
+  final String? relationshipId;
+
   final Task? task;
 
   const AppNotification({
-    required this.type,
+    required this.notificationType,
+    required this.drawType,
 
     // Icon mode
     this.icon,
@@ -59,14 +71,17 @@ class AppNotification {
     this.actions = false,
     this.dangerBorder = false,
 
+    this.relationshipId,
+
     this.task,
   });
 
-  bool get isAvatar => type == NotificationType.avatar;
+  bool get isAvatar => drawType == NotificationDrawType.avatar;
   
   static AppNotification taskInvite(Task task, Member invitedBy, DateTime time) {
     return AppNotification(
-      type: NotificationType.icon,
+      notificationType: NotificationType.taskInvite,
+      drawType: NotificationDrawType.icon,
       icon: Icons.add_task_outlined,
       backgroundColor: const Color(0xFFEAF1FB),
       title: 'Nova tarefa atribuída a você por ${invitedBy.username}:',
@@ -80,7 +95,8 @@ class AppNotification {
 
   static AppNotification taskExpiringIn(Task task, DateTime time) {
     return AppNotification(
-      type: NotificationType.icon,
+      notificationType: NotificationType.taskExpiringIn,
+      drawType: NotificationDrawType.icon,
       icon: Icons.warning_rounded,
       backgroundColor: const Color(0xFFFFECEC),
       iconColor: Colors.red,
@@ -93,28 +109,49 @@ class AppNotification {
     );
   }
   
-  static AppNotification taskCompleted(Task task, Member completedBy, DateTime time) {
+  static AppNotification taskCompleted(Task task, String completedBy, DateTime time) {
+    final member = Member(
+        id: completedBy,
+        name: "João Batista",
+        username: "joaobat"
+      );
     return AppNotification(
-      type: NotificationType.avatar,
-      userId: completedBy.id,
+      notificationType: NotificationType.taskCompleted,
+      drawType: NotificationDrawType.avatar,
+      userId: member.id,
       checkmark: true,
-      title: completedBy.username,
+      title: member.username,
       subtitle: 'Concluiu a tarefa:\n${task.title}',
       time: time,
       category: Lists.tables[task.table]?.title ?? 'Indisponível',
     );
   }
   
-  static AppNotification invitedToTable(Table table, DateTime time) {
+  static AppNotification invitedToTable(String relationshipId, Table table, DateTime time) {
     return AppNotification(
-      type: NotificationType.icon,
+      relationshipId: relationshipId,
+      notificationType: NotificationType.invitedToTable,
+      drawType: NotificationDrawType.icon,
       icon: Icons.mail_rounded,
       backgroundColor: const Color(0xFFFFE7BE),
       iconColor: const Color(0xFF7A4B00),
       title: 'Você foi convidado para o quadro',
-      subtitle: '"${table}"',
+      subtitle: '"${table.title}"',
       time: time,
       actions: true,
+    );
+  }
+
+  static AppNotification dummy() {
+    return AppNotification(
+      notificationType: NotificationType.dummy,
+      drawType: NotificationDrawType.icon,
+      icon: Icons.person,
+      backgroundColor: const Color.fromARGB(255, 200, 201, 202),
+      iconColor: const Color.fromARGB(255, 86, 87, 90),
+      title: 'Carregando...',
+      subtitle: 'Carregando...',
+      time: DateTime.now(),
     );
   }
 }

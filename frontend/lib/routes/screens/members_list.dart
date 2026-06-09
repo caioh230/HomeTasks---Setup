@@ -12,6 +12,21 @@ class MembersListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sortedEntries = table.members.entries.toList()..sort((a, b) {
+      int rank(UserRole role) {
+        switch (role) {
+          case UserRole.owner:
+            return 0;
+          case UserRole.editor:
+            return 1;
+          case UserRole.reader:
+            return 2;
+        }
+      }
+
+      return rank(a.value).compareTo(rank(b.value));
+    });
+
     return Container(
       color: const Color(0xFFF8F9FF),
       child: SingleChildScrollView(
@@ -133,29 +148,18 @@ class MembersListScreen extends StatelessWidget {
 
               const SizedBox(height: 38),
 
-              memberCard(
-                image: 'https://i.pravatar.cc/150?img=32',
-                name: 'Márcia',
-                role: UserRole.owner,
-              ),
+              for (var entry in sortedEntries) ... [
+                //String id = entry.key;
+                //UserRole role = entry.value;
 
-              const SizedBox(height: 22),
-
-              memberCard(
-                image: 'https://i.pravatar.cc/150?img=12',
-                name: 'Pedro',
-                role: UserRole.editor,
-              ),
-
-              const SizedBox(height: 22),
-
-              memberCard(
-                image: 'https://i.pravatar.cc/150?img=20',
-                name: 'João',
-                role: UserRole.reader,
-              ),
-
-              const SizedBox(height: 40),
+                memberCard(
+                  id: entry.key,
+                  name: entry.key,
+                  role: entry.value,
+                ),
+                const SizedBox(height: 22),
+              ],
+              const SizedBox(height: 18),
 
               /// DEFINIÇÕES
               Container(
@@ -221,7 +225,7 @@ class MembersListScreen extends StatelessWidget {
   }
 
   Widget memberCard({
-    required String image,
+    required String id,
     required String name,
     required UserRole role,
   }) {
@@ -246,7 +250,7 @@ class MembersListScreen extends StatelessWidget {
 
               CircleAvatar(
                 radius: 34,
-                backgroundImage: NetworkImage(image),
+                backgroundImage: NetworkImage('https://i.pravatar.cc/100?img=${id}'),
               ),
 
               Positioned(

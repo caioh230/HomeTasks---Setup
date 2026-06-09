@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart' hide Table;
+import 'package:hometasks/core/services/post.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/routes/screens/members_list.dart';
 import 'package:hometasks/widgets/basic_button.dart';
@@ -13,17 +15,27 @@ class InviteMemberScreen extends StatefulWidget {
 }
 
 class _InviteMemberScreenState extends State<InviteMemberScreen> {
-  final _emailController = TextEditingController();
-  String _selectedRole = 'editor'; // Valor inicial selecionado
+  final _userController = TextEditingController();
+  String _selectedRole = 'reader'; // Valor inicial selecionado
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _userController.dispose();
     super.dispose(); // CORREÇÃO 1: O correto é super.dispose()
   }
 
   void sendInvite() async {
-    final email = _emailController.text;
+    String username = _userController.text.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+    if(username.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Preencha o campo de usuário.',
+          ),
+        ),
+      );
+    }
+
     final navigator = Navigator.of(context, rootNavigator: true);
     showDialog(
       context: context,
@@ -31,14 +43,31 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    // TO DO
-    // Trocar o "await Future.delayed" por uma
-    // chamada de API para convidar novo usuário
-    await Future.delayed(Duration(seconds: 1)); //placeholder
-    //
-
-    navigator.pop(); 
-    DashboardPage.globalKey.currentState?.closeOverlay();
+    try {
+      final response = await BackendPost.invitedToTable(widget.table, username, _selectedRole == 'editor' ? UserRole.editor : UserRole.reader);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        navigator.pop();
+        Lists.isTasksLoaded = false;
+        DashboardPage.globalKey.currentState?.closeOverlay();
+      } else {
+        navigator.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao enviar convite (${response.statusCode})',
+            ),
+          ),
+        );
+      }
+    }
+    catch(e) {
+      navigator.pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao enviar convite: ${e}'),
+        ),
+      );
+    }
   }
 
   @override
@@ -71,7 +100,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
 
             // 2. Campo de E-mail
             const Text(
-              'E-mail do novo membro',
+              'Nome de usuário do novo membro',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -80,10 +109,15 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _emailController,
+              controller: _userController,
               keyboardType: TextInputType.emailAddress,
+              onChanged: (String str) {
+                str = str.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+                if(str.isNotEmpty) _userController.text = "@${str}";
+                else _userController.text = "";
+              },
               decoration: InputDecoration(
-                hintText: 'exemplo@email.com',
+                hintText: "@nomeusuario",
                 hintStyle: const TextStyle(color: Colors.black38),
                 prefixIcon: const Icon(Icons.email_outlined, color: Colors.black45),
                 filled: true,
@@ -109,7 +143,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
             const SizedBox(height: 12),
 
             _buildRoleOption(
-              id: 'leitor',
+              id: 'reader',
               title: 'Leitor',
               subtitle: 'Pode apenas visualizar as tarefas',
               icon: Icons.visibility_outlined,
@@ -121,13 +155,13 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
               subtitle: 'Pode criar, editar e concluir tarefas',
               icon: Icons.edit_square,
             ),
-            const SizedBox(height: 12),
+            /*const SizedBox(height: 12),
             _buildRoleOption(
               id: 'proprietario',
               title: 'Proprietário',
               subtitle: 'Controle total sobre o quadro e membros',
               icon: Icons.admin_panel_settings_outlined,
-            ),
+            ),*/
             const SizedBox(height: 40),
 
             BasicButton(

@@ -14,6 +14,7 @@ class Lists {
 
   static bool isTablesLoaded = false;
   static bool isTasksLoaded = false;
+  static bool isNotifsLoaded = false;
   static Future<void> reloadTables() async {
     tables.clear();
     isTablesLoaded = false;
@@ -73,6 +74,7 @@ class Lists {
         };
         final expiration = DateTime.parse(obj['timeLimit']);
         final completedAt = (status == TaskStatus.complete ? (obj['completedAt'] != null ? DateTime.parse(obj['completedAt']) : expiration) : null);
+        final completedBy = (status == TaskStatus.complete ? (obj['completedAt'] as String) : null);
         final accountable = List<String>.from(obj['accountable'] ?? []);
         final taskId = obj['id'] as String;
         tasks[taskId] = Task(
@@ -81,6 +83,7 @@ class Lists {
           description: obj['description'] as String?,
           expiration: expiration,
           completedAt: completedAt,
+          completedBy: completedBy,
           table: obj['idTable'] as String,
           priority: priority,
           status: status,
@@ -92,11 +95,58 @@ class Lists {
   }
 
   static Future<void> reloadNotifications() async {
+    while (!isTablesLoaded || !isTasksLoaded) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+
     notifications.clear();
-    // TO DO: Load notifications from backend
+    isNotifsLoaded = false;
+    for (Task task in tasks.values) {
+      if(task.status == TaskStatus.complete) {
+        notifications.add(
+          AppNotification.taskCompleted(
+            task,
+            task.completedBy!,
+            task.completedAt!
+          ));
+      } else {
+        final timeToExpire = task.expiration.difference(DateTime.now());
+        if (timeToExpire > Duration.zero && timeToExpire < const Duration(hours: 2)) {
+          notifications.add(
+            AppNotification.taskExpiringIn(
+              task,
+              task.expiration,
+            ),
+          );
+        }
+      }
+    }
+
+    final response = await BackendGet.invitesPending();
+    final List<dynamic> data = jsonDecode(response.body);
+    for (var obj in data) {
+      //final idRelation = obj["id"] as String;
+      final idTable = obj["idTable"] as String;
+      final tableName = obj["tableName"] as String;
+      final createdAt = DateTime.tryParse((obj["createdAt"] as String?) ?? "") ?? DateTime.now();
+      notifications.add(
+        AppNotification.invitedToTable(
+          idTable,
+          Table(
+            id: idTable,
+            title: tableName,
+            members: const {},
+            role: UserRole.reader,
+            isActive: true,
+            icon: Icons.home_work_outlined,
+          ),
+          createdAt
+        )
+      );
+    }
 
     // PLACEHOLDER:
-    notifications.add(
+    /*notifications.add(
       AppNotification.taskInvite(Task(
         id: "awuieyu120qiwla",
         title: "Compras da semana",
@@ -110,46 +160,26 @@ class Lists {
         username: "marcia",
       ),
       DateTime.now().subtract(const Duration(minutes: 20)))
-    );
-    
-    notifications.add(
-      AppNotification.taskExpiringIn(Task(
-        id: "bvocjdfklg43091lm",
-        title: "Limpar caixa do gato",
-        table: "asdhuhawrihasr",
-        accountable: [],
-        expiration: DateTime.now().add(const Duration(hours: 2)),
-      ),
-      DateTime.now().subtract(const Duration(hours: 1)))
-    );
+    );*/
 
-    notifications.add(
-      AppNotification.taskCompleted(Task(
-        id: "bvocjdfklg43091lm",
-        title: "Limpar caixa do gato",
-        table: "asdhuhawrihasr",
-        accountable: [],
-        expiration: DateTime.now().add(const Duration(hours: 1)),
-      ),
-      Member(
-        id: "1",
-        name: "João Batista",
-        username: "joaobat"
-      ),
-      DateTime.now().subtract(const Duration(days: 1)))
-    );
-    notifications.add(
-      AppNotification.invitedToTable(Table(
-        id: "lsdfmklsdnfxcv",
-        title: "Escritório Central",
-        members: const {
-          "315521531": UserRole.owner,
-        },
-        role: UserRole.reader,
-        isActive: false,
-        icon: Icons.home_work_outlined,
-      ),
-      DateTime.now().subtract(const Duration(days: 1)))
-    );
+    notifications.sort((a, b) {
+      final aHasTask = a.task != null;
+      final bHasTask = b.task != null;
+
+      // Notificações com task primeiro
+      if (aHasTask && !bHasTask) return -1;
+      if (!aHasTask && bHasTask) return 1;
+
+      // Ambas têm task: ordenar por expiração
+      if (aHasTask && bHasTask) {
+        return a.task!.expiration.compareTo(
+          b.task!.expiration,
+        );
+      }
+
+      // Fallback: mais recentes primeiro
+      return b.time.compareTo(a.time);
+    });
+    isNotifsLoaded = true;
   }
 }

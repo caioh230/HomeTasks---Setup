@@ -9,6 +9,7 @@ class TaskPatchModel {
     this.priority,
     this.description,
     this.completedAt,
+    this.completedBy,
     this.accountable
   });
 
@@ -24,6 +25,7 @@ class TaskPatchModel {
       completedAt: map['completedAt'] != null ? DateTime
         .parse(map['completedAt'].toString())
         .toIso8601String() : null,
+      completedBy: map['completedBy']?.toString(),
       idTable: map['idTable'].toString(),
       accountable: map['accountable'] != null ?
         (map['accountable'] as List).cast<String>() : null,
@@ -45,6 +47,8 @@ class TaskPatchModel {
   final String? timeLimit;
   ///Campo completedAt
   final String? completedAt;
+  ///Campo completedBy
+  final String? completedBy;
   ///Campo accountable
   final List<String>? accountable;
 
@@ -65,6 +69,8 @@ class TaskPatchModel {
         'timeLimit': timeLimit,
       if(completedAt != null)
         'completedAt': completedAt,
+      if(completedBy != null)
+        'completedBy': completedBy,
       if(priority != null)
         'priority': priority,
     };

@@ -9,7 +9,8 @@ class RelationshipDBModel {
     required this.tableName,
     required this.idUser,
     required this.roleName,
-    required this.valid
+    required this.valid,
+    this.createdAt,
   });
 
   ///Conversão de Map para DBModel
@@ -20,7 +21,8 @@ class RelationshipDBModel {
       tableName:map['tableName'].toString(),
       idUser:   map['idUser'].toString(),
       roleName: map['roleName'].toString(),
-      valid:    bool.parse(map['valid'].toString())
+      valid:    bool.parse(map['valid'].toString()),
+      createdAt: DateTime.parse(map['createdAt'].toString()),
     );
   }
 
@@ -36,7 +38,8 @@ class RelationshipDBModel {
       tableName:dados['tableName'].toString(),
       idUser:   dados['idUser'].toString(),
       roleName: dados['roleName'].toString(),
-      valid:    bool.parse(dados['valid'].toString())
+      valid:    bool.parse(dados['valid'].toString()),
+      createdAt: dados['createdAt'] != null ? DateTime.parse(dados['createdAt'].toString()) : null,
     );
   }
 
@@ -52,6 +55,8 @@ class RelationshipDBModel {
   final String roleName;
   ///Campo valid
   final bool valid;
+  ///Campo createdAt
+  final DateTime? createdAt;
   
   ///Conversão para tipo Map
   Map<String, dynamic> toMap(){
@@ -61,7 +66,9 @@ class RelationshipDBModel {
       'tableName': tableName,
       'idUser': idUser,
       'roleName': roleName,
-      'valid': valid
+      'valid': valid,
+      if(createdAt != null)
+        'createdAt': createdAt?.toIso8601String(),
     };
   }
 }

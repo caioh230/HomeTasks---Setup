@@ -63,7 +63,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  Avatar(id: "1", size: 120),
+                  Avatar(id: UserAccount.userId, size: 120),
                   const SizedBox(height: 16),
                   Text(
                     UserAccount.name ?? "Nome",

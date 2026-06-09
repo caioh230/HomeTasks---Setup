@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:hometasks/core/services/storage.dart';
 import 'package:hometasks/core/utils/env.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +15,11 @@ class BackendGet {
         },
       );
       
-      return response;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response;
+      } else {
+        throw Exception('Failed to fetch table list: ${response.statusCode}');
+      }
     } catch (e) {
       throw Exception('Failed to fetch table list: $e');
     }
@@ -53,6 +56,27 @@ class BackendGet {
       );
       
       return response;
+    } catch (e) {
+      throw Exception('Failed to fetch table list: $e');
+    }
+  }
+  static Future<http.Response> invitesPending() async {
+    try {
+      final token = await UserStorage.getToken();
+
+      final response = await http.get(
+        Uri.parse('${Env.apiUrl}/Relationship/invite'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response;
+      } else {
+        throw Exception('Failed to fetch table list: ${response.statusCode}');
+      }
     } catch (e) {
       throw Exception('Failed to fetch table list: $e');
     }

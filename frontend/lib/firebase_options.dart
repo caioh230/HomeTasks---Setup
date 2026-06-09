@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '98977958789',
     projectId: 'hometasks-ef2d9',
     storageBucket: 'hometasks-ef2d9.firebasestorage.app',
-    iosBundleId: 'com.example.hometasks',
+    iosBundleId: 'com.unit.hometasks',
   );
 }

@@ -110,6 +110,37 @@ class RelationshipService {
   }
 
   //-----------------------------
+  //            read
+  //-----------------------------
+  /// Solicitação de leitura de convites conjunta
+  Future<Response> readPendingRelationships(
+    RequestContext context,
+  ) async {
+    try {
+      _log.info({
+        'event': 'read_all_relationships_requested',
+      }.toString());
+
+      final repository = context.read<RelationshipRepository>();
+
+      return repository.readPendingRelationships(
+        context,
+      );
+    } catch (e, stackTrace) {
+      _log.severe(
+        {
+          'event': 'read_all_relationships_failed',
+          'error': e.toString(),
+        }.toString(),
+        e,
+        stackTrace,
+      );
+
+      rethrow;
+    }
+  }
+
+  //-----------------------------
   //            update
   //-----------------------------
   /// Solicitação de atualização

@@ -1,11 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hometasks/core/services/account.dart';
+import 'package:hometasks/core/utils/env.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -81,23 +84,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
-  Future<UserCredential?> signInWithGoogle() async {
-    // TO DO: Test this
+  Future<http.Response?> signInWithGoogle() async {
+    print('Initializing Google Sign-In...');
     try {
-      await signIn.initialize();
+      await signIn.initialize(
+        serverClientId: Env.oauth2Id,
+      );
+      print('Initialized.');
+
       final GoogleSignInAccount user = await signIn.authenticate();
       final authentication = user.authentication;
+      print('User selected: ${user.email}');
 
-      final credential = GoogleAuthProvider.credential(
-        idToken: authentication.idToken,
+      final response = await http.post(
+        Uri.parse('${Env.apiUrl}/User/google'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'idToken': authentication.idToken,
+        }),
       );
-      final logged = await FirebaseAuth.instance.signInWithCredential(credential); //verificar assinatura do google
-      if(context.mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      }
-      return logged;
+      return response;
     } catch (e) {
-      debugPrint('Google sign-in error: $e');
+      print('Google sign-in error: $e');
       return null;
     }
   }

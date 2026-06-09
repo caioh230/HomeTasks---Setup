@@ -46,6 +46,7 @@ class TableRepository {
           'idUser': idUser,
           'idTable': newId,
           'roleName': 'owner',
+          'valid': true,
         };
 
         await relationship

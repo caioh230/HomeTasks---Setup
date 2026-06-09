@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:hometasks/core/services/storage.dart';
 import 'package:hometasks/core/utils/env.dart';
+import 'package:hometasks/core/utils/lists.dart';
 import 'package:http/http.dart' as http;
 
 class UserAccount {
@@ -95,6 +96,7 @@ class UserAccount {
       final response = await http.get(
         Uri.parse('${Env.apiUrl}/User'),
         headers: {
+          'Login': 'true',
           'Authorization': 'Bearer $jwt',
         },
       );
@@ -119,6 +121,7 @@ class UserAccount {
   **********************/
   static Future<void> logout() async {
     userId = username = name = /*email =*/ null;
+    Lists.isTablesLoaded = Lists.isTasksLoaded = Lists.isNotifsLoaded = false;
     await UserStorage.deleteToken();
   }
 }

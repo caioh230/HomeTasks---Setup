@@ -13,6 +13,7 @@ class TaskDBModel {
     this.priority,
     this.description,
     this.completedAt,
+    this.completedBy,
     this.accountable
   });
 
@@ -30,6 +31,7 @@ class TaskDBModel {
       completedAt: map['completedAt'] != null ? DateTime
         .parse(map['completedAt'].toString())
         .toIso8601String() : null,
+      completedBy: map['criadoPor']?.toString(),
       idTable: map['idTable'].toString(),
       priority: map['priority']?.toString()
     );
@@ -53,6 +55,7 @@ class TaskDBModel {
         completedAt: dados['completedAt'] != null ? DateTime
           .parse(dados['completedAt'].toString())
           .toIso8601String() : null,
+        completedBy: dados['criadoPor']?.toString(),
         idTable: dados['idTable'].toString(),
         accountable: (dados['accountable'] as List).cast<String>(),
         priority: dados['priority'].toString()
@@ -75,6 +78,8 @@ class TaskDBModel {
   final String timeLimit;
   ///Campo completedAt
   final String? completedAt;
+  ///Campo completedBy
+  final String? completedBy;
   ///Campo idTable
   final String idTable;
   ///Campo accountable
@@ -91,6 +96,7 @@ class TaskDBModel {
       'description': description,
       'timeLimit': timeLimit,
       'completedAt': completedAt,
+      'completedBy': completedBy,
       'idTable': idTable,
       'priority': priority,
       'accountable': accountable

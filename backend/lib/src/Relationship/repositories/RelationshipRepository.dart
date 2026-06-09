@@ -34,16 +34,21 @@ class RelationshipRepository {
           try{
             final notif = firestore.collection('Notification');
 
-            await notif
-            .doc()
-            .create({
-              'content': 'Você quer participar do quadro ${relationship.tableName} criado por ${_validateUsr(context)}?',
-              'subject': 'Convite de participação',
-              'toUser': relationship.idUser,
-              'fromUser': _validateUsr(context),
-              'read': false
-            });
+            final invitedBy = await _validateUsr(context);
+            if(relationship.idUser != invitedBy) {
+              await notif
+              .doc()
+              .create({
+                'notificationType': 'invitedToTable',
+                'tableId': 'Convite de participação',
+                'toUser': relationship.idUser,
+                'fromUser': invitedBy,
+                'createdAt': DateTime.now().toIso8601String(),
+                'read': false,
+              });
+            }
           }catch(_){
+            throw Exception('Erro ao criar Relationship: Não conseguiu criar notificação');
           }
 
           //Lógica principal da função
@@ -151,6 +156,50 @@ class RelationshipRepository {
   }
 
   //-----------------------------
+  //            read - JWT
+  //-----------------------------
+  ///Leitura de todos os convites pendentes do usuário
+  Future<Response> readPendingRelationships(
+    RequestContext context
+    ) async {
+      try{
+        final idUser = await _validateUsr(context);
+        
+        final val = await ref
+        .where(
+          'idUser', 
+          WhereFilter.equal, 
+          idUser
+        ).where(
+          'valid', 
+          WhereFilter.equal, 
+          false
+        )
+        .get();
+
+        final formDados = [];
+
+        for (var i = 0; i < val.docs.length; i++) {
+          final data = val.docs[i].data();
+
+          formDados.add({
+            'id': val.docs[i].id,
+            'idTable': data['idTable'],
+            'tableName': data['tableName'],
+            'createdAt': data['createdAt'],
+          });
+        }
+
+        return Response.json(
+          statusCode: HttpStatus.ok,
+          body: formDados
+        );
+      }catch(e){
+        throw Exception(e);
+      }
+  }
+
+  //-----------------------------
   //            update - owner
   //-----------------------------
   ///Atualização de relacionamento único - Convidados
@@ -206,38 +255,28 @@ class RelationshipRepository {
         try{
           final idUser = await _validateUsr(context);
 
-          if(
-            await _validateOpr(idTable, context, 'owner')
-          ){
-            final val = await ref
-            .where(
-              'idUser', 
-              WhereFilter.equal, 
-              idUser
-            )
-            .where(
-              'idTable', 
-              WhereFilter.equal, 
-              idTable
-            )
-            .get();
-          
+          final val = await ref
+          .where(
+            'idUser', 
+            WhereFilter.equal, 
+            idUser
+          )
+          .where(
+            'idTable', 
+            WhereFilter.equal, 
+            idTable
+          )
+          .get();
+        
 
-            await ref
-            .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
-            .delete();
+          await ref
+          .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
+          .delete();
 
-            return Response(
-              statusCode: HttpStatus.accepted, 
-              body: 'Deleção bem sucedida'
-            );
-          }else{
-            return Response(
-              statusCode: HttpStatus.badRequest, 
-              body: 'Você não pode executar esta operação, '  
-              'esta conta não está em um quadro seu.'
-            );
-          }
+          return Response(
+            statusCode: HttpStatus.accepted, 
+            body: 'Deleção bem sucedida'
+          );
         }catch(e){
           throw Exception(e);
         }

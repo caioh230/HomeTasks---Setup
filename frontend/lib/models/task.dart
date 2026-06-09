@@ -37,6 +37,7 @@ class Task {
   TaskPriority? priority;
   DateTime expiration;
   DateTime? completedAt;
+  String? completedBy;
   TaskStatus status;
 
   Task({
@@ -49,6 +50,7 @@ class Task {
     this.table,
     this.status = TaskStatus.notStarted,
     this.completedAt,
+    this.completedBy,
   });
 
   static copy(Task task) {
@@ -62,6 +64,7 @@ class Task {
       table: task.table,
       status: task.status,
       completedAt: task.completedAt,
+      completedBy: task.completedBy,
     );
   }
 }

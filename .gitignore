@@ -1,54 +1,36 @@
-# See https://www.dartlang.org/guides/libraries/private-files
-
-#FRONTEND
-# Files and directories created by the Operating System
+# =========================
+# Sistema Operacional
+# =========================
 .DS_Store
 
-# Files and directories created by pub
-frontend/.dart_tool/
-frontend/.packages
-frontend/pubspec.lock
-frontend/build/
+# =========================
+# Arquivos sensíveis
+# =========================
+.env
+database-credentials.json
 
-# Test related files
-frontend/coverage/
+# Documentação local
+frontend/doc/
+backend/doc/
 
-#build
+# =========================
+# Dart / Flutter / Dart Frog
+# =========================
+.dart_tool/
+.packages
+pubspec.lock
 build/
+.dart_frog/
 
-#Dados sensíveis
-frontend/.env
-frontend/database-credentials.json
-frontend/doc
+# =========================
+# Cobertura de testes
+# =========================
+coverage/
 
-#BACKEND
-# Files and directories created by pub
-backend/.dart_tool/
-backend/.packages
-backend/pubspec.lock
-
-# Files and directories created by dart_frog
-backend/build/
-backend/.dart_frog
-
-# Test related files
-backend/coverage/
-
-#Dados sensíveis
-backend/.env
-backend/database-credentials.json
-backend/doc
-frontend/linux/flutter/generated_plugin_registrant.cc
-frontend/linux/flutter/generated_plugin_registrant.h
-frontend/linux/flutter/generated_plugins.cmake
-frontend/macos/Flutter/GeneratedPluginRegistrant.swift
-frontend/windows/flutter/generated_plugin_registrant.cc
-frontend/windows/flutter/generated_plugin_registrant.h
-frontend/windows/flutter/generated_plugins.cmake
-frontend/linux/flutter/generated_plugin_registrant.cc
-frontend/linux/flutter/generated_plugin_registrant.h
-frontend/linux/flutter/generated_plugins.cmake
-frontend/macos/Flutter/GeneratedPluginRegistrant.swift
-frontend/windows/flutter/generated_plugin_registrant.cc
-frontend/windows/flutter/generated_plugin_registrant.h
-frontend/windows/flutter/generated_plugins.cmake
+# =========================
+# Flutter - arquivos gerados
+# =========================
+**/GeneratedPluginRegistrant.swift
+**/generated_plugin_registrant.cc
+**/generated_plugin_registrant.h
+**/generated_plugins.cmake

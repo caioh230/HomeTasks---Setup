@@ -1,1 +1,0 @@
- C:\\Users\\mrque\\Desktop\\teste\\HomeTasks---Setup\\.dart_tool\\flutter_build\\b326f79b736567c17918e2e40c194859\\native_assets.json: 

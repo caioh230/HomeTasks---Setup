@@ -4,9 +4,7 @@ class RelationshipModel {
   RelationshipModel({
     required this.idUser,
     required this.idTable,
-    required this.tableName,
     required this.roleName,
-    required this.valid,
   });
 
   ///Conversão de map para model
@@ -16,11 +14,9 @@ class RelationshipModel {
       list.contains(map['roleName'].toString())
     ){
       return RelationshipModel(
-        idUser:     map['idUser'].toString(),
-        idTable:    map['idTable'].toString(),
-        tableName:    map['tableName'].toString(),
-        roleName:   map['roleName'].toString(),
-        valid:      bool.parse(map['valid'].toString())
+        idUser: map['idUser'].toString(),
+        idTable:  map['idTable'].toString(),
+        roleName:  map['roleName'].toString(),
       );
     }else {
       throw Exception('Cargo inexistente, ignorando acesso');
@@ -31,21 +27,16 @@ class RelationshipModel {
   final String idUser;
   ///Campo idTable
   final String idTable;
-  ///Campo tableName
-  final String tableName;
   ///Campo roleName
   final String roleName;
-  ///Campo valid
-  final bool valid;
+
   
   ///Conversão do Model para Map
   Map<String, dynamic> toMap(){
     return {
       'idUser': idUser,
       'idTable': idTable,
-      'tableName': tableName,
       'roleName': roleName,
-      'valid': valid
     };
   }  
 }

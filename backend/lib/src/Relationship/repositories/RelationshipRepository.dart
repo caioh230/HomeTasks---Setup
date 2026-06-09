@@ -7,10 +7,8 @@ import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
-
 import 'package:hometasks/src/Relationship/models/RelationshipDBModel.dart';
 import 'package:hometasks/src/Relationship/models/RelationshipModel.dart';
-import 'package:hometasks/src/Relationship/models/RelationshipPatchModel.dart';
 
 ///Importação de dados sensíveis
 final _env = DotEnv()..load();
@@ -30,33 +28,13 @@ class RelationshipRepository {
     ) async {
       if(await _validateOpr(relationship.idTable, context, 'owner')){
         try{
-          //Emisão de notificação
-          try{
-            final notif = firestore.collection('Notification');
-
-            await notif
-            .doc()
-            .create({
-              'content': 'Você quer participar do quadro ${relationship.tableName} criado por ${_validateUsr(context)}?',
-              'subject': 'Convite de participação',
-              'toUser': relationship.idUser,
-              'fromUser': _validateUsr(context),
-              'read': false
-            });
-          }catch(_){
-          }
-
-          //Lógica principal da função
-          final relac = relationship.toMap();
-          relac['valid'] = false;
-
           await ref
           .doc()
-          .set(relac);
+          .set(relationship.toMap());
           
           return Response.json(
             statusCode: HttpStatus.created, 
-            body: 'Criação de relação temporária bem sucedida'
+            body: 'Criação bem sucedida'
           );
         }catch(e){
           throw Exception(e);
@@ -129,10 +107,6 @@ class RelationshipRepository {
           'idUser', 
           WhereFilter.equal, 
           idUser
-        ).where(
-          'valid', 
-          WhereFilter.equal, 
-          true
         )
         .get();
 
@@ -242,44 +216,6 @@ class RelationshipRepository {
           throw Exception(e);
         }
     }
-
-  //-----------------------------
-  //            Patch - owner
-  //-----------------------------
-  ///Atualização de relacionamento único - Convidados
-  Future<Response> patchRelationship(
-    String idTable,
-    RelationshipPatchModel relationship,
-    RequestContext context
-    ) async {
-        try{
-          final idUser = await _validateUsr(context);
-
-          final val = await ref
-          .where(
-            'idUser', 
-            WhereFilter.equal, 
-            idUser
-          )
-          .where(
-            'idTable', 
-            WhereFilter.equal, 
-            idTable
-          )
-          .get();
-
-          await ref
-          .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
-          .update(relationship.toMap());
-
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Patch bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-  }
 }
 
 //-----------------------------

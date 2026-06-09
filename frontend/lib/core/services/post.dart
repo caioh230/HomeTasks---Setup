@@ -85,27 +85,4 @@ class BackendPost {
         '${twoDigits(utc.minute)}:'
         '${twoDigits(utc.second)}Z';
   }
-
-  static Future<http.Response> updateProfile({
-    required String email,
-    required String password,
-    String? name,
-    String? username,
-  }) async {
-    final token = await UserStorage.getToken();
-    return http.post(
-      Uri.parse('${Env.apiUrl}/User/Update'), 
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      // Usamos o método .toMap() do seu próprio UserModel para gerar o JSON perfeito!
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        if (name != null) 'name': name,
-        if (username != null) 'username': username,
-      }),
-    );
-  }
 }

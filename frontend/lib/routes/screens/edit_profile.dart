@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hometasks/core/services/post.dart';
 import 'package:hometasks/routes/dashboard.dart';
 import 'package:hometasks/widgets/avatar.dart';
 import 'package:hometasks/widgets/basic_button.dart';
@@ -42,39 +41,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // TO DO
     // Trocar o "await Future.delayed" por uma
     // chamada de API para salvar o novo quadro no backend
-   try {
-  // Validação simples: verificar se as senhas coincidem antes de mandar para o servidor
-  if (_passwordController.text != _confirmPasswordController.text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('As senhas não coincidem!')),
-    );
-    return; // Para a execução aqui e não envia para o back
-  }
-
-  // Chamada da API adaptada para os seus controllers existentes
-  final response = await BackendPost.updateProfile(
-    name: _nameController.text,
-    username: 'marcia_almeida', // ⚠️ Placeholder: Como você não tem esse controller na tela ainda, deixei fixo.
-    email: 'marcia@email.com',  // ⚠️ Placeholder: Como o seu email está comentado, deixei fixo.
-    password: _passwordController.text,
-  );
-
-  if (response.statusCode == 200) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Perfil atualizado com sucesso!')),
-    );
-    Navigator.pop(context); 
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao salvar: ${response.body}')),
-    );
-  }
-} catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Erro de conexão: $e')),
-  );
-}
-    //placeholder
+    await Future.delayed(Duration(seconds: 1)); //placeholder
     //
 
     navigator.pop(); 

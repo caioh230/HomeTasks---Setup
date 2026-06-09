@@ -1,6 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:hometasks/src/Relationship/models/RelationshipModel.dart';
+import 'package:hometasks/src/Relationship/models/RelationshipPatchModel.dart';
+
 import 'package:hometasks/src/Relationship/services/RelationshipService.dart';
 
 //-----------------------------
@@ -18,10 +20,11 @@ Future<dynamic> onRequest(
           return updateRelationship(id, context);
         case HttpMethod.delete:
           return deleteRelationship(id, context);
+        case HttpMethod.patch:
+          return patchRelationship(id, context);
         case HttpMethod.post:
         case HttpMethod.head:
         case HttpMethod.options:
-        case HttpMethod.patch:
       }
     }catch(e){
       throw Exception(e);
@@ -81,6 +84,28 @@ Future<Response> deleteRelationship(
 
       return service.deleteRelationship(
         id,
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//            Patch
+//-----------------------------
+Future<Response> patchRelationship(
+  String id,
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<RelationshipService>();
+
+      final data = await context.request.json() as Map<String, dynamic>;
+
+      return service.patchRelationship(
+        id,
+        RelationshipPatchModel.toModel(data), 
         context
       );
     }catch(e){

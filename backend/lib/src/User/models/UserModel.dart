@@ -6,6 +6,7 @@ class UserModel{
     required this.password,
     this.name,
     this.username,
+    this.googleId,
   });
   
   ///Conversão para o model
@@ -25,7 +26,8 @@ class UserModel{
         name: map['name'].toString(),
         username: username,
         email:  map['email'].toString(),
-        password: map['password'].toString()
+        password: map['password'].toString(),
+        googleId: map['googleId']?.toString(),
       );
     } else {
       throw Exception('Email inválido');
@@ -40,6 +42,8 @@ class UserModel{
   final String email;
   ///Campo password
   final String password;
+  ///Campo googleId
+  final String? googleId;
   
   ///Conversão para Map
   Map<String, dynamic> toMap(){
@@ -48,6 +52,8 @@ class UserModel{
       'username': username,
       'email': email,
       'password': password,
+      if(googleId != null)
+        'password': googleId,
     };
   }
 }

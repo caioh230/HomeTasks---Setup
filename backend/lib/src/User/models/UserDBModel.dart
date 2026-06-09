@@ -9,6 +9,7 @@ class UserDBModel{
     required this.username,
     required this.email,
     required this.password,
+    this.googleId,
   });
 
   ///Conversão de map para DBmodel
@@ -18,7 +19,8 @@ class UserDBModel{
       name: map['name'].toString(),
       username: map['username'].toString(),
       email: map['email'].toString(),
-      password: map['password'].toString()
+      password: map['password'].toString(),
+      googleId: map['googleId']?.toString(),
     );
   }
 
@@ -33,7 +35,8 @@ class UserDBModel{
       name: dados['name'].toString(),
       username: dados['username'].toString(),
       email: dados['email'].toString(),
-      password: dados['password'].toString()
+      password: dados['password'].toString(),
+      googleId: dados['googleId']?.toString(),
     );
   }
 
@@ -42,6 +45,7 @@ class UserDBModel{
   final String username;
   final String email;
   final String password;
+  final String? googleId;
 
   ///Conversão para Map
   Map<String, dynamic> toMap(){
@@ -50,7 +54,9 @@ class UserDBModel{
       'name': name,
       'username': username,
       'email': email,
-      'password': password
+      'password': password,
+      if(googleId != null)
+        'googleId': googleId,
     };
   }
 }

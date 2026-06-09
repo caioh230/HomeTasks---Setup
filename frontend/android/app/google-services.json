@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "98977958789",
-    "project_id": "hometasks-ef2d9",
-    "storage_bucket": "hometasks-ef2d9.firebasestorage.app"
+    "project_number": "641929220731",
+    "project_id": "hometasks-d646a",
+    "storage_bucket": "hometasks-d646a.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:98977958789:android:744df343da1a17e27192ec",
+        "mobilesdk_app_id": "1:641929220731:android:983e6a1ec01e21afe708de",
         "android_client_info": {
           "package_name": "com.unit.hometasks"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "641929220731-9j7f7q7ngjiat8rlr2vs5cmj3uecsurm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDfOpECD6RVW7BcJT88WkYNUm9r-8Zqg4E"
+          "current_key": "AIzaSyA_yc0IgmuhBDOeV-9UH9tDF4o1u0YnycU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641929220731-9j7f7q7ngjiat8rlr2vs5cmj3uecsurm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

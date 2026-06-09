@@ -132,6 +132,18 @@ class _TableCardState extends State<TableCard> {
               ),
             ),
 
+            if(table.description != null && table.description!.isNotEmpty) ... [
+              // Title
+              Text(
+                table.description!,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade700
+                ),
+              ),
+            ],
+
             const SizedBox(height: 18),
             GestureDetector(
               onTap: !table.isLoading ? () {

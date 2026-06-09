@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
@@ -39,7 +39,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const Center(child: CircularProgressIndicator()),
     );
 
-    bool success = false;
+    /*bool success = false;
 
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(
@@ -88,7 +88,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         );
       }
-    }
+    }*/
   }
 
   @override

@@ -150,6 +150,12 @@ class UserRepository {
 
       final doc = val.docs.first;
       final data = UserDBModel.fromFirestore(doc).toMap();
+      if (data['googleId'] != null && (data['googleId'] as String).isNotEmpty) {
+        return Response.json(
+          statusCode: HttpStatus.unauthorized,
+          body: 'Este usuário faz login com Google. Use "Entrar com Google".',
+        );
+      }
 
       final token = _jwtToken({
         'id': data['id'],

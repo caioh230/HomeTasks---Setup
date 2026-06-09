@@ -41,6 +41,7 @@ class Lists {
       tables[body['id']] = Table(
         id: body['id'],
         title: body['name'],
+        description: body['description'],
         members: members,
         icon: Table.getIconFromString(body['icon']),
         role: switch(body['roleName']) {

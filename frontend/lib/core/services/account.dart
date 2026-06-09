@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hometasks/core/services/storage.dart';
 import 'package:hometasks/core/utils/env.dart';
 import 'package:hometasks/core/utils/lists.dart';
@@ -29,6 +30,47 @@ class UserAccount {
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(switch(response.statusCode) {
+        500 => "Credenciais incorretas",
+        _ => response.body,
+      });
+    }
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final token = json['token'] as String;
+    UserAccount.userId = json['id'] as String?;
+    UserAccount.username = json['username'] as String?;
+    //UserAccount.email = json['email'] as String?;
+    UserAccount.name = json['name'] as String?;
+    UserStorage.saveToken(token);
+    return token;
+  }
+
+  /*********************
+      LOGIN (GOOGLE)
+  **********************/
+  static final GoogleSignIn signIn = GoogleSignIn.instance;
+  static Future<String> googleLogin() async {
+    await signIn.initialize(
+      serverClientId: Env.oauth2Id,
+    );
+    //print('Initialized.');
+
+    final GoogleSignInAccount user = await signIn.authenticate();
+    final authentication = user.authentication;
+    //print('User selected: ${user.email}');
+
+    final response = await http.post(
+        Uri.parse('${Env.apiUrl}/User/google'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'idToken': authentication.idToken,
+        }),
+      );
+
+    if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 202) {
       throw Exception(switch(response.statusCode) {
         500 => "Credenciais incorretas",
         _ => response.body,

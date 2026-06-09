@@ -84,31 +84,24 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
-  Future<http.Response?> signInWithGoogle() async {
-    print('Initializing Google Sign-In...');
+  void signInWithGoogle() async {
+    //print('Initializing Google Sign-In...');
+    final navigator = Navigator.of(context, rootNavigator: true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
     try {
-      await signIn.initialize(
-        serverClientId: Env.oauth2Id,
-      );
-      print('Initialized.');
-
-      final GoogleSignInAccount user = await signIn.authenticate();
-      final authentication = user.authentication;
-      print('User selected: ${user.email}');
-
-      final response = await http.post(
-        Uri.parse('${Env.apiUrl}/User/google'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'idToken': authentication.idToken,
-        }),
-      );
-      return response;
+      await UserAccount.googleLogin();
+      navigator.pop();
+      Navigator.pushReplacementNamed(context, '/dashboard');
     } catch (e) {
-      print('Google sign-in error: $e');
-      return null;
+      navigator.pop(); 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 

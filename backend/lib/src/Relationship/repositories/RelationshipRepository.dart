@@ -12,12 +12,17 @@ import 'package:hometasks/src/Relationship/models/RelationshipDBModel.dart';
 import 'package:hometasks/src/Relationship/models/RelationshipModel.dart';
 import 'package:hometasks/src/Relationship/models/RelationshipPatchModel.dart';
 
+import 'package:logging/logging.dart';
+
+/// Logger do repositório
+final Logger _log = Logger('RelationshipRepository');
+
 ///Importação de dados sensíveis
 final _env = DotEnv()..load();
 
-///Repositório de conexão com o banco remoto 
+///Repositório de conexão com o banco remoto
 class RelationshipRepository {
-  ///Referência à coleção Relationship 
+  ///Referência à coleção Relationship
   final ref = firestore.collection('Relationship');
 
   //-----------------------------
@@ -26,52 +31,73 @@ class RelationshipRepository {
   ///Registro de Nova instância
   Future<Response> createRelationship(
     RelationshipModel relationship,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(relationship.idTable, context, 'owner')){
-        try{
-          //Emisão de notificação
-          try{
-            final notif = firestore.collection('Notification');
+    RequestContext context,
+  ) async {
+    _log.info(
+      'createRelationship iniciado | idTable=${relationship.idTable} | idUser=${relationship.idUser}',
+    );
 
-            final invitedBy = await _validateUsr(context);
-            if(relationship.idUser != invitedBy) {
-              await notif
-              .doc()
-              .create({
-                'notificationType': 'invitedToTable',
-                'tableId': 'Convite de participação',
-                'toUser': relationship.idUser,
-                'fromUser': invitedBy,
-                'createdAt': DateTime.now().toIso8601String(),
-                'read': false,
-              });
-            }
-          }catch(_){
-            throw Exception('Erro ao criar Relationship: Não conseguiu criar notificação');
+    if (await _validateOpr(relationship.idTable, context, 'owner')) {
+      try {
+        //Emisão de notificação
+        try {
+          final notif = firestore.collection('Notification');
+
+          final invitedBy = await _validateUsr(context);
+
+          if (relationship.idUser != invitedBy) {
+            _log.info(
+              'Criando notificação | toUser=${relationship.idUser} | fromUser=$invitedBy',
+            );
+
+            await notif.doc().create({
+              'notificationType': 'invitedToTable',
+              'tableId': 'Convite de participação',
+              'toUser': relationship.idUser,
+              'fromUser': invitedBy,
+              'createdAt': DateTime.now().toIso8601String(),
+              'read': false,
+            });
+
+            _log.info(
+              'Notificação criada com sucesso | toUser=${relationship.idUser}',
+            );
           }
-
-          //Lógica principal da função
-          final relac = relationship.toMap();
-          relac['valid'] = false;
-
-          await ref
-          .doc()
-          .set(relac);
-          
-          return Response.json(
-            statusCode: HttpStatus.created, 
-            body: 'Criação de relação temporária bem sucedida'
+        } catch (_) {
+          _log.severe('Falha ao criar notificação');
+          throw Exception(
+            'Erro ao criar Relationship: Não conseguiu criar notificação',
           );
-        }catch(e){
-          throw Exception(e);
         }
-      }else{
-        return Response.json(
-          statusCode: HttpStatus.badRequest, 
-          body: 'Você não possui autorização para esta operação'
+
+        //Lógica principal da função
+        final relac = relationship.toMap();
+        relac['valid'] = false;
+
+        await ref.doc().set(relac);
+
+        _log.info(
+          'Relationship criado com sucesso | idTable=${relationship.idTable}',
         );
+
+        return Response.json(
+          statusCode: HttpStatus.created,
+          body: 'Criação de relação temporária bem sucedida',
+        );
+      } catch (e) {
+        _log.severe('Erro ao criar Relationship | error=$e');
+        throw Exception(e);
       }
+    } else {
+      _log.warning(
+        'Acesso negado ao criar Relationship | idTable=${relationship.idTable}',
+      );
+
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: 'Você não possui autorização para esta operação',
+      );
+    }
   }
 
   //-----------------------------
@@ -82,6 +108,8 @@ class RelationshipRepository {
     String idTable,
     RequestContext context,
   ) async {
+    _log.info('readRelationship iniciado | idTable=$idTable');
+
     if (await _validateOpr(idTable, context)) {
       try {
         final userId = await _validateUsr(context);
@@ -92,6 +120,10 @@ class RelationshipRepository {
             .get();
 
         if (val.docs.isEmpty) {
+          _log.warning(
+            'Relationship não encontrado | idTable=$idTable | userId=$userId',
+          );
+
           return Response.json(
             statusCode: HttpStatus.notFound,
             body: 'Relationship não encontrado',
@@ -101,17 +133,24 @@ class RelationshipRepository {
         final formDados =
             RelationshipDBModel.fromFirestore(val.docs.first);
 
+        _log.info(
+          'Relationship encontrado | idTable=$idTable | userId=$userId',
+        );
+
         return Response.json(
           statusCode: HttpStatus.ok,
           body: formDados.toMap(),
         );
       } catch (e) {
+        _log.severe('Erro ao ler Relationship | error=$e');
         return Response.json(
           statusCode: HttpStatus.internalServerError,
           body: {'error': e.toString()},
         );
       }
     }
+
+    _log.warning('Acesso negado ao readRelationship | idTable=$idTable');
 
     return Response.json(
       statusCode: HttpStatus.forbidden,
@@ -123,36 +162,34 @@ class RelationshipRepository {
   //            read - JWT
   //-----------------------------
   ///Leitura de todos os relacionamentos do usuário
-  Future<Response> readAllRelationships(
-    RequestContext context
-    ) async {
-      try{
-        final idUser = await _validateUsr(context);
-        
-        final val = await ref
-        .where(
-          'idUser', 
-          WhereFilter.equal, 
-          idUser
-        ).where(
-          'valid', 
-          WhereFilter.equal, 
-          true
-        )
-        .get();
+  Future<Response> readAllRelationships(RequestContext context) async {
+    _log.info('readAllRelationships iniciado');
 
-        final formDados = [];
-        for (var i = 0; i < val.docs.length; i++) {
-          formDados.add(val.docs[i].data()['idTable'].toString());
-        }
+    try {
+      final idUser = await _validateUsr(context);
 
-        return Response.json(
-          statusCode: HttpStatus.ok,
-          body: formDados
-        );
-      }catch(e){
-        throw Exception(e);
+      final val = await ref
+          .where('idUser', WhereFilter.equal, idUser)
+          .where('valid', WhereFilter.equal, true)
+          .get();
+
+      final formDados = [];
+      for (var i = 0; i < val.docs.length; i++) {
+        formDados.add(val.docs[i].data()['idTable'].toString());
       }
+
+      _log.info(
+        'readAllRelationships concluído | userId=$idUser | total=${formDados.length}',
+      );
+
+      return Response.json(
+        statusCode: HttpStatus.ok,
+        body: formDados,
+      );
+    } catch (e) {
+      _log.severe('Erro em readAllRelationships | error=$e');
+      throw Exception(e);
+    }
   }
 
   //-----------------------------
@@ -160,43 +197,43 @@ class RelationshipRepository {
   //-----------------------------
   ///Leitura de todos os convites pendentes do usuário
   Future<Response> readPendingRelationships(
-    RequestContext context
-    ) async {
-      try{
-        final idUser = await _validateUsr(context);
-        
-        final val = await ref
-        .where(
-          'idUser', 
-          WhereFilter.equal, 
-          idUser
-        ).where(
-          'valid', 
-          WhereFilter.equal, 
-          false
-        )
-        .get();
+    RequestContext context,
+  ) async {
+    _log.info('readPendingRelationships iniciado');
 
-        final formDados = [];
+    try {
+      final idUser = await _validateUsr(context);
 
-        for (var i = 0; i < val.docs.length; i++) {
-          final data = val.docs[i].data();
+      final val = await ref
+          .where('idUser', WhereFilter.equal, idUser)
+          .where('valid', WhereFilter.equal, false)
+          .get();
 
-          formDados.add({
-            'id': val.docs[i].id,
-            'idTable': data['idTable'],
-            'tableName': data['tableName'],
-            'createdAt': data['createdAt'],
-          });
-        }
+      final formDados = [];
 
-        return Response.json(
-          statusCode: HttpStatus.ok,
-          body: formDados
-        );
-      }catch(e){
-        throw Exception(e);
+      for (var i = 0; i < val.docs.length; i++) {
+        final data = val.docs[i].data();
+
+        formDados.add({
+          'id': val.docs[i].id,
+          'idTable': data['idTable'],
+          'tableName': data['tableName'],
+          'createdAt': data['createdAt'],
+        });
       }
+
+      _log.info(
+        'readPendingRelationships concluído | userId=$idUser | total=${formDados.length}',
+      );
+
+      return Response.json(
+        statusCode: HttpStatus.ok,
+        body: formDados,
+      );
+    } catch (e) {
+      _log.severe('Erro em readPendingRelationships | error=$e');
+      throw Exception(e);
+    }
   }
 
   //-----------------------------
@@ -206,42 +243,45 @@ class RelationshipRepository {
   Future<Response> updateRelationship(
     String idTable,
     RelationshipModel relationship,
-    RequestContext context
-    ) async {
-        try{
-          final idUser = await _validateUsr(context);
+    RequestContext context,
+  ) async {
+    _log.info('updateRelationship iniciado | idTable=$idTable');
 
-          if(await _validateOpr(idTable, context, 'owner')){ 
-            final val = await ref
-            .where(
-              'idUser', 
-              WhereFilter.equal, 
-              idUser
-            )
-            .where(
-              'idTable', 
-              WhereFilter.equal, 
-              idTable
-            )
+    try {
+      final idUser = await _validateUsr(context);
+
+      if (await _validateOpr(idTable, context, 'owner')) {
+        final val = await ref
+            .where('idUser', WhereFilter.equal, idUser)
+            .where('idTable', WhereFilter.equal, idTable)
             .get();
 
-            await ref
+        await ref
             .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
             .update(relationship.toMap());
 
-            return Response.json(
-              statusCode: HttpStatus.accepted, 
-              body: 'Atualização bem sucedida'
-            );
-          }else{
-            return Response.json(
-              statusCode: HttpStatus.badRequest, 
-              body: 'Você não possui autorização para esta operação'
-            );
-          }
-        }catch(e){
-          throw Exception(e);
-        }
+        _log.info(
+          'updateRelationship concluído com sucesso | idTable=$idTable | userId=$idUser',
+        );
+
+        return Response.json(
+          statusCode: HttpStatus.accepted,
+          body: 'Atualização bem sucedida',
+        );
+      } else {
+        _log.warning(
+          'Acesso negado em updateRelationship | idTable=$idTable | userId=$idUser',
+        );
+
+        return Response.json(
+          statusCode: HttpStatus.badRequest,
+          body: 'Você não possui autorização para esta operação',
+        );
+      }
+    } catch (e) {
+      _log.severe('Erro em updateRelationship | error=$e');
+      throw Exception(e);
+    }
   }
 
   //-----------------------------
@@ -250,37 +290,35 @@ class RelationshipRepository {
   ///Deleção de relacionamento único
   Future<Response> deleteRelationship(
     String idTable,
-    RequestContext context
-    ) async {
-        try{
-          final idUser = await _validateUsr(context);
+    RequestContext context,
+  ) async {
+    _log.info('deleteRelationship iniciado | idTable=$idTable');
 
-          final val = await ref
-          .where(
-            'idUser', 
-            WhereFilter.equal, 
-            idUser
-          )
-          .where(
-            'idTable', 
-            WhereFilter.equal, 
-            idTable
-          )
+    try {
+      final idUser = await _validateUsr(context);
+
+      final val = await ref
+          .where('idUser', WhereFilter.equal, idUser)
+          .where('idTable', WhereFilter.equal, idTable)
           .get();
-        
 
-          await ref
+      await ref
           .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
           .delete();
 
-          return Response(
-            statusCode: HttpStatus.accepted, 
-            body: 'Deleção bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
+      _log.info(
+        'deleteRelationship concluído | idTable=$idTable | userId=$idUser',
+      );
+
+      return Response(
+        statusCode: HttpStatus.accepted,
+        body: 'Deleção bem sucedida',
+      );
+    } catch (e) {
+      _log.severe('Erro em deleteRelationship | error=$e');
+      throw Exception(e);
     }
+  }
 
   //-----------------------------
   //            Patch - owner
@@ -289,35 +327,34 @@ class RelationshipRepository {
   Future<Response> patchRelationship(
     String idTable,
     RelationshipPatchModel relationship,
-    RequestContext context
-    ) async {
-        try{
-          final idUser = await _validateUsr(context);
+    RequestContext context,
+  ) async {
+    _log.info('patchRelationship iniciado | idTable=$idTable');
 
-          final val = await ref
-          .where(
-            'idUser', 
-            WhereFilter.equal, 
-            idUser
-          )
-          .where(
-            'idTable', 
-            WhereFilter.equal, 
-            idTable
-          )
+    try {
+      final idUser = await _validateUsr(context);
+
+      final val = await ref
+          .where('idUser', WhereFilter.equal, idUser)
+          .where('idTable', WhereFilter.equal, idTable)
           .get();
 
-          await ref
+      await ref
           .doc(RelationshipDBModel.fromFirestore(val.docs.first).id)
           .update(relationship.toMap());
 
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Patch bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
+      _log.info(
+        'patchRelationship concluído | idTable=$idTable | userId=$idUser',
+      );
+
+      return Response.json(
+        statusCode: HttpStatus.accepted,
+        body: 'Patch bem sucedida',
+      );
+    } catch (e) {
+      _log.severe('Erro em patchRelationship | error=$e');
+      throw Exception(e);
+    }
   }
 }
 
@@ -363,15 +400,17 @@ Future<bool> _validateOpr(
 
     const validRoles = ['reader', 'editor', 'owner'];
     final userRole = data.docs.first.data()['roleName']?.toString();
-    if(!validRoles.contains(userRole)) {
-      //Role invalido
+
+    if (!validRoles.contains(userRole)) {
       return false;
     }
 
     if (minimalRole == null) {
       return true;
     }
-    return validRoles.indexOf(userRole!) >= validRoles.indexOf(minimalRole);
+
+    return validRoles.indexOf(userRole!) >=
+        validRoles.indexOf(minimalRole);
   } catch (_) {
     return false;
   }
@@ -381,11 +420,8 @@ Future<bool> _validateOpr(
 //             RLS
 //-----------------------------
 ///Buscar o id do usuário
-Future<String> _validateUsr(
-  RequestContext context,
-)async{
-  try{
-    //Obtenção de dados do usuário
+Future<String> _validateUsr(RequestContext context) async {
+  try {
     final authHeader = context.request.headers['authorization'];
 
     if (authHeader == null) {
@@ -404,9 +440,9 @@ Future<String> _validateUsr(
     );
 
     final payload = jwt.payload as Map<String, dynamic>;
-    
+
     return payload['id'].toString();
-  }catch(e){
+  } catch (e) {
     throw Exception(e);
   }
 }

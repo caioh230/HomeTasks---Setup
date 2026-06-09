@@ -5,6 +5,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
+import 'package:logging/logging.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
 
@@ -15,9 +16,11 @@ import 'package:hometasks/src/Task/models/TaskPatchModel.dart';
 ///Importação de dados sensíveis
 final _env = DotEnv()..load();
 
-///Repositório de conexão com o banco remoto 
+///Repositório de conexão com o banco remoto
 class TaskRepository {
-  ///Referência à coleção Task 
+  static final _log = Logger('TaskRepository');
+
+  ///Referência à coleção Task
   final ref = firestore.collection('Task');
 
   //-----------------------------
@@ -26,27 +29,50 @@ class TaskRepository {
   ///Registro de Nova instância
   Future<Response> createTask(
     TaskModel task,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(task.idTable, context, 'editor')){
-        try{
-          await ref
-          .doc()
-          .set(task.toMap());
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(task.idTable, context, 'editor')) {
+      try {
+        _log.info({
+          'event': 'task_create_started',
+          'table_id': task.idTable,
+        }.toString());
 
-          return Response.json(
-            statusCode: HttpStatus.created, 
-            body: 'Criação bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
+        await ref.doc().set(task.toMap());
+
+        _log.info({
+          'event': 'task_create_success',
+          'table_id': task.idTable,
+        }.toString());
+
         return Response.json(
-          statusCode: HttpStatus.badRequest, 
-          body: 'Você não possui autorização para esta operação'
+          statusCode: HttpStatus.created,
+          body: 'Criação bem sucedida',
         );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'task_create_failed',
+            'table_id': task.idTable,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'task_create_unauthorized',
+        'table_id': task.idTable,
+      }.toString());
+
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: 'Você não possui autorização para esta operação',
+      );
+    }
   }
 
   //-----------------------------
@@ -56,26 +82,53 @@ class TaskRepository {
   Future<Response> readTask(
     String idTable,
     String id,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(idTable, context, 'reader')){
-        try{
-          final val = await ref
-          .doc(id)
-          .get();
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(idTable, context, 'reader')) {
+      try {
+        _log.info({
+          'event': 'task_read_started',
+          'table_id': idTable,
+          'task_id': id,
+        }.toString());
 
-          final formDados = TaskDBModel.fromFirestore(val);
-          
-          return Response.json(
-            statusCode: HttpStatus.ok, 
-            body: formDados.toMap()
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
-        return Response.json();
+        final val = await ref.doc(id).get();
+
+        final formDados = TaskDBModel.fromFirestore(val);
+
+        _log.info({
+          'event': 'task_read_success',
+          'table_id': idTable,
+          'task_id': id,
+        }.toString());
+
+        return Response.json(
+          statusCode: HttpStatus.ok,
+          body: formDados.toMap(),
+        );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'task_read_failed',
+            'table_id': idTable,
+            'task_id': id,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'task_read_unauthorized',
+        'table_id': idTable,
+        'task_id': id,
+      }.toString());
+
+      return Response.json();
+    }
   }
 
   //-----------------------------
@@ -84,35 +137,61 @@ class TaskRepository {
   ///Leitura de tarefas pertencentes à mesma coluna
   Future<Response> readTableTasks(
     String idTable,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(idTable, context, 'reader')){
-        try{
-          final snapshot = await ref
-              .where(
-                'idTable',
-                WhereFilter.equal,
-                idTable,
-              )
-              .get();
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(idTable, context, 'reader')) {
+      try {
+        _log.info({
+          'event': 'table_tasks_read_started',
+          'table_id': idTable,
+        }.toString());
 
-          final tasks = snapshot.docs.map((doc) {
-            return {
-              'id': doc.id,
-              ...doc.data(),
-            };
-          }).toList();
+        final snapshot = await ref
+            .where(
+              'idTable',
+              WhereFilter.equal,
+              idTable,
+            )
+            .get();
 
-          return Response.json(
-            statusCode: HttpStatus.ok,
-            body: tasks,
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
-        return Response.json();
+        final tasks = snapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            ...doc.data(),
+          };
+        }).toList();
+
+        _log.info({
+          'event': 'table_tasks_read_success',
+          'table_id': idTable,
+          'count': tasks.length,
+        }.toString());
+
+        return Response.json(
+          statusCode: HttpStatus.ok,
+          body: tasks,
+        );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'table_tasks_read_failed',
+            'table_id': idTable,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'table_tasks_read_unauthorized',
+        'table_id': idTable,
+      }.toString());
+
+      return Response.json();
+    }
   }
 
   //-----------------------------
@@ -120,27 +199,53 @@ class TaskRepository {
   //-----------------------------
   ///Atualização de tarefa única
   Future<Response> updateTask(
-    String id, 
+    String id,
     TaskModel task,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(task.idTable, context, 'editor')){
-        try{
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(task.idTable, context, 'editor')) {
+      try {
+        _log.info({
+          'event': 'task_update_started',
+          'task_id': id,
+          'table_id': task.idTable,
+        }.toString());
 
-          await ref
-          .doc(id)
-          .update(task.toMap());
+        await ref.doc(id).update(task.toMap());
 
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Atualização bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
-        return Response.json();
+        _log.info({
+          'event': 'task_update_success',
+          'task_id': id,
+          'table_id': task.idTable,
+        }.toString());
+
+        return Response.json(
+          statusCode: HttpStatus.accepted,
+          body: 'Atualização bem sucedida',
+        );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'task_update_failed',
+            'task_id': id,
+            'table_id': task.idTable,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'task_update_unauthorized',
+        'task_id': id,
+        'table_id': task.idTable,
+      }.toString());
+
+      return Response.json();
+    }
   }
 
   //-----------------------------
@@ -150,24 +255,51 @@ class TaskRepository {
   Future<Response> deleteTask(
     String idTable,
     String id,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(idTable, context, 'editor')){
-        try{
-          await ref
-          .doc(id)
-          .delete();
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(idTable, context, 'editor')) {
+      try {
+        _log.info({
+          'event': 'task_delete_started',
+          'task_id': id,
+          'table_id': idTable,
+        }.toString());
 
-          return Response(
-            statusCode: HttpStatus.accepted, 
-            body: 'Deleção bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
-        return Response.json();
+        await ref.doc(id).delete();
+
+        _log.info({
+          'event': 'task_delete_success',
+          'task_id': id,
+          'table_id': idTable,
+        }.toString());
+
+        return Response(
+          statusCode: HttpStatus.accepted,
+          body: 'Deleção bem sucedida',
+        );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'task_delete_failed',
+            'task_id': id,
+            'table_id': idTable,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'task_delete_unauthorized',
+        'task_id': id,
+        'table_id': idTable,
+      }.toString());
+
+      return Response.json();
+    }
   }
 
   //-----------------------------
@@ -175,26 +307,53 @@ class TaskRepository {
   //-----------------------------
   ///Atualização de tarefa única
   Future<Response> patchTask(
-    String id, 
+    String id,
     TaskPatchModel task,
-    RequestContext context
-    ) async {
-      if(await _validateOpr(task.idTable, context, 'editor')){
-        try{
-          await ref
-          .doc(id)
-          .update(task.toMap());
+    RequestContext context,
+  ) async {
+    if (await _validateOpr(task.idTable, context, 'editor')) {
+      try {
+        _log.info({
+          'event': 'task_patch_started',
+          'task_id': id,
+          'table_id': task.idTable,
+        }.toString());
 
-          return Response.json(
-            statusCode: HttpStatus.accepted, 
-            body: 'Atualização bem sucedida'
-          );
-        }catch(e){
-          throw Exception(e);
-        }
-      }else{
-        return Response.json();
+        await ref.doc(id).update(task.toMap());
+
+        _log.info({
+          'event': 'task_patch_success',
+          'task_id': id,
+          'table_id': task.idTable,
+        }.toString());
+
+        return Response.json(
+          statusCode: HttpStatus.accepted,
+          body: 'Atualização bem sucedida',
+        );
+      } catch (e, stackTrace) {
+        _log.severe(
+          {
+            'event': 'task_patch_failed',
+            'task_id': id,
+            'table_id': task.idTable,
+            'error': e.toString(),
+          }.toString(),
+          e,
+          stackTrace,
+        );
+
+        throw Exception(e);
       }
+    } else {
+      _log.warning({
+        'event': 'task_patch_unauthorized',
+        'task_id': id,
+        'table_id': task.idTable,
+      }.toString());
+
+      return Response.json();
+    }
   }
 }
 
@@ -240,15 +399,17 @@ Future<bool> _validateOpr(
 
     const validRoles = ['reader', 'editor', 'owner'];
     final userRole = data.docs.first.data()['roleName']?.toString();
-    if(!validRoles.contains(userRole)) {
-      //Role invalido
+
+    if (!validRoles.contains(userRole)) {
       return false;
     }
 
     if (minimalRole == null) {
       return true;
     }
-    return validRoles.indexOf(userRole!) >= validRoles.indexOf(minimalRole);
+
+    return validRoles.indexOf(userRole!) >=
+        validRoles.indexOf(minimalRole);
   } catch (_) {
     return false;
   }

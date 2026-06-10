@@ -52,7 +52,7 @@ class RelationshipRepository {
 
             await notif.doc().create({
               'notificationType': 'invitedToTable',
-              'tableId': 'Convite de participação',
+              'tableId': relationship.idTable,
               'toUser': relationship.idUser,
               'fromUser': invitedBy,
               'createdAt': DateTime.now().toIso8601String(),

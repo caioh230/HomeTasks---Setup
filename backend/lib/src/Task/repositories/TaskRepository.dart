@@ -5,13 +5,15 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import 'package:dotenv/dotenv.dart';
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
-import 'package:logging/logging.dart';
 
 import 'package:hometasks/config/DataBase_client.dart';
 
 import 'package:hometasks/src/Task/models/TaskDBModel.dart';
 import 'package:hometasks/src/Task/models/TaskModel.dart';
 import 'package:hometasks/src/Task/models/TaskPatchModel.dart';
+
+import 'package:logging/logging.dart';
+
 
 ///Importação de dados sensíveis
 final _env = DotEnv()..load();
@@ -44,6 +46,17 @@ class TaskRepository {
           'event': 'task_create_success',
           'table_id': task.idTable,
         }.toString());
+
+        try{
+          if(
+            task.accountable!.isNotEmpty
+          ){
+            for(var i = 0; i < task.accountable!.length; i++){
+              await _notification(task.accountable![i], task.idTable, context);
+            }
+          }
+        }catch(_){
+        }
 
         return Response.json(
           statusCode: HttpStatus.created,
@@ -218,6 +231,17 @@ class TaskRepository {
           'task_id': id,
           'table_id': task.idTable,
         }.toString());
+
+        try{
+          if(
+            task.accountable!.isNotEmpty
+          ){
+            for(var i = 0; i < task.accountable!.length; i++){
+              await _notification(task.accountable![i], task.idTable, context);
+            }
+          }
+        }catch(_){
+        }
 
         return Response.json(
           statusCode: HttpStatus.accepted,
@@ -412,5 +436,43 @@ Future<bool> _validateOpr(
         validRoles.indexOf(minimalRole);
   } catch (_) {
     return false;
+  }
+}
+
+Future<void> _notification(
+  String idUser,
+  String idTable,
+  RequestContext context
+)async{
+  final notificacao = firestore.collection('Notification');
+
+  await notificacao.doc().create({
+    'notificationType': 'invitedToTask',
+    'tableId': idTable,
+    'toUser': idUser,
+    'fromUser': _validateUsr(context),
+    'createdAt': DateTime.now().toIso8601String(),
+    'read': false,
+  });
+}
+
+Future<String> _validateUsr(
+  RequestContext context,
+)async{
+  try{
+    //Obtenção de dados do usuário
+    final request = context.request;
+    final header = request.headers['authorization'];
+                
+    final jwt = JWT.verify(
+      header!, 
+      SecretKey(_env['jwtSecretKey'].toString())
+    );
+
+    final payload = jwt.payload as Map<String, dynamic>;
+    
+    return payload['id'].toString();
+  }catch(e){
+    return '';
   }
 }

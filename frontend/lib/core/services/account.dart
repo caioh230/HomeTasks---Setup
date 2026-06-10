@@ -125,6 +125,28 @@ class UserAccount {
     UserStorage.saveToken(token);
     return token;
   }
+
+  /*********************
+          EXCLUSION
+  **********************/
+  //Verificar em caso de erro
+  static Future<void> exclude(
+  ) async {
+    final response = await http.delete(
+      Uri.parse('${Env.apiUrl}/User'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${await UserStorage.getToken()}',
+      }
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(switch(response.statusCode) {
+        500 => "Credenciais incorretas",
+        _ => response.body,
+      });
+    }    
+  }
   
   /*********************
             JWT

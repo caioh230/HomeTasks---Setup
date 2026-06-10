@@ -151,6 +151,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     color: const Color(0xFFE53E3E),
                     iconBg: const Color(0xFFE53E3E),
                     iconColor: Colors.white,
+                    //Verificar em caso de erro
+                    onTap: () async {
+                      await UserAccount.exclude();
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
                   ),
                 ],
               ),

@@ -19,9 +19,9 @@ Future<Response> onRequest(
           return isLogin ? getUser(context) : getUserbyUsername(context);
         case HttpMethod.post:
           return createUser(context);
-
-        case HttpMethod.put:
         case HttpMethod.delete:
+          return deleteUser(context);
+        case HttpMethod.put:
         case HttpMethod.head:
         case HttpMethod.options:
         case HttpMethod.patch:
@@ -105,6 +105,24 @@ Future<Response> createUser(
 
       return service.createUser(
         UserModel.toModel(data), 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//          Delete
+//-----------------------------
+///Responsável por executar a requisição de remoção
+Future<Response> deleteUser(
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<UserService>();
+
+      return service.deleteUser(
         context
       );
     }catch(e){

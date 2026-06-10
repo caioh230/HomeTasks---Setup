@@ -16,9 +16,7 @@ Future<dynamic> onRequest(
           return readUser(id, context);
         case HttpMethod.put:
           return updateUser(id, context);
-        case HttpMethod.delete:
-          return deleteUser(id, context);
-        
+        case HttpMethod.delete:        
         case HttpMethod.post:
         case HttpMethod.head:
         case HttpMethod.options:
@@ -63,25 +61,6 @@ Future<Response> updateUser(
 
       return service.updateUser(
         UserModel.toModel(data), 
-        context
-      );
-    }catch(e){
-      throw Exception(e);
-    }
-}
-
-//-----------------------------
-//          Delete
-//-----------------------------
-///Responsável por executar a requisição de remoção
-Future<Response> deleteUser(
-  String id, 
-  RequestContext context
-  )async{
-    try{
-      final service = context.read<UserService>();
-
-      return service.deleteUser(
         context
       );
     }catch(e){

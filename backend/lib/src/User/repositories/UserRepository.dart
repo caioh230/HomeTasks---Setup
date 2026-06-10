@@ -495,37 +495,44 @@ class UserRepository {
       }.toString());
 
       await ref
-          .doc(id)
-          .delete();
+      .doc(id)
+      .delete();
 
-      final relacionamentos = firestore.collection('Relationship');
+      var listaRel = 0;
+      
+      try{
+        final relacionamentos = firestore.collection('Relationship');
 
-      final lista = await relacionamentos
-          .where(
-            'idUser',
-            WhereFilter.equal,
-            id,
-          )
-          .get();
+        final lista = await relacionamentos
+        .where(
+          'idUser',
+          WhereFilter.equal,
+          id,
+        )
+        .get();
 
-      final formDados = <Map<String, dynamic>>[];
+        listaRel = lista.docs.length;
 
-      for (var i = 0; i < lista.docs.length; i++) {
-        formDados.add(
-          UserDBModel.fromFirestore(lista.docs[i]).toMap(),
-        );
-      }
+        final formDados = <Map<String, dynamic>>[];
 
-      for (var i = 0; i < lista.docs.length; i++) {
-        await relacionamentos
-            .doc(formDados[i]['id'].toString())
-            .delete();
+        for (var i = 0; i < lista.docs.length; i++) {
+          formDados.add(
+            UserDBModel.fromFirestore(lista.docs[i]).toMap(),
+          );
+        }
+
+        for (var i = 0; i < lista.docs.length; i++) {
+          await relacionamentos
+              .doc(formDados[i]['id'].toString())
+              .delete();
+        }
+      }catch(_){
       }
 
       _log.info({
         'event': 'user_deleted',
         'user_id': id,
-        'relationships_removed': lista.docs.length,
+        'relationships_removed': listaRel,
       }.toString());
 
       return Response.json(

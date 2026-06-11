@@ -127,6 +127,52 @@ class UserAccount {
   }
 
   /*********************
+          UPDATE
+  **********************/
+  //Verificar em caso de erro
+  static Future<String> update({
+    String? name,
+    String? password,
+  }) async {
+    final body = <String, dynamic>{};
+
+    if (name != null && name.trim().isNotEmpty) {
+      body['name'] = name.trim();
+    }
+
+    if (password != null && password.trim().isNotEmpty) {
+      body['password'] = password.trim();
+    }
+
+    final response = await http.put(
+      Uri.parse('${Env.apiUrl}/User'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${await UserStorage.getToken()}',
+      },
+      body: jsonEncode({
+        body
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(switch(response.statusCode) {
+        500 => "Credenciais incorretas",
+        _ => response.body,
+      });
+    }
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final token = json['token'] as String;
+    UserAccount.userId = json['id'] as String?;
+    UserAccount.username = json['username'] as String?;
+    //UserAccount.email = json['email'] as String?;
+    UserAccount.name = json['name'] as String?;
+    UserStorage.saveToken(token);
+    return token;
+  }
+
+  /*********************
           EXCLUSION
   **********************/
   //Verificar em caso de erro

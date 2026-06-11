@@ -1,4 +1,5 @@
 import 'package:dart_frog/dart_frog.dart';
+
 import 'package:hometasks/src/User/models/UserModel.dart';
 import 'package:hometasks/src/User/services/UserService.dart';
 
@@ -15,7 +16,6 @@ Future<dynamic> onRequest(
         case HttpMethod.get:
           return readUser(id, context);
         case HttpMethod.put:
-          return updateUser(id, context);
         case HttpMethod.delete:        
         case HttpMethod.post:
         case HttpMethod.head:
@@ -39,28 +39,6 @@ Future<dynamic> readUser(
       final service = context.read<UserService>();
       
       return service.readUser(
-        context
-      );
-    }catch(e){
-      throw Exception(e);
-    }
-}
-
-//-----------------------------
-//            Update
-//-----------------------------
-///Responsável por executar a requisição de atualização
-Future<Response> updateUser(
-  String id, 
-  RequestContext context
-  )async{
-    try{
-      final service = context.read<UserService>();
-
-      final data = await context.request.json() as Map<String, dynamic>;
-
-      return service.updateUser(
-        UserModel.toModel(data), 
         context
       );
     }catch(e){

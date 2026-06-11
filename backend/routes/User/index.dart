@@ -22,6 +22,7 @@ Future<Response> onRequest(
         case HttpMethod.delete:
           return deleteUser(context);
         case HttpMethod.put:
+          return updateUser(context);
         case HttpMethod.head:
         case HttpMethod.options:
         case HttpMethod.patch:
@@ -104,6 +105,27 @@ Future<Response> createUser(
       final data = await context.request.json() as Map<String, dynamic>;
 
       return service.createUser(
+        UserModel.toModel(data), 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//            Update
+//-----------------------------
+///Responsável por executar a requisição de atualização
+Future<Response> updateUser(
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<UserService>();
+
+      final data = await context.request.json() as Map<String, dynamic>;
+
+      return service.updateUser(
         UserModel.toModel(data), 
         context
       );

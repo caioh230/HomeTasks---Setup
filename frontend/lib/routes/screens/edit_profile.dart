@@ -31,31 +31,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // TO DO
   }
 
-  void saveChanges() async {
-    if(_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Preencha o campo de usuário.',
-          ),
-        ),
-      );
-    }
-    final navigator = Navigator.of(context, rootNavigator: true);
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+  //Verificar em caso de erro
+  Future<void> saveChanges() async {
+      if(
+        _nameController.text.isEmpty
+        &&
+        _passwordController.text.isEmpty
+        ){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Preencha os campos de edição.',
+              ),
+            ),
+          );
+      }else{
+        final navigator = Navigator.of(context, rootNavigator: true);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(child: CircularProgressIndicator()),
+        );
 
-    // TO DO
-    // Trocar o "await Future.delayed" por uma
-    // chamada de API para salvar o novo quadro no backend
-    await Future.delayed(Duration(seconds: 1)); //placeholder
-    //
+        try{
+          //Verificar em caso de erro
+          await UserAccount.update(
+            name: _nameController.text, 
+            password:  _passwordController.text
+          );
 
-    navigator.pop(); 
-    DashboardPage.globalKey.currentState?.closeOverlay();
+          navigator.pop(); 
+          DashboardPage.globalKey.currentState?.closeOverlay();
+        }catch(_){
+          navigator.pop(); 
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Erro na alteração.',
+              ),
+            ),
+          );
+        }
+      }
   }
 
   @override
@@ -180,6 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               //Botões
               BasicButton(
                 text: 'Salvar Alterações',
+                //Verificar em caso de erro
                 onTap: saveChanges,
                 margin: EdgeInsets.zero,
                 textSize: 18,

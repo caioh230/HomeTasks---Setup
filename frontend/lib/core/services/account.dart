@@ -232,6 +232,8 @@ class UserAccount {
   static Future<void> logout() async {
     userId = username = name = /*email =*/ null;
     Lists.isTablesLoaded = Lists.isTasksLoaded = Lists.isNotifsLoaded = false;
+    
+
     await UserStorage.deleteToken();
   }
 }

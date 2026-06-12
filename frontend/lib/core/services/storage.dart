@@ -14,4 +14,14 @@ class UserStorage {
   static Future<void> deleteToken() async {
     await _storage.delete(key: 'access_token');
   }
+
+  //Verificar em caso de erro
+  static Future<void> saveConfig(Map map) async {
+    await _storage.write(key: 'configuration', value: map.toString());
+  }
+
+  //Verificar em caso de erro
+  static Future<String?> getConfig() async {
+    return await _storage.read(key: 'configuration');
+  }
 }

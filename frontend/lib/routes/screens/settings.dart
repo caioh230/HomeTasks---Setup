@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:hometasks/core/services/account.dart';
 import 'package:hometasks/routes/dashboard.dart';
- 
+import 'package:hometasks/core/services/preferences.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
  
@@ -13,7 +15,10 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificacoesPush = true;
   bool _sonsAlertas = true;
- 
+  //Verificar em caso de erro
+  String _tema = UserPreferences.tema;
+  String _idioma = UserPreferences.idioma;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -76,13 +81,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _NavRow(
                     icon: Icons.palette_outlined,
                     label: 'Tema',
-                    trailing: 'Sistema',
+                    //Verificar em caso de erro
+                    trailing: _tema,
                   ),
                   _Divider(),
                   _NavRow(
                     icon: Icons.translate_outlined,
                     label: 'Idioma',
-                    trailing: 'Português (Brasil)',
+                    //Verificar em caso de erro
+                    trailing: _idioma,
                   ),
                 ],
               ),

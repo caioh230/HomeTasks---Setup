@@ -13,6 +13,7 @@ Future<Response> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
+          return getForgotPassword(context);
         case HttpMethod.post:
           return createForgotPassword(context);
         case HttpMethod.put:
@@ -37,11 +38,30 @@ Future<Response> createForgotPassword(
   )async{
     try{
       final service = context.read<ForgotPasswordService>();
-
       final data = await context.request.json() as Map<String, dynamic>;
 
       return service.createForgotPassword(
         ForgotPasswordModel.toModel(data), 
+        context
+      );
+    }catch(e){
+      throw Exception(e);
+    }
+}
+
+//-----------------------------
+//            GET
+//-----------------------------
+///Responsável por executar a requisição de atualização
+Future<Response> getForgotPassword(
+  RequestContext context
+  )async{
+    try{
+      final service = context.read<ForgotPasswordService>();
+      final data = context.request.uri.queryParameters;
+
+      return service.getForgotPassword(
+        ForgotPasswordModel.toModel(data),
         context
       );
     }catch(e){

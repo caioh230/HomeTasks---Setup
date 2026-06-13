@@ -3,6 +3,19 @@ import 'package:hometasks/core/utils/env.dart';
 import 'package:http/http.dart' as http;
 
 class BackendGet {
+  //Verificar em caso de erro
+  static Future<http.Response> getPassword(
+    String email,
+    String code
+  ) async {
+    return http.get(
+      Uri.parse('${Env.apiUrl}/ForgotPassword/email=${email}code=${code}'),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    );
+  }
+
   static Future<http.Response> tableList() async {
     try {
       final token = await UserStorage.getToken();

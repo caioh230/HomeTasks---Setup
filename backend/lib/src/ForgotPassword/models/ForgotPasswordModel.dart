@@ -3,7 +3,7 @@ class ForgotPasswordModel{
   ///Modelo base
   ForgotPasswordModel({
     required this.email,
-    required this.code,
+    this.code,
   });
   
   ///Conversão para o model
@@ -27,7 +27,7 @@ class ForgotPasswordModel{
   ///Campo email
   final String email;
   ///Campo code
-  final String code;
+  final String? code;
 
   ///Conversão para Map
   Map<String, dynamic> toMap(){

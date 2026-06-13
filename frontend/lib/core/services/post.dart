@@ -8,6 +8,21 @@ import 'package:hometasks/models/task.dart';
 import 'package:http/http.dart' as http;
 
 class BackendPost {
+  //Verificar em caso de erro
+  static Future<http.Response> getPasswordCode(
+  String email
+  ) async {
+    return http.post(
+      Uri.parse('${Env.apiUrl}/ForgotPassword'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+      }),
+    );
+  }
+
   static Future<http.Response> table({
     required String name,
     required String? description,

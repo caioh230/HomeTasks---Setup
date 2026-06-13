@@ -2,9 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-
-import 'package:dotenv/dotenv.dart';
 
 import 'package:google_cloud_firestore/google_cloud_firestore.dart';
 
@@ -17,8 +14,6 @@ import 'package:mailer/smtp_server/gmail.dart';
 
 import 'package:uuid/uuid.dart';
 
-///Importação de dados sensíveis
-final _env = DotEnv()..load();
 
 ///Responsável pela conexão com o banco remoto
 class ForgotPasswordRepository {
@@ -30,8 +25,9 @@ class ForgotPasswordRepository {
   //-----------------------------
   ///Criação de uma nova instância no banco remoto
   Future<Response> createForgotPassword(
-    ForgotPasswordModel forgotPasswordModel
+    ForgotPasswordModel forgotModel
     ) async {
+      final email = forgotModel.email;
       try {        
         late final bool val;
         try{  
@@ -40,7 +36,7 @@ class ForgotPasswordRepository {
           await pesq.where(
             'email', 
             WhereFilter.equal, 
-            forgotPasswordModel.email
+            email
           ).get();
 
           val = true;
@@ -58,7 +54,7 @@ class ForgotPasswordRepository {
 
           final model = ForgotPasswordModel.toModel(
             {
-              'email': forgotPasswordModel.email,
+              'email': email,
               'code': (100000 + random.nextInt(900000)).toString()
             }
           );
@@ -72,7 +68,7 @@ class ForgotPasswordRepository {
           final message =
               Message()
                 ..from = const Address('caiohchagas92@gmail.com', 'HomeTasks')
-                ..recipients.add(forgotPasswordModel.email)
+                ..recipients.add(email)
                 ..subject = 'Código de recuperação de senha'
                 ..text = 'Olá! Seu código de recuperação de senha é ${model.code}.'
                 ..html = '<h1>Olá!</h1><p>Email enviado pela equipe do Hometasks.</p>';
@@ -107,31 +103,45 @@ class ForgotPasswordRepository {
   //-----------------------------
   //            get - JWT
   //-----------------------------
-  ///Atualizar uma instância no banco remoto
+  ///Obter uma instância no banco remoto
   Future<Response> getForgotPassword(
-    String id,
+    ForgotPasswordModel forgotModel,
     RequestContext context,
     ) async{ 
       try{
-        await ref
-          .doc(id)
-          .get();
+        final instance = await ref
+          .where(
+            'code', 
+            WhereFilter.equal, 
+            forgotModel.code
+          ).get();
 
-        final pesq = firestore.collection('User');
+        if(
+          await _validateUsr(forgotModel.email)
+          &&
+          instance.docs.first.data()['email'] == forgotModel.email
+        ){
+          final pesq = firestore.collection('User');
 
-        //Obtendo de senha do usuário          
-        final user = await pesq.where(
-          'email', 
-          WhereFilter.equal, 
-          await _validateUsr(context)
-        ).get();
+          //Obtendo de senha do usuário          
+          final user = await pesq.where(
+            'email', 
+            WhereFilter.equal, 
+            forgotModel.email
+          ).get();
 
-        final mod = UserDBModel.fromFirestore(user.docs.first);
-        
-        return Response.json(
-          statusCode: HttpStatus.accepted, 
-          body: mod.password,
-        );
+          final mod = UserDBModel.fromFirestore(user.docs.first);
+          
+          return Response.json(
+            statusCode: HttpStatus.accepted, 
+            body: mod.password,
+          );
+        }else{
+          return Response.json(
+            statusCode: HttpStatus.badRequest, 
+            body: 'O código não faz referência ao email passado',
+          );
+        }
       }catch(e){
         throw Exception(e);
       }
@@ -142,23 +152,21 @@ class ForgotPasswordRepository {
 //             RLS
 //-----------------------------
 ///Buscar o id do usuário
-Future<String> _validateUsr(
-  RequestContext context,
+Future<bool> _validateUsr(
+  String email,
 )async{
   try{
-    //Obtenção de dados do usuário
-    final request = context.request;
-    final header = request.headers['authorization'];
-                
-    final jwt = JWT.verify(
-      header!, 
-      SecretKey(_env['jwtSecretKey'].toString())
-    );
+    final pesq = firestore.collection('User');
 
-    final payload = jwt.payload as Map<String, dynamic>;
+    await pesq
+    .where(
+      'email', 
+      WhereFilter.equal, 
+      email
+    ).get();
     
-    return payload['id'].toString();
+    return true;
   }catch(e){
-    return '';
+    return false;
   }
 }

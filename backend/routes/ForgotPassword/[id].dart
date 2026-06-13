@@ -13,7 +13,6 @@ Future<dynamic> onRequest(
     try{
       switch (context.request.method){
         case HttpMethod.get:
-          return getForgotPassword(id, context);
         case HttpMethod.put:
         case HttpMethod.delete:
         case HttpMethod.post:
@@ -21,28 +20,6 @@ Future<dynamic> onRequest(
         case HttpMethod.options:
         case HttpMethod.patch:
       }
-    }catch(e){
-      throw Exception(e);
-    }
-}
-
-//-----------------------------
-//            Update
-//-----------------------------
-///Responsável por executar a requisição de atualização
-Future<Response> getForgotPassword(
-  String id, 
-  RequestContext context
-  )async{
-    try{
-      final service = context.read<ForgotPasswordService>();
-
-      final data = await context.request.json() as Map<String, dynamic>;
-
-      return service.getForgotPassword(
-        id,
-        context
-      );
     }catch(e){
       throw Exception(e);
     }

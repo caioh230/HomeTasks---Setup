@@ -1,14 +1,18 @@
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:hometasks/core/services/account.dart';
+import 'package:hometasks/core/services/get.dart';
+import 'package:hometasks/core/services/post.dart';
 import 'package:hometasks/core/utils/env.dart';
+
 import 'package:hometasks/widgets/basic_button.dart';
 import 'package:hometasks/widgets/input_field.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -107,6 +111,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    //Verificar em caso de erro
+    String _email = '';
+
     return Scaffold(
       backgroundColor: Color(0xFFF2F3FB),
       resizeToAvoidBottomInset: true,
@@ -187,7 +194,133 @@ class _LoginPageState extends State<LoginPage> {
                               isPassword: true,
                               backgroundColor: Color(0xFFF2F3FB),
                               prefixIcon: Icon(Icons.lock_outline),
-                              onForgotPassword: () => Navigator.pushReplacementNamed(context, '/forgot_password'),
+                              //Verificar em caso de erro
+                              onForgotPassword: () async {
+                                bool emailEnviadoComSucesso = false;
+
+                                await showDialog(
+                                  context: context,
+                                  builder: (BuildContext dialogContext) { 
+                                    return AlertDialog(
+                                      title: const Text('Recuperação de senha'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text('Insira o seu email'),
+                                          const SizedBox(height: 20),
+                                          TextField(
+                                            decoration: const InputDecoration(
+                                              labelText: 'E-mail',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (valor) {
+                                              _email = valor;
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        // Botão Sair
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(dialogContext);
+                                          },
+                                          child: const Text('Sair'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            if (_email.isNotEmpty) {
+                                              await BackendPost.getPasswordCode(_email);
+                                              
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('E-mail enviado, verifique seu código'),
+                                                ),
+                                              );
+
+                                              emailEnviadoComSucesso = true;
+                                              Navigator.pop(dialogContext); 
+                                            } else {
+                                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Campo de email vazio, preencha-o antes de enviar'),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: const Text('Confirmar'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                if (emailEnviadoComSucesso) {
+                                  String _codigoVerificacao = '';
+
+                                  await showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext secondDialogContext) {
+                                      return AlertDialog(
+                                        title: const Text('Verificação de Código'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text('Insira o código enviado para o seu e-mail:'),
+                                            const SizedBox(height: 20),
+                                            TextField(
+                                              decoration: const InputDecoration(
+                                                labelText: 'Código de Verificação',
+                                                border: OutlineInputBorder(),
+                                              ),
+                                              onChanged: (valor) {
+                                                _codigoVerificacao = valor;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(secondDialogContext);
+                                            },
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              if (_codigoVerificacao.isNotEmpty) {
+                                                final password = await BackendGet.getPassword(_email, _codigoVerificacao);
+
+                                                if (
+                                                  context.mounted
+                                                  &&
+                                                  password.statusCode == 202
+                                                ) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text('Sua senha é: ${jsonDecode(password.body)}'),
+                                                    ),
+                                                  );
+                                                }else{
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text('Erro ${password.statusCode} na requisição'),
+                                                    ),
+                                                  );
+                                                }
+                                                
+                                                Navigator.pop(secondDialogContext);
+                                              }
+                                            },
+                                            child: const Text('Verificar Código'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              },
                               hintText: "Senha1234*",
                             ),
                             const SizedBox(height: 35),

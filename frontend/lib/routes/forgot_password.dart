@@ -39,6 +39,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const Center(child: CircularProgressIndicator()),
     );
 
+    try{
+      
+    }catch(_){
+
+    }
+
     /*bool success = false;
 
     try {
@@ -133,8 +139,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      //Verificar em caso de erro
                       Text(
-                        'Insira seu e-mail para receber as instruções de recuperação.',
+                        'Insira seu e-mail para receber o código de verificação.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey.shade700,
@@ -166,11 +173,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               prefixIcon: Icon(Icons.mail_outline),
                             ),
                             const SizedBox(height: 35),
+                            //Verificar em caso de erro
                             BasicButton(
                               margin: EdgeInsetsGeometry.zero,
                               padding: EdgeInsetsGeometry.symmetric(vertical: 16),
                               onTap: confirmEmailSend,
-                              text: 'Enviar Link de Recuperação',
+                              text: 'Enviar Código de de Recuperação',
                               suffixIcon: Icon(Icons.send_outlined, color: Colors.white),
                             )
                           ],

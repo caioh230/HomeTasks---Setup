@@ -15,7 +15,7 @@ class ForgotPasswordService {
   //-----------------------------
   /// Requisição de criação de nova instância
   Future<Response> createForgotPassword(
-    ForgotPasswordModel forgotPassword,
+    ForgotPasswordModel forgotModel,
     RequestContext context,
   ) async {
     try {
@@ -25,7 +25,7 @@ class ForgotPasswordService {
 
       final repository = context.read<ForgotPasswordRepository>();
 
-      return repository.createForgotPassword(forgotPassword);
+      return repository.createForgotPassword(forgotModel);
     } catch (e, stackTrace) {
       _log.severe(
         {
@@ -45,26 +45,26 @@ class ForgotPasswordService {
   //-----------------------------
   /// Requisição de atualização de instância
   Future<Response> getForgotPassword(
-    String id,
+    ForgotPasswordModel forgotModel,
     RequestContext context,
   ) async {
     try {
       _log.info({
         'event': 'reset_password_requested',
-        'reset_id': id,
+        'reset_id': forgotModel.code,
       }.toString());
 
       final repository = context.read<ForgotPasswordRepository>();
 
       return repository.getForgotPassword(
-        id,
+        forgotModel,
         context
       );
     } catch (e, stackTrace) {
       _log.severe(
         {
           'event': 'reset_password_failed',
-          'reset_id': id,
+          'reset_id': forgotModel.code,
           'error': e.toString(),
         }.toString(),
         e,
